@@ -1,0 +1,15 @@
+/* ./styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply text-text-primary;
+  @apply dark:text-text-primary-dark;
+
+  font-size: 18px;
+}
+
+a {
+  @apply text-primary-500
+}
