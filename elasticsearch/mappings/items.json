@@ -1,0 +1,48 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "default": {
+          "type": "custom",
+          "tokenizer": "kuromoji_tokenizer"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text",
+        "analyzer": "default"
+      },
+      "description": {
+        "type": "text",
+        "analyzer": "default"
+      },
+      "status": {
+        "type": "long"
+      },
+      "sellingPageUrl": {
+        "type": "keyword"
+      },
+      "price": {
+        "type": "long"
+      },
+      "imageUrls": {
+        "type": "keyword"
+      },
+      "averageRating": {
+        "type": "float"
+      },
+      "reviewCount": {
+        "type": "long"
+      },
+      "platform": {
+        "type": "keyword"
+      }
+    }
+  }
+}
