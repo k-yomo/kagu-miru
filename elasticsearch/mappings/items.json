@@ -2,7 +2,7 @@
   "settings": {
     "analysis": {
       "analyzer": {
-        "default": {
+        "kuromoji_analyzer": {
           "type": "custom",
           "tokenizer": "kuromoji_tokenizer"
         }
@@ -16,11 +16,11 @@
       },
       "name": {
         "type": "text",
-        "analyzer": "default"
+        "analyzer": "kuromoji_analyzer"
       },
       "description": {
         "type": "text",
-        "analyzer": "default"
+        "analyzer": "kuromoji_analyzer"
       },
       "status": {
         "type": "long"
