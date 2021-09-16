@@ -110,6 +110,10 @@ type Item struct {
 	ShipOverseasArea string `json:"shipOverseasArea"`
 }
 
+func (i *Item) ID() string {
+	return fmt.Sprintf("rakuten_%s", i.ItemCode)
+}
+
 type SearchItemParams struct {
 	// Either one of `Keyword`, `ShopCode`, `ItemCode` or `GenreID` must be supplied
 	Keyword  string

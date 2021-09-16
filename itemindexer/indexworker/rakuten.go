@@ -160,7 +160,7 @@ func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*es.Item, error) {
 	}
 
 	return &es.Item{
-		ID:             fmt.Sprintf("rakuten_%s", rakutenItem.ItemCode),
+		ID:             rakutenItem.ID(),
 		Name:           rakutenItem.ItemName,
 		Description:    rakutenItem.ItemCaption,
 		Status:         status,
