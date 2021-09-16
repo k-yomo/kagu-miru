@@ -11,6 +11,7 @@ module.exports = {
                 primary: colors.rose,
                 'text-primary': colors.gray["800"],
                 'text-primary-dark': colors.gray["50"],
+                'rakuten': '#BF0000'
             },
             fontFamily: {
                 sans: [

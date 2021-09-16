@@ -17,6 +17,7 @@ import {
 import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
 import { useRouter } from 'next/router';
+import PlatformBadge from '@src/components/PlatformBadge';
 
 gql`
   query homePageSearchItems($input: SearchItemsInput!) {
@@ -77,12 +78,12 @@ const Home: NextPage = () => {
         refreshPageWithParams();
       }
     },
-    [searchQuery, refreshPageWithParams]
+    [searchQuery]
   );
 
   useEffect(() => {
     refreshPageWithParams();
-  }, [page, sortType, refreshPageWithParams]);
+  }, [page, sortType]);
 
   useEffect(() => {
     const page = parseInt(router.query.page as string) || 1;
@@ -157,7 +158,7 @@ const Home: NextPage = () => {
         </div>
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
-          <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-4 lg:gap-8 text-sm sm:text-md">
+          <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 md:gap-4 lg:gap-8 text-sm sm:text-md">
             {data &&
               data.searchItems.map((item) => (
                 <Link key={item.id} href={item.sellingPageURL}>
@@ -175,7 +176,7 @@ const Home: NextPage = () => {
                         className="w-20 h-20"
                       />
                       <div className="p-2">
-                        <div className="text-xs">{item.platform}</div>
+                        <PlatformBadge platform={item.platform} />
                         <h4 className="my-1 break-all truncate">{item.name}</h4>
                         <span className="font-bold">￥{item.price}</span>
                       </div>
