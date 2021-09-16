@@ -24,8 +24,15 @@ type Item {
     platform: ItemSellingPlatform!
 }
 
+enum SearchItemsSortType {
+    BEST_MATCH
+    SORT_BY_PRICE_ASC
+    SORT_BY_PRICE_DESC
+}
+
 input SearchItemsInput {
     query: String!
+    sortType: SearchItemsSortType!
     page: Int
     pageSize: Int
 }

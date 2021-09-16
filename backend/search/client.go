@@ -28,8 +28,17 @@ func NewSearchClient(itemsIndexName string, esClient *elasticsearch.Client) *Cli
 const DefaultPage uint64 = 1
 const defaultPageSize uint64 = 100
 
+type SortType int
+
+const (
+	SortTypeBestMatch SortType = iota
+	SortTypePriceAsc
+	SortTypePriceDesc
+)
+
 type Request struct {
 	Query    string
+	SortType SortType
 	Page     uint64
 	PageSize *int
 }
@@ -52,7 +61,7 @@ func (p *Client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 	response, err := p.esClient.Search(
 		p.esClient.Search.WithContext(ctx),
 		p.esClient.Search.WithIndex(p.itemsIndexName),
-		p.esClient.Search.WithBody(buildSearchQuery(req.Query, page, pageSize)),
+		p.esClient.Search.WithBody(buildSearchQuery(req.Query, req.SortType, page, pageSize)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)
@@ -91,9 +100,20 @@ func mapResponseToSearchResult(response *esapi.Response) (*Result, error) {
 	return sr, nil
 }
 
-func buildSearchQuery(query string, page, pageSize uint64) io.Reader {
+func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) io.Reader {
+	var sort string
+	switch sortType {
+	case SortTypePriceAsc:
+		sort = `[{ "price" : "asc" }]`
+	case SortTypePriceDesc:
+		sort = `[{ "price" : "desc" }]`
+	default:
+		sort = `[{ "_score" : "desc" }]`
+	}
+
 	var b strings.Builder
 
+	// TODO: refactor query construction
 	b.WriteString(fmt.Sprintf(`{
 	"_source": [
 		"id", 
@@ -114,10 +134,10 @@ func buildSearchQuery(query string, page, pageSize uint64) io.Reader {
 			"fields": ["name^100", "description"]
 		}
 	},
+	"sort": %s,
 	"from": %d,
-	"size": %d,
-	"sort": [{ "_score" : "desc" }, { "_doc" : "asc" }]
-}`, query, page*pageSize, pageSize))
+	"size": %d
+}`, query, sort, page*pageSize, pageSize))
 
 	return strings.NewReader(b.String())
 }

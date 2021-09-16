@@ -14,12 +14,17 @@ import (
 )
 
 func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.SearchItemsInput) ([]*gqlmodell.Item, error) {
+	sortType, err := mapGraphqlSortTypeToSearchSortType(input.SortType)
+	if err != nil {
+		return nil, fmt.Errorf("mapGraphqlSortTypeToSearchSortType: %w", err)
+	}
 	page := search.DefaultPage
 	if input.Page != nil {
 		page = uint64(*input.Page)
 	}
 	searchResponse, err := r.SearchClient.SearchItems(ctx, &search.Request{
 		Query:    input.Query,
+		SortType: sortType,
 		Page:     page,
 		PageSize: input.PageSize,
 	})

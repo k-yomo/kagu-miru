@@ -22,9 +22,10 @@ type Item struct {
 }
 
 type SearchItemsInput struct {
-	Query    string `json:"query"`
-	Page     *int   `json:"page"`
-	PageSize *int   `json:"pageSize"`
+	Query    string              `json:"query"`
+	SortType SearchItemsSortType `json:"sortType"`
+	Page     *int                `json:"page"`
+	PageSize *int                `json:"pageSize"`
 }
 
 type ItemSellingPlatform string
@@ -104,5 +105,48 @@ func (e *ItemStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ItemStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SearchItemsSortType string
+
+const (
+	SearchItemsSortTypeBestMatch       SearchItemsSortType = "BEST_MATCH"
+	SearchItemsSortTypeSortByPriceAsc  SearchItemsSortType = "SORT_BY_PRICE_ASC"
+	SearchItemsSortTypeSortByPriceDesc SearchItemsSortType = "SORT_BY_PRICE_DESC"
+)
+
+var AllSearchItemsSortType = []SearchItemsSortType{
+	SearchItemsSortTypeBestMatch,
+	SearchItemsSortTypeSortByPriceAsc,
+	SearchItemsSortTypeSortByPriceDesc,
+}
+
+func (e SearchItemsSortType) IsValid() bool {
+	switch e {
+	case SearchItemsSortTypeBestMatch, SearchItemsSortTypeSortByPriceAsc, SearchItemsSortTypeSortByPriceDesc:
+		return true
+	}
+	return false
+}
+
+func (e SearchItemsSortType) String() string {
+	return string(e)
+}
+
+func (e *SearchItemsSortType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SearchItemsSortType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SearchItemsSortType", str)
+	}
+	return nil
+}
+
+func (e SearchItemsSortType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

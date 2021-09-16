@@ -3,9 +3,24 @@ package graph
 import (
 	"fmt"
 
+	"github.com/k-yomo/kagu-miru/backend/search"
+
 	"github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/internal/es"
 )
+
+func mapGraphqlSortTypeToSearchSortType(st gqlmodel.SearchItemsSortType) (search.SortType, error) {
+	switch st {
+	case gqlmodel.SearchItemsSortTypeBestMatch:
+		return search.SortTypeBestMatch, nil
+	case gqlmodel.SearchItemsSortTypeSortByPriceAsc:
+		return search.SortTypePriceAsc, nil
+	case gqlmodel.SearchItemsSortTypeSortByPriceDesc:
+		return search.SortTypePriceDesc, nil
+	default:
+		return 0, fmt.Errorf("unknown sort type '%s' is given", st)
+	}
+}
 
 func mapSearchItemsToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
 	gqlItems := make([]*gqlmodel.Item, 0, len(items))

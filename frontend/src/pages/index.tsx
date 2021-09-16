@@ -10,7 +10,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import gql from 'graphql-tag';
 import { SearchIcon } from '@heroicons/react/solid';
-import { useHomePageSearchItemsLazyQuery } from '@src/generated/graphql';
+import {
+  SearchItemsSortType,
+  useHomePageSearchItemsLazyQuery,
+} from '@src/generated/graphql';
 import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
 import { useRouter } from 'next/router';
@@ -35,12 +38,30 @@ gql`
 const Home: NextPage = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortType, setSortType] = useState(SearchItemsSortType.BestMatch);
   const [page, setPage] = useState<number>(1);
   const [searchItems, { data, loading, error }] =
     useHomePageSearchItemsLazyQuery({
       fetchPolicy: 'no-cache',
       nextFetchPolicy: 'no-cache',
     });
+
+  const refreshPageWithParams = () => {
+    router.push(
+      `${router.pathname}?q=${searchQuery}&sort=${sortType}&page=${page}`,
+      undefined,
+      {
+        shallow: true,
+      }
+    );
+  };
+
+  const onChangeSortBy = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      setSortType(e.target.value as SearchItemsSortType);
+    },
+    [setSortType]
+  );
 
   const onChangeSearchInput = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -56,26 +77,33 @@ const Home: NextPage = () => {
         refreshPageWithParams();
       }
     },
-    [searchQuery]
+    [searchQuery, refreshPageWithParams]
   );
 
-  const refreshPageWithParams = () => {
-    router.push(`${router.pathname}?q=${searchQuery}&page=${page}`, undefined, {
-      shallow: true,
-    });
-  };
+  useEffect(() => {
+    refreshPageWithParams();
+  }, [page, sortType, refreshPageWithParams]);
 
   useEffect(() => {
     const page = parseInt(router.query.page as string) || 1;
+    const sortType =
+      (router.query.sort as SearchItemsSortType) ||
+      SearchItemsSortType.BestMatch;
     setPage(page);
     if (router.query.q) {
       const query = router.query.q as string;
       setSearchQuery(query);
       searchItems({
-        variables: { input: { query, page } },
+        variables: {
+          input: {
+            query,
+            sortType,
+            page,
+          },
+        },
       });
     }
-  }, [router.query.q]);
+  }, [router.query]);
 
   return (
     <div className="max-w-[1200px] mx-auto">
@@ -87,14 +115,14 @@ const Home: NextPage = () => {
       />
       <div className="m-4">
         <h1 className="text-2xl text-black dark:text-white">商品検索</h1>
-        <div className="my-4 max-w-xl w-full lg:max-w-lg">
-          <div className="relative text-gray-400 focus-within:text-gray-600">
+        <div className="flex flex-col sm:flex-row items-end justify-between gap-2 my-4 w-full">
+          <div className="relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400  focus-within:text-gray-600">
             <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
               <SearchIcon className="h-5 w-5" aria-hidden="true" />
             </div>
             <input
               id="search"
-              className="appearance-none lock w-full bg-white py-3 pl-10 pr-3 dark:bg-gray-800 border border-gray-700 rounded-sm leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
+              className="appearance-none lock w-full bg-white py-3 pl-10 pr-3 dark:bg-gray-800 border border-gray-700 rounded-md leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
               placeholder="Search"
               type="search"
               name="search"
@@ -102,6 +130,29 @@ const Home: NextPage = () => {
               onChange={onChangeSearchInput}
               onKeyPress={onSearchKeyPress}
             />
+          </div>
+          <div>
+            <label
+              htmlFor="location"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              並び替え
+            </label>
+            <select
+              id="location"
+              name="location"
+              className="mt-1 block w-full pl-3 pr-10 py-2 rounded-md text-base border border-gray-700 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
+              value={sortType}
+              onChange={onChangeSortBy}
+            >
+              <option value={SearchItemsSortType.BestMatch}>関連度順</option>
+              <option value={SearchItemsSortType.SortByPriceAsc}>
+                価格の安い順
+              </option>
+              <option value={SearchItemsSortType.SortByPriceDesc}>
+                価格の高い順
+              </option>
+            </select>
           </div>
         </div>
         {loading ? <Loading /> : <></>}

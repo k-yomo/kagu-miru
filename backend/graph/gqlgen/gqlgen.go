@@ -237,8 +237,15 @@ type Item {
     platform: ItemSellingPlatform!
 }
 
+enum SearchItemsSortType {
+    BEST_MATCH
+    SORT_BY_PRICE_ASC
+    SORT_BY_PRICE_DESC
+}
+
 input SearchItemsInput {
     query: String!
+    sortType: SearchItemsSortType!
     page: Int
     pageSize: Int
 }
@@ -1920,6 +1927,14 @@ func (ec *executionContext) unmarshalInputSearchItemsInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "sortType":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortType"))
+			it.SortType, err = ec.unmarshalNSearchItemsSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchItemsSortType(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "page":
 			var err error
 
@@ -2447,6 +2462,16 @@ func (ec *executionContext) unmarshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkagu�
 }
 
 func (ec *executionContext) marshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemStatus(ctx context.Context, sel ast.SelectionSet, v gqlmodel.ItemStatus) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNSearchItemsSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchItemsSortType(ctx context.Context, v interface{}) (gqlmodel.SearchItemsSortType, error) {
+	var res gqlmodel.SearchItemsSortType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNSearchItemsSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchItemsSortType(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchItemsSortType) graphql.Marshaler {
 	return v
 }
 

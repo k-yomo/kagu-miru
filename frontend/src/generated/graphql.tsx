@@ -54,7 +54,14 @@ export type SearchItemsInput = {
   page?: Maybe<Scalars['Int']>;
   pageSize?: Maybe<Scalars['Int']>;
   query: Scalars['String'];
+  sortType: SearchItemsSortType;
 };
+
+export enum SearchItemsSortType {
+  BestMatch = 'BEST_MATCH',
+  SortByPriceAsc = 'SORT_BY_PRICE_ASC',
+  SortByPriceDesc = 'SORT_BY_PRICE_DESC',
+}
 
 export type HomePageSearchItemsQueryVariables = Exact<{
   input: SearchItemsInput;
