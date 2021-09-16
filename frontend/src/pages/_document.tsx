@@ -19,8 +19,6 @@ export default class MyDocument extends Document {
     return (
       <Html lang="ja">
         <Head>
-          {/* TODO: Remove when launch */}
-          <meta name="robots" content="noindex,nofollow,noarchive" />
           <link rel="icon" href="/favicon.ico" />
           {GA_ID && (
             <>
