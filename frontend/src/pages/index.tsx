@@ -12,7 +12,7 @@ import gql from 'graphql-tag';
 import { SearchIcon } from '@heroicons/react/solid';
 import { useHomePageSearchItemsLazyQuery } from '@src/generated/graphql';
 import SEOMeta from '@src/components/SEOMeta';
-import PageLoading from '@src/components/PageLoading';
+import Loading from '@src/components/Loading';
 import { useRouter } from 'next/router';
 
 gql`
@@ -78,7 +78,7 @@ const Home: NextPage = () => {
   }, [router.query.q]);
 
   return (
-    <div>
+    <div className="max-w-[1200px] mx-auto">
       <SEOMeta
         title="カグミル - 家具検索サービス"
         excludeSiteTitle
@@ -94,7 +94,7 @@ const Home: NextPage = () => {
             </div>
             <input
               id="search"
-              className="block w-full bg-white py-3 pl-10 pr-3 dark:bg-gray-800 border border-gray-700 rounded-sm leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
+              className="appearance-none lock w-full bg-white py-3 pl-10 pr-3 dark:bg-gray-800 border border-gray-700 rounded-sm leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
               placeholder="Search"
               type="search"
               name="search"
@@ -104,14 +104,14 @@ const Home: NextPage = () => {
             />
           </div>
         </div>
-        {loading ? <PageLoading /> : <></>}
-        <div className="flex flex-col items-center sm:m-6">
-          <div className="relative grid grid-cols-3 md:grid-cols-6 gap-8 px-3 w-full">
+        {loading ? <Loading /> : <></>}
+        <div className="flex flex-col items-center">
+          <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-4 lg:gap-8 text-sm sm:text-md">
             {data &&
               data.searchItems.map((item) => (
                 <Link key={item.id} href={item.sellingPageURL}>
                   <a>
-                    <div className="rounded-sm shadow">
+                    <div className="rounded-md sm:shadow">
                       <Image
                         src={
                           item.imageUrls[0] || 'https://via.placeholder.com/300'
@@ -124,9 +124,9 @@ const Home: NextPage = () => {
                         className="w-20 h-20"
                       />
                       <div className="p-2">
-                        <h4 className="truncate">{item.name}</h4>
-                        <span>￥{item.price}</span>
-                        <span>{item.platform}</span>
+                        <div className="text-xs">{item.platform}</div>
+                        <h4 className="my-1 break-all truncate">{item.name}</h4>
+                        <span className="font-bold">￥{item.price}</span>
                       </div>
                     </div>
                   </a>
