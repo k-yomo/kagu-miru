@@ -19,7 +19,7 @@ const link = ApolloLink.from([
     credentials: 'include',
     fetch,
     headers: {
-      'X-Requested-By': 'ichi-in-frontend', // for CSRF validation
+      'X-Requested-By': 'kagu-miru-frontend', // for CSRF validation
     },
 
   }),
