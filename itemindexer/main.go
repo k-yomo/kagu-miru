@@ -30,7 +30,7 @@ func main() {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}
 
-	indexer := index.NewItemIndexer("items", esClient)
+	indexer := index.NewItemIndexer(cfg.ItemsIndexName, esClient)
 	rakutenIchibaClient := rakuten.NewIchibaClient(cfg.RakutenApplicationID)
 	rakutenItemWorker := indexworker.NewRakutenItemIndexWorker(indexer, rakutenIchibaClient, logger)
 

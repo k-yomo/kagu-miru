@@ -44,7 +44,7 @@ type Genre struct {
 type SearchGenreResponse struct {
 	Parents  []*Genre `json:"parents"`
 	Current  *Genre   `json:"current"`
-	Children []struct{
+	Children []struct {
 		Child *Genre `json:"child"`
 	} `json:"children"`
 }
@@ -55,7 +55,7 @@ func (i *IchibaClient) SearchGenre(ctx context.Context, genreID string) (*Search
 	u := urlutil.CopyWithQueries(i.ichibaGenreAPIBaseURL, i.buildParams(map[string]string{"genreId": genreID}))
 	var resp SearchGenreResponse
 	if err := getAndUnmarshal(ctx, i.httpClient, u, &resp); err != nil {
-		return nil, fmt.Errorf("getAndUnmarshal, err: %w", err)
+		return nil, fmt.Errorf("getAndUnmarshal: %w", err)
 	}
 	return &resp, nil
 }
@@ -64,18 +64,18 @@ const SearchItemCountPerPage = 30
 const SearchItemPageLimit = 100
 
 type Item struct {
-	ItemName        string   `json:"itemName"`
-	Catchcopy       string   `json:"catchcopy"`
-	ItemCaption     string   `json:"itemCaption"`
-	ItemPrice       int      `json:"itemPrice"`
-	PointRate       float64  `json:"pointRate"`
-	ItemCode        string   `json:"itemCode"`
-	ItemURL         string   `json:"itemUrl"`
-	AffiliateRate   int      `json:"affiliateRate"`
-	AffiliateUrl    string   `json:"affiliateUrl"`
-	Availability    int      `json:"availability"`
-	GenreID         string   `json:"genreId"`
-	TagIDs          []int `json:"tagIds"`
+	ItemName        string  `json:"itemName"`
+	Catchcopy       string  `json:"catchcopy"`
+	ItemCaption     string  `json:"itemCaption"`
+	ItemPrice       int     `json:"itemPrice"`
+	PointRate       float64 `json:"pointRate"`
+	ItemCode        string  `json:"itemCode"`
+	ItemURL         string  `json:"itemUrl"`
+	AffiliateRate   int     `json:"affiliateRate"`
+	AffiliateUrl    string  `json:"affiliateUrl"`
+	Availability    int     `json:"availability"`
+	GenreID         string  `json:"genreId"`
+	TagIDs          []int   `json:"tagIds"`
 	MediumImageURLs []struct {
 		ImageURL string `json:"imageUrl"`
 	} `json:"mediumImageUrls"`
@@ -137,16 +137,16 @@ type SearchItemSortType string
 
 const (
 	SearchItemSortTypeStandard          SearchItemSortType = "standard"
-	SearchItemSortTypeAffiliateRateAsc                     = "+affiliateRate"
-	SearchItemSortTypeAffiliateRateDesc                    = "-affiliateRate"
-	SearchItemSortTypeReviewCountAsc                       = "+reviewCount"
-	SearchItemSortTypeReviewCountDesc                      = "-reviewCount"
-	SearchItemSortTypeReviewAverageAsc                     = "+reviewAverage"
-	SearchItemSortTypeReviewAverageDesc                    = "-reviewAverage"
-	SearchItemSortTypeItemPriceAsc                         = "+itemPrice"
-	SearchItemSortTypeItemPriceDesc                        = "-itemPrice"
-	SearchItemSortTypeUpdateTimeAsc                        = "+updateTime"
-	SearchItemSortTypeUpdateTimeDesc                       = "-updateTime"
+	SearchItemSortTypeAffiliateRateAsc  SearchItemSortType = "+affiliateRate"
+	SearchItemSortTypeAffiliateRateDesc SearchItemSortType = "-affiliateRate"
+	SearchItemSortTypeReviewCountAsc    SearchItemSortType = "+reviewCount"
+	SearchItemSortTypeReviewCountDesc   SearchItemSortType = "-reviewCount"
+	SearchItemSortTypeReviewAverageAsc  SearchItemSortType = "+reviewAverage"
+	SearchItemSortTypeReviewAverageDesc SearchItemSortType = "-reviewAverage"
+	SearchItemSortTypeItemPriceAsc      SearchItemSortType = "+itemPrice"
+	SearchItemSortTypeItemPriceDesc     SearchItemSortType = "-itemPrice"
+	SearchItemSortTypeUpdateTimeAsc     SearchItemSortType = "+updateTime"
+	SearchItemSortTypeUpdateTimeDesc    SearchItemSortType = "-updateTime"
 )
 
 // SearchItem searches items
@@ -188,7 +188,7 @@ func (i *IchibaClient) SearchItem(ctx context.Context, params *SearchItemParams)
 	u := urlutil.CopyWithQueries(i.ichibaItemAPIBaseURL, i.buildParams(reqParams))
 	var resp SearchItemResponse
 	if err := getAndUnmarshal(ctx, i.httpClient, u, &resp); err != nil {
-		return nil, fmt.Errorf("getAndUnmarshal, err: %w", err)
+		return nil, fmt.Errorf("getAndUnmarshal: %w", err)
 	}
 	return &resp, nil
 }

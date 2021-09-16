@@ -3,9 +3,11 @@ package config
 import "github.com/kelseyhightower/envconfig"
 
 type Config struct {
-	RakutenApplicationID string `envconfig:"RAKUTEN_APPLICATION_ID" required:"true"`
-	RakutenStartGenreID  int    `envconfig:"RAKUTEN_START_GENRE_ID" default:"0"`
-	RakutenMinPrice      int    `envconfig:"RAKUTEN_MIN_PRICE" default:"0"`
+	ItemsIndexName       string `default:"items" envconfig:"ITEMS_INDEX_NAME"`
+
+	RakutenApplicationID string `required:"true" envconfig:"RAKUTEN_APPLICATION_ID"`
+	RakutenStartGenreID  int    `default:"0" envconfig:"RAKUTEN_START_GENRE_ID"`
+	RakutenMinPrice      int    `default:"0" envconfig:"RAKUTEN_MIN_PRICE"`
 }
 
 func NewConfig() (*Config, error) {

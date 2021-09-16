@@ -1,0 +1,31 @@
+type Query {
+    searchItems(input: SearchItemsInput): [Item!]!
+}
+
+enum ItemStatus {
+    ACTIVE
+    INACTIVE
+}
+
+enum ItemSellingPlatform {
+    RAKUTEN
+}
+
+type Item {
+    id: ID!
+    name: String!
+    description: String!
+    status: ItemStatus!
+    sellingPageURL: String!
+    price: Int!
+    imageUrls: [String!]!
+    averageRating: Float!
+    reviewCount: Int!
+    platform: ItemSellingPlatform!
+}
+
+input SearchItemsInput {
+    query: String!
+    page: Int
+    pageSize: Int
+}

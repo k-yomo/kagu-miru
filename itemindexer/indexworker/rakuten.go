@@ -3,6 +3,7 @@ package indexworker
 import (
 	"context"
 	"fmt"
+	"github.com/k-yomo/kagu-miru/internal/es"
 	"github.com/k-yomo/kagu-miru/itemindexer/index"
 	"github.com/k-yomo/kagu-miru/pkg/rakuten"
 	"go.uber.org/zap"
@@ -33,7 +34,7 @@ type RakutenWorkerOption struct {
 func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) error {
 	furnitureGenreIDs, err := r.getFurnitureGenreIDs(ctx)
 	if err != nil {
-		return fmt.Errorf("getFurnitureGenreIDs, err: %w", err)
+		return fmt.Errorf("getFurnitureGenreIDs: %w", err)
 	}
 	sort.Slice(furnitureGenreIDs, func(i, j int) bool {
 		return furnitureGenreIDs[i] < furnitureGenreIDs[j]
@@ -60,7 +61,7 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 			return ctx.Err()
 		default:
 			if err := rateLimiter.Wait(ctx); err != nil {
-				return fmt.Errorf("rateLimiter.Wait, err: %w", err)
+				return fmt.Errorf("rateLimiter.Wait: %w", err)
 			}
 
 			genreID := furnitureGenreIDs[curGenreIdx]
@@ -71,7 +72,7 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 				SortType: rakuten.SearchItemSortTypeItemPriceAsc,
 			})
 			if err != nil {
-				return fmt.Errorf("rakutenIchibaAPIClient.SearchItem, err: %w", err)
+				return fmt.Errorf("rakutenIchibaAPIClient.SearchItem: %w", err)
 			}
 
 			// when finished to get all items in the genre
@@ -91,11 +92,11 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 				}
 				items, err := mapRakutenItemsToIndexItems(rakutenItems)
 				if err != nil {
-					return fmt.Errorf("mapRakutenItemsToIndexItems, err: %w", err)
+					return fmt.Errorf("mapRakutenItemsToIndexItems: %w", err)
 				}
 
 				if err := r.itemIndexer.BulkIndex(ctx, items); err != nil {
-					return fmt.Errorf("itemIndexer.BulkIndex, err: %w", err)
+					return fmt.Errorf("itemIndexer.BulkIndex: %w", err)
 				}
 
 				r.logger.Info(fmt.Sprintf(
@@ -120,7 +121,7 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 func (r *RakutenWorker) getFurnitureGenreIDs(ctx context.Context) ([]int, error) {
 	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakuten.GenreFurnitureID)
 	if err != nil {
-		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre, err: %w", err)
+		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
 	}
 	genreIDs := make([]int, 0, len(furnitureGenre.Children))
 	for _, genre := range furnitureGenre.Children {
@@ -129,8 +130,8 @@ func (r *RakutenWorker) getFurnitureGenreIDs(ctx context.Context) ([]int, error)
 	return genreIDs, nil
 }
 
-func mapRakutenItemsToIndexItems(rakutenItems []*rakuten.Item) ([]*index.Item, error) {
-	items := make([]*index.Item, 0, len(rakutenItems))
+func mapRakutenItemsToIndexItems(rakutenItems []*rakuten.Item) ([]*es.Item, error) {
+	items := make([]*es.Item, 0, len(rakutenItems))
 	for _, rakutenItem := range rakutenItems {
 		item, err := mapRakutenItemToIndexItem(rakutenItem)
 		if err != nil {
@@ -141,13 +142,13 @@ func mapRakutenItemsToIndexItems(rakutenItems []*rakuten.Item) ([]*index.Item, e
 	return items, nil
 }
 
-func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*index.Item, error) {
-	var status index.Status
+func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*es.Item, error) {
+	var status es.Status
 	switch rakutenItem.Availability {
 	case 0:
-		status = index.StatusInactive
+		status = es.StatusInactive
 	case 1:
-		status = index.StatusActive
+		status = es.StatusActive
 	default:
 		return nil, fmt.Errorf("unknown status %d, item: %v", rakutenItem.Availability, rakutenItem)
 	}
@@ -157,7 +158,7 @@ func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*index.Item, error) {
 		imageURLs = append(imageURLs, mediumImage.ImageURL)
 	}
 
-	return &index.Item{
+	return &es.Item{
 		ID:             fmt.Sprintf("rakuten_%s", rakutenItem.ItemCode),
 		Name:           rakutenItem.ItemName,
 		Description:    rakutenItem.ItemCaption,
@@ -167,6 +168,6 @@ func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*index.Item, error) {
 		ImageURLs:      imageURLs,
 		AverageRating:  rakutenItem.ReviewAverage,
 		ReviewCount:    rakutenItem.ReviewCount,
-		Platform:       index.PlatformRakuten,
+		Platform:       es.PlatformRakuten,
 	}, nil
 }

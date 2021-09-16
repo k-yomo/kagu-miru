@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/elastic/go-elasticsearch"
+	"github.com/k-yomo/kagu-miru/internal/es"
 	"io/ioutil"
 )
 
@@ -21,56 +22,43 @@ func NewItemIndexer(indexName string, esClient *elasticsearch.Client) *ItemIndex
 	}
 }
 
-func (i *ItemIndexer) Index(ctx context.Context, item *Item) error {
-	params := indexParams{Index: &index{Index: i.indexName, ID: item.ID}}
-	postIndexByte, err := json.Marshal(&params)
-	if err != nil {
-		return fmt.Errorf("json.Marshal failed, param: %v,  err: %w", params, err)
-	}
-
-	response, err := i.esClient.Index(i.indexName, bytes.NewReader(postIndexByte), i.esClient.Index.WithContext(ctx))
-	if err != nil {
-		return fmt.Errorf("esClient.Index failed, err: %w", err)
-	}
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return fmt.Errorf("read body failed, err: %w", err)
-	}
-	if response.StatusCode >= 400 {
-		return fmt.Errorf("index failed, body: %v, err: %w", body, err)
-	}
-
-	return nil
+type indexParams struct {
+	Index *indexParamsIndex `json:"index"`
 }
 
-func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*Item) error {
+type indexParamsIndex struct {
+	Index string `json:"_index"`
+	ID    string `json:"_id"`
+}
+
+func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*es.Item) error {
 	var bulkIndexParamsByte []byte
 	for _, item := range items {
-		params := indexParams{Index: &index{Index: i.indexName, ID: item.ID}}
+		params := &indexParams{Index: &indexParamsIndex{Index: i.indexName, ID: item.ID}}
 		paramsJSON, err := json.Marshal(params)
 		if err != nil {
 			return fmt.Errorf("json.Marshal failed, param: %v,  err: %w", params, err)
 		}
-		postByte, err := json.Marshal(item)
+		itemJSON, err := json.Marshal(item)
 		if err != nil {
 			return err
 		}
 		bulkIndexParamsByte = append(bulkIndexParamsByte, paramsJSON...)
 		bulkIndexParamsByte = append(bulkIndexParamsByte, []byte("\n")...)
-		bulkIndexParamsByte = append(bulkIndexParamsByte, postByte...)
+		bulkIndexParamsByte = append(bulkIndexParamsByte, itemJSON...)
 		bulkIndexParamsByte = append(bulkIndexParamsByte, []byte("\n")...)
 	}
 
 	response, err := i.esClient.Bulk(bytes.NewReader(bulkIndexParamsByte), i.esClient.Bulk.WithContext(ctx))
 	if err != nil {
-		return fmt.Errorf("esClient.Bulk failed, err: %w", err)
+		return fmt.Errorf("esClient.Bulk failed: %w", err)
 	}
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return fmt.Errorf("read body failed, err: %w", err)
+		return fmt.Errorf("read body failed: %w", err)
 	}
 	if response.StatusCode >= 400 {
-		return fmt.Errorf("bulk index failed, body: %s, err: %w", body, err)
+		return fmt.Errorf("bulk index failed, body: %s: %w", body, err)
 	}
 
 	return nil
