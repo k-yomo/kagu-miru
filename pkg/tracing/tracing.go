@@ -8,8 +8,8 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-func InitTracer() (error, func(ctx context.Context) error) {
-	exporter, err := texporter.New()
+func InitTracer(gcpProjectID string) (error, func(ctx context.Context) error) {
+	exporter, err := texporter.New(texporter.WithProjectID(gcpProjectID))
 	if err != nil {
 		return err, nil
 	}

@@ -44,7 +44,7 @@ func main() {
 	defer cancel()
 
 	if cfg.Env.IsDeployed() {
-		err, shutdown := tracing.InitTracer()
+		err, shutdown := tracing.InitTracer(cfg.GCPProjectID)
 		if err != nil {
 			logger.Error("set trace provider failed", zap.Error(err))
 		} else {
@@ -79,7 +79,10 @@ func main() {
 	r := newBaseRouter(cfg, logger)
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/query", gqlServer)
-	httpServer := &http.Server{Addr: fmt.Sprintf(":%d", cfg.Port), Handler: r}
+	httpServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.Port),
+		Handler: otelhttp.NewHandler(r, "server"),
+	}
 
 	go func() {
 		logger.Info(fmt.Sprintf("server listening on port: %d", cfg.Port))
