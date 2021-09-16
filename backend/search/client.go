@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"go.opentelemetry.io/otel"
+
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/pkg/errors"
@@ -50,6 +52,9 @@ type Response struct {
 }
 
 func (p *Client) SearchItems(ctx context.Context, req *Request) (*Response, error) {
+	ctx, span := otel.Tracer("search").Start(ctx, "search.Client_SearchItems")
+	defer span.End()
+
 	var page uint64
 	if req.Page > 1 {
 		page = req.Page - 1 // page starts from 0 in elasticsearch

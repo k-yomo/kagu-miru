@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/blendle/zapdriver"
@@ -41,6 +43,8 @@ func main() {
 		Addresses: []string{cfg.ElasticSearchURL},
 		Username:  cfg.ElasticSearchUsername,
 		Password:  cfg.ElasticSearchPassword,
+
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
 	})
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
