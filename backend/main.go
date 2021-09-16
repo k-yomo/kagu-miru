@@ -61,7 +61,9 @@ func main() {
 		Username:  cfg.ElasticSearchUsername,
 		Password:  cfg.ElasticSearchPassword,
 
-		Transport: otelhttp.NewTransport(http.DefaultTransport),
+		Transport: otelhttp.NewTransport(http.DefaultTransport, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+			return fmt.Sprintf("Elasticsearch%s", r.URL.EscapedPath())
+		})),
 	})
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
