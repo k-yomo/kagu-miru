@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"cloud.google.com/go/profiler"
+
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -36,6 +38,22 @@ func main() {
 	logger, err := logging.NewLogger(!cfg.Env.IsDeployed())
 	if err != nil {
 		panic(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if cfg.Env.IsDeployed() {
+		err, shutdown := tracing.InitTracer()
+		if err != nil {
+			logger.Error("set trace provider failed", zap.Error(err))
+		} else {
+			defer shutdown(ctx)
+		}
+
+		if err := profiler.Start(profiler.Config{}); err != nil {
+			logger.Error("start profiler failed", zap.Error(err))
+		}
 	}
 
 	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
@@ -70,8 +88,6 @@ func main() {
 	signal.Notify(sigCh, syscall.SIGTERM, os.Interrupt)
 	logger.Info("Signal received, shutting down gracefully...", zap.Any("signal", <-sigCh))
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 	if err := httpServer.Shutdown(ctx); err != nil {
 		logger.Error("graceful shutdown failed", zap.Error(err))
 	}
