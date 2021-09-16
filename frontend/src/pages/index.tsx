@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  memo,
 } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
@@ -11,6 +12,7 @@ import Image from 'next/image';
 import gql from 'graphql-tag';
 import { SearchIcon } from '@heroicons/react/solid';
 import {
+  HomePageSearchItemsQuery,
   SearchItemsSortType,
   useHomePageSearchItemsLazyQuery,
 } from '@src/generated/graphql';
@@ -159,38 +161,52 @@ const Home: NextPage = () => {
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
-            {data &&
-              data.searchItems.map((item) => (
-                <Link key={item.id} href={item.sellingPageURL}>
-                  <a>
-                    <div className="rounded-md sm:shadow">
-                      <Image
-                        src={
-                          item.imageUrls[0] || 'https://via.placeholder.com/300'
-                        }
-                        alt={item.name}
-                        width={300}
-                        height={300}
-                        layout="responsive"
-                        objectFit="cover"
-                        className="w-20 h-20"
-                      />
-                      <div className="py-0.5 sm:p-2">
-                        <PlatformBadge platform={item.platform} />
-                        <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
-                          {item.name}
-                        </h4>
-                        <div className="font-bold">￥{item.price}</div>
-                      </div>
-                    </div>
-                  </a>
-                </Link>
-              ))}
+            {data && <ItemList items={data.searchItems} loading={loading} />}
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+interface ItemListProps {
+  items: HomePageSearchItemsQuery['searchItems'];
+  loading: boolean;
+}
+
+const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
+  if (loading) {
+    return <Loading />;
+  }
+
+  return (
+    <>
+      {items.map((item) => (
+        <Link key={item.id} href={item.sellingPageURL}>
+          <a>
+            <div className="rounded-md sm:shadow">
+              <Image
+                src={item.imageUrls[0] || 'https://via.placeholder.com/300'}
+                alt={item.name}
+                width={300}
+                height={300}
+                layout="responsive"
+                objectFit="cover"
+                className="w-20 h-20"
+              />
+              <div className="py-0.5 sm:p-2">
+                <PlatformBadge platform={item.platform} />
+                <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
+                  {item.name}
+                </h4>
+                <div className="font-bold">￥{item.price}</div>
+              </div>
+            </div>
+          </a>
+        </Link>
+      ))}
+    </>
+  );
+});
 
 export default Home;
