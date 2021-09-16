@@ -2,6 +2,7 @@ package graph
 
 import (
 	"fmt"
+
 	"github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/internal/es"
 )

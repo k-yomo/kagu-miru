@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { ThemeProvider } from 'next-themes';
-import { ApolloProvider } from "@apollo/client"
+import { ApolloProvider } from '@apollo/client';
 import { usePageView } from '@src/lib/googleAnalytics';
 import apolloClient from '@src/lib/apolloClient';
 import Header from '@src/components/Header';

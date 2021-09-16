@@ -5,9 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/internal/es"
-	"io/ioutil"
 )
 
 type ItemIndexer struct {

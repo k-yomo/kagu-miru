@@ -23,8 +23,8 @@ type Config struct {
 
 	ElasticSearchUsername string `envconfig:"ELASTICSEARCH_USERNAME"`
 	ElasticSearchPassword string `envconfig:"ELASTICSEARCH_PASSWORD"`
-	ElasticSearchURL string `default:"http://localhost:9200" envconfig:"ELASTICSEARCH_URL"`
-	ItemsIndexName string `default:"items" envconfig:"ITEMS_INDEX_NAME"`
+	ElasticSearchURL      string `default:"http://localhost:9200" envconfig:"ELASTICSEARCH_URL"`
+	ItemsIndexName        string `default:"items" envconfig:"ITEMS_INDEX_NAME"`
 }
 
 func NewConfig() (*Config, error) {

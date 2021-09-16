@@ -2,6 +2,7 @@ package logging
 
 import (
 	"context"
+
 	"github.com/blendle/zapdriver"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"go.uber.org/zap"
@@ -32,4 +33,3 @@ func Logger(ctx context.Context) *zap.Logger {
 func AddFields(ctx context.Context, fields ...zap.Field) {
 	ctxzap.AddFields(ctx, fields...)
 }
-

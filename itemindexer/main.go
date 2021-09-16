@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/blendle/zapdriver"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/itemindexer/config"
@@ -9,9 +13,6 @@ import (
 	"github.com/k-yomo/kagu-miru/itemindexer/indexworker"
 	"github.com/k-yomo/kagu-miru/pkg/rakuten"
 	"go.uber.org/zap"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func main() {
@@ -27,8 +28,8 @@ func main() {
 
 	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: []string{cfg.ElasticSearchURL},
-		Username: cfg.ElasticSearchUsername,
-		Password: cfg.ElasticSearchPassword,
+		Username:  cfg.ElasticSearchUsername,
+		Password:  cfg.ElasticSearchPassword,
 	})
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))

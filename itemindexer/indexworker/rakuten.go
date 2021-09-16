@@ -3,12 +3,13 @@ package indexworker
 import (
 	"context"
 	"fmt"
+	"sort"
+
 	"github.com/k-yomo/kagu-miru/internal/es"
 	"github.com/k-yomo/kagu-miru/itemindexer/index"
 	"github.com/k-yomo/kagu-miru/pkg/rakuten"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
-	"sort"
 )
 
 type RakutenWorker struct {

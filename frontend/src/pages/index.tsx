@@ -1,68 +1,81 @@
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useState } from "react"
-import type { NextPage } from 'next'
-import Link from 'next/link'
-import Image from 'next/image'
-import gql from "graphql-tag"
-import { SearchIcon } from '@heroicons/react/solid'
-import { useHomePageSearchItemsLazyQuery } from "@src/generated/graphql"
-import SEOMeta from '@src/components/SEOMeta'
-import PageLoading from "@src/components/PageLoading"
-import { useRouter } from "next/router"
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import type { NextPage } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import gql from 'graphql-tag';
+import { SearchIcon } from '@heroicons/react/solid';
+import { useHomePageSearchItemsLazyQuery } from '@src/generated/graphql';
+import SEOMeta from '@src/components/SEOMeta';
+import PageLoading from '@src/components/PageLoading';
+import { useRouter } from 'next/router';
 
 gql`
-    query homePageSearchItems($input: SearchItemsInput!) {
-        searchItems(input: $input) {
-            id
-            name
-            description
-            status
-            sellingPageURL
-            price
-            imageUrls
-            averageRating
-            reviewCount
-            platform
-        }
+  query homePageSearchItems($input: SearchItemsInput!) {
+    searchItems(input: $input) {
+      id
+      name
+      description
+      status
+      sellingPageURL
+      price
+      imageUrls
+      averageRating
+      reviewCount
+      platform
     }
-`
+  }
+`;
 
 const Home: NextPage = () => {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState<number>(1);
-  const [searchItems, { data, loading, error }] = useHomePageSearchItemsLazyQuery({
-    fetchPolicy: 'no-cache',
-    nextFetchPolicy: 'no-cache',
-  })
+  const [searchItems, { data, loading, error }] =
+    useHomePageSearchItemsLazyQuery({
+      fetchPolicy: 'no-cache',
+      nextFetchPolicy: 'no-cache',
+    });
 
-  const onChangeSearchInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value.trim())
-  }, [setSearchQuery])
+  const onChangeSearchInput = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(e.target.value.trim());
+    },
+    [setSearchQuery]
+  );
 
-  const onSearchKeyPress = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key == 'Enter') {
-      e.preventDefault()
-      refreshPageWithParams()
-    }
-  }, [searchQuery])
+  const onSearchKeyPress = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key == 'Enter') {
+        e.preventDefault();
+        refreshPageWithParams();
+      }
+    },
+    [searchQuery]
+  );
 
   const refreshPageWithParams = () => {
-    router.push(`${router.pathname}?q=${searchQuery}&page=${page}`, undefined, { shallow: true });
-  }
+    router.push(`${router.pathname}?q=${searchQuery}&page=${page}`, undefined, {
+      shallow: true,
+    });
+  };
 
   useEffect(() => {
     const page = parseInt(router.query.page as string) || 1;
-    setPage(page)
+    setPage(page);
     if (router.query.q) {
-      const query = router.query.q as string
-      setSearchQuery(query)
-      searchItems(
-        {
-          variables: { input: { query, page } },
-        },
-      )
+      const query = router.query.q as string;
+      setSearchQuery(query);
+      searchItems({
+        variables: { input: { query, page } },
+      });
     }
-  }, [router.query.q])
+  }, [router.query.q]);
 
   return (
     <div>
@@ -77,7 +90,7 @@ const Home: NextPage = () => {
         <div className="my-4 max-w-xl w-full lg:max-w-lg">
           <div className="relative text-gray-400 focus-within:text-gray-600">
             <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-              <SearchIcon className="h-5 w-5" aria-hidden="true"/>
+              <SearchIcon className="h-5 w-5" aria-hidden="true" />
             </div>
             <input
               id="search"
@@ -91,16 +104,18 @@ const Home: NextPage = () => {
             />
           </div>
         </div>
-        {loading ? <PageLoading/> : <></>}
+        {loading ? <PageLoading /> : <></>}
         <div className="flex flex-col items-center sm:m-6">
           <div className="relative grid grid-cols-3 md:grid-cols-6 gap-8 px-3 w-full">
-            {
-              data && data.searchItems.map(item => (
+            {data &&
+              data.searchItems.map((item) => (
                 <Link key={item.id} href={item.sellingPageURL}>
                   <a>
                     <div className="rounded-sm shadow">
                       <Image
-                        src={item.imageUrls[0] || 'https://via.placeholder.com/300'}
+                        src={
+                          item.imageUrls[0] || 'https://via.placeholder.com/300'
+                        }
                         alt={item.name}
                         width={300}
                         height={300}
@@ -116,13 +131,12 @@ const Home: NextPage = () => {
                     </div>
                   </a>
                 </Link>
-              ))
-            }
+              ))}
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

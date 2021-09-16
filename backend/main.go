@@ -3,6 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/blendle/zapdriver"
@@ -18,11 +24,6 @@ import (
 	"github.com/k-yomo/kagu-miru/pkg/tracing"
 	"github.com/rs/cors"
 	"go.uber.org/zap"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func main() {
@@ -38,14 +39,14 @@ func main() {
 
 	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: []string{cfg.ElasticSearchURL},
-		Username: cfg.ElasticSearchUsername,
-		Password: cfg.ElasticSearchPassword,
+		Username:  cfg.ElasticSearchUsername,
+		Password:  cfg.ElasticSearchPassword,
 	})
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}
 
-	gqlConfig := gqlgen.Config {
+	gqlConfig := gqlgen.Config{
 		Resolvers: graph.NewResolver(search.NewSearchClient(cfg.ItemsIndexName, esClient)),
 	}
 	gqlServer := handler.NewDefaultServer(gqlgen.NewExecutableSchema(gqlConfig))
@@ -89,7 +90,6 @@ func newBaseRouter(cfg *config.Config, logger *zap.Logger) *chi.Mux {
 		middleware.Recoverer,
 		logging.NewMiddleware(cfg.GCPProjectID, logger),
 		csrf.NewCSRFValidationMiddleware(cfg.Env.IsDeployed()),
-
 	)
 	return r
 }

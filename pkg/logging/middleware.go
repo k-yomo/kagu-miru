@@ -1,12 +1,13 @@
 package logging
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/blendle/zapdriver"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"go.uber.org/zap"
-	"net/http"
-	"strings"
 )
 
 // NewMiddleware returns middleware to set logger to context

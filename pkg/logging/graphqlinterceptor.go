@@ -2,6 +2,7 @@ package logging
 
 import (
 	"context"
+
 	"github.com/99designs/gqlgen/graphql"
 	"go.uber.org/zap"
 )
@@ -26,4 +27,3 @@ func (g GraphQLResponseInterceptor) InterceptResponse(ctx context.Context, next 
 	Logger(ctx).Info(oc.OperationName, zap.String("query", oc.RawQuery), zap.Any("variables", oc.Variables))
 	return next(ctx)
 }
-

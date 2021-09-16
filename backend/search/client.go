@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
-	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"strings"
+
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
+	"github.com/pkg/errors"
 )
 
 type Client struct {
@@ -23,7 +24,6 @@ func NewSearchClient(itemsIndexName string, esClient *elasticsearch.Client) *Cli
 		esClient:       esClient,
 	}
 }
-
 
 const DefaultPage uint64 = 1
 const defaultPageSize uint64 = 100
