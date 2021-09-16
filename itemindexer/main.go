@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/blendle/zapdriver"
-	"github.com/elastic/go-elasticsearch"
+	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/itemindexer/config"
 	"github.com/k-yomo/kagu-miru/itemindexer/index"
 	"github.com/k-yomo/kagu-miru/itemindexer/indexworker"
@@ -25,7 +25,11 @@ func main() {
 		logger.Fatal("failed to initialize config", zap.Error(err))
 	}
 
-	esClient, err := elasticsearch.NewDefaultClient()
+	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: []string{cfg.ElasticSearchURL},
+		Username: cfg.ElasticSearchUsername,
+		Password: cfg.ElasticSearchPassword,
+	})
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}

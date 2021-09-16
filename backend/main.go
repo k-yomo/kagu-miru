@@ -6,7 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/blendle/zapdriver"
-	"github.com/elastic/go-elasticsearch"
+	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/k-yomo/kagu-miru/backend/config"
@@ -36,7 +36,11 @@ func main() {
 		logger.Fatal("failed to initialize config", zap.Error(err))
 	}
 
-	esClient, err := elasticsearch.NewDefaultClient()
+	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: []string{cfg.ElasticSearchURL},
+		Username: cfg.ElasticSearchUsername,
+		Password: cfg.ElasticSearchPassword,
+	})
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}

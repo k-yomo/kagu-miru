@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/go-elasticsearch"
+	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/internal/es"
 	"io/ioutil"
 )
