@@ -13,6 +13,7 @@ import (
 	"github.com/k-yomo/kagu-miru/backend/graph"
 	"github.com/k-yomo/kagu-miru/backend/graph/gqlgen"
 	"github.com/k-yomo/kagu-miru/backend/search"
+	"github.com/k-yomo/kagu-miru/pkg/csrf"
 	"github.com/k-yomo/kagu-miru/pkg/logging"
 	"github.com/k-yomo/kagu-miru/pkg/tracing"
 	"github.com/rs/cors"
@@ -72,7 +73,7 @@ func newBaseRouter(cfg *config.Config, logger *zap.Logger) *chi.Mux {
 	r := chi.NewRouter()
 	c := cors.New(cors.Options{
 		AllowedOrigins:   cfg.AllowedOrigins,
-		AllowedHeaders:   []string{"X-Requested-By", "Origin", "Authorization", "Accept", "Content-Type"},
+		AllowedHeaders:   []string{"Origin", "Authorization", "Accept", "Content-Type", csrf.HeaderKey},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowCredentials: true,
 	})
@@ -83,6 +84,8 @@ func newBaseRouter(cfg *config.Config, logger *zap.Logger) *chi.Mux {
 		middleware.RealIP,
 		middleware.Recoverer,
 		logging.NewMiddleware(cfg.GCPProjectID, logger),
+		csrf.NewCSRFValidationMiddleware(cfg.Env.IsDeployed()),
+
 	)
 	return r
 }

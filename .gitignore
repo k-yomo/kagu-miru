@@ -17,3 +17,6 @@
 .vercel
 
 .env
+
+
+**/tmp
