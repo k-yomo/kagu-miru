@@ -13,7 +13,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/blendle/zapdriver"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -29,14 +28,14 @@ import (
 )
 
 func main() {
-	logger, err := zapdriver.NewProduction()
+	cfg, err := config.NewConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	cfg, err := config.NewConfig()
+	logger, err := logging.NewLogger(!cfg.Env.IsDeployed())
 	if err != nil {
-		logger.Fatal("failed to initialize config", zap.Error(err))
+		panic(err)
 	}
 
 	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
