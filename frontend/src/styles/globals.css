@@ -10,6 +10,6 @@ body {
   font-size: 18px;
 }
 
-a {
-  @apply text-primary-500
+.page-loader {
+  @apply border-t-black;
 }

@@ -24,6 +24,8 @@ func NewSearchClient(itemsIndexName string, esClient *elasticsearch.Client) *Cli
 	}
 }
 
+
+const DefaultPage uint64 = 1
 const defaultPageSize uint64 = 100
 
 type Request struct {
@@ -39,6 +41,10 @@ type Response struct {
 }
 
 func (p *Client) SearchItems(ctx context.Context, req *Request) (*Response, error) {
+	var page uint64
+	if req.Page > 1 {
+		page = req.Page - 1 // page starts from 0 in elasticsearch
+	}
 	pageSize := defaultPageSize
 	if req.PageSize != nil {
 		pageSize = uint64(*req.PageSize)
@@ -46,7 +52,7 @@ func (p *Client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 	response, err := p.esClient.Search(
 		p.esClient.Search.WithContext(ctx),
 		p.esClient.Search.WithIndex(p.itemsIndexName),
-		p.esClient.Search.WithBody(buildSearchQuery(req.Query, req.Page, pageSize)),
+		p.esClient.Search.WithBody(buildSearchQuery(req.Query, page, pageSize)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)
@@ -75,9 +81,6 @@ func mapResponseToSearchResult(response *esapi.Response) (*Result, error) {
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
-	fmt.Println("****************")
-	fmt.Println(string(body))
-	fmt.Println("****************")
 	if err != nil {
 		return nil, errors.Wrap(err, "read response body failed")
 	}
@@ -114,7 +117,7 @@ func buildSearchQuery(query string, page, pageSize uint64) io.Reader {
 	"from": %d,
 	"size": %d,
 	"sort": [{ "_score" : "desc" }, { "_doc" : "asc" }]
-}`, query, (page)*pageSize, pageSize))
+}`, query, page*pageSize, pageSize))
 
 	return strings.NewReader(b.String())
 }

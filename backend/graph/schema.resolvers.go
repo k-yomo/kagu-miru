@@ -14,9 +14,9 @@ import (
 )
 
 func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.SearchItemsInput) ([]*gqlmodell.Item, error) {
-	var page uint64
+	page := search.DefaultPage
 	if input.Page != nil {
-		page = 0
+		page = uint64(*input.Page)
 	}
 	searchResponse, err := r.SearchClient.SearchItems(ctx, &search.Request{
 		Query:    input.Query,
