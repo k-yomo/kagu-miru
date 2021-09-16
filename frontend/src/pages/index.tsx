@@ -158,7 +158,7 @@ const Home: NextPage = () => {
         </div>
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
-          <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 md:gap-4 lg:gap-8 text-sm sm:text-md">
+          <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
             {data &&
               data.searchItems.map((item) => (
                 <Link key={item.id} href={item.sellingPageURL}>
@@ -175,10 +175,12 @@ const Home: NextPage = () => {
                         objectFit="cover"
                         className="w-20 h-20"
                       />
-                      <div className="p-2">
+                      <div className="py-0.5 sm:p-2">
                         <PlatformBadge platform={item.platform} />
-                        <h4 className="my-1 break-all truncate">{item.name}</h4>
-                        <span className="font-bold">￥{item.price}</span>
+                        <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
+                          {item.name}
+                        </h4>
+                        <div className="font-bold">￥{item.price}</div>
                       </div>
                     </div>
                   </a>

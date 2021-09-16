@@ -15,6 +15,7 @@
     "@apollo/client": "^3.4.11",
     "@apollo/react-hooks": "^4.0.0",
     "@heroicons/react": "^1.0.4",
+    "@tailwindcss/line-clamp": "^0.2.1",
     "apollo-link-scalars": "^2.1.4",
     "graphql": "^15.5.3",
     "graphql-anywhere": "^4.2.7",
