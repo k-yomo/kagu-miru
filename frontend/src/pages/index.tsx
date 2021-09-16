@@ -68,7 +68,7 @@ const Home: NextPage = () => {
 
   const onChangeSearchInput = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value.trim());
+      setSearchQuery(e.target.value);
     },
     [setSearchQuery]
   );
