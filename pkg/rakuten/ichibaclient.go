@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/k-yomo/kagu-miru/pkg/urlutil"
 	"net/http"
 	"net/url"
 	"strconv"
-
-	"github.com/k-yomo/kagu-miru/pkg/urlutil"
+	"sync"
 )
 
 const (
@@ -17,6 +17,8 @@ const (
 )
 
 type IchibaClient struct {
+	sync.Mutex
+
 	applicationIDs []string
 	appIDIndex     int
 
@@ -223,6 +225,9 @@ func (i *IchibaClient) buildParams(params map[string]string) map[string]string {
 }
 
 func (i *IchibaClient) getApplicationID() string {
+	i.Lock()
+	defer i.Unlock()
+
 	idx := i.appIDIndex
 	if idx == len(i.applicationIDs)-1 {
 		i.appIDIndex = 0
