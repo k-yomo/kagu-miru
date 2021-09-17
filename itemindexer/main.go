@@ -36,7 +36,7 @@ func main() {
 	}
 
 	indexer := index.NewItemIndexer(cfg.ItemsIndexName, esClient)
-	rakutenIchibaClient := rakuten.NewIchibaClient(cfg.RakutenApplicationID)
+	rakutenIchibaClient := rakuten.NewIchibaClient(cfg.RakutenApplicationIDs, cfg.RakutenAffiliateID)
 	rakutenItemWorker := indexworker.NewRakutenItemIndexWorker(indexer, rakutenIchibaClient, logger)
 
 	ctx, cancel := context.WithCancel(context.Background())

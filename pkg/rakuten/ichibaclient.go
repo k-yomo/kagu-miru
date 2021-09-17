@@ -17,17 +17,22 @@ const (
 )
 
 type IchibaClient struct {
-	applicationID         string
+	applicationIDs []string
+	appIDIndex     int
+
+	affiliateID string
+
 	ichibaItemAPIBaseURL  *url.URL
 	ichibaGenreAPIBaseURL *url.URL
 	httpClient            *http.Client
 }
 
-func NewIchibaClient(appid string) *IchibaClient {
+func NewIchibaClient(appIDs []string, affiliateID string) *IchibaClient {
 	ichibaItemAPIURL, _ := url.Parse(ichibaItemAPIBaseURL)
 	ichibaGenreAPIURL, _ := url.Parse(ichibaGenreAPIBaseURL)
 	return &IchibaClient{
-		applicationID:         appid,
+		applicationIDs:        appIDs,
+		affiliateID:           affiliateID,
 		ichibaItemAPIBaseURL:  ichibaItemAPIURL,
 		ichibaGenreAPIBaseURL: ichibaGenreAPIURL,
 		httpClient:            http.DefaultClient,
@@ -59,6 +64,12 @@ func (i *IchibaClient) SearchGenre(ctx context.Context, genreID string) (*Search
 		return nil, fmt.Errorf("getAndUnmarshal: %w", err)
 	}
 	return &resp, nil
+}
+
+// ApplicationIDNum returns number of application ids available
+// It's be useful for rate limiting
+func (i *IchibaClient) ApplicationIDNum() int {
+	return len(i.applicationIDs)
 }
 
 const SearchItemCountPerPage = 30
@@ -166,7 +177,8 @@ func (i *IchibaClient) SearchItem(ctx context.Context, params *SearchItemParams)
 	}
 
 	reqParams := map[string]string{
-		"sort": string(params.SortType),
+		"sort":        string(params.SortType),
+		"affiliateId": i.affiliateID,
 	}
 	if params.Keyword != "" {
 		reqParams["keyword"] = params.Keyword
@@ -201,11 +213,21 @@ func (i *IchibaClient) SearchItem(ctx context.Context, params *SearchItemParams)
 func (i *IchibaClient) buildParams(params map[string]string) map[string]string {
 	p := map[string]string{
 		"format":        "json",
-		"applicationId": i.applicationID,
+		"applicationId": i.getApplicationID(),
 	}
 	for k, v := range params {
 		p[k] = v
 	}
 
 	return p
+}
+
+func (i *IchibaClient) getApplicationID() string {
+	idx := i.appIDIndex
+	if idx == len(i.applicationIDs)-1 {
+		i.appIDIndex = 0
+	} else {
+		i.appIDIndex++
+	}
+	return i.applicationIDs[idx]
 }

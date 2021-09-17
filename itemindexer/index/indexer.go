@@ -33,6 +33,10 @@ type indexParamsIndex struct {
 }
 
 func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*es.Item) error {
+	if len(items) == 0 {
+		return nil
+	}
+
 	var bulkIndexParamsByte []byte
 	for _, item := range items {
 		params := &indexParams{Index: &indexParamsIndex{Index: i.indexName, ID: item.ID}}

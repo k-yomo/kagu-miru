@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/k-yomo/kagu-miru/internal/es"
 	"github.com/k-yomo/kagu-miru/itemindexer/index"
 	"github.com/k-yomo/kagu-miru/pkg/rakuten"
@@ -41,6 +42,7 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 		return furnitureGenreIDs[i] < furnitureGenreIDs[j]
 	})
 
+	totalIndexCount := 0
 	curGenreIdx := 0
 	curPage := 1
 	curMinPrice := option.MinPrice
@@ -54,7 +56,7 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 		}
 	}
 
-	rateLimiter := rate.NewLimiter(1, 1)
+	rateLimiter := rate.NewLimiter(rate.Limit(r.rakutenIchibaAPIClient.ApplicationIDNum()), 1)
 
 	for {
 		select {
@@ -66,14 +68,47 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 			}
 
 			genreID := furnitureGenreIDs[curGenreIdx]
-			searchItemRes, err := r.rakutenIchibaAPIClient.SearchItem(ctx, &rakuten.SearchItemParams{
+
+			searchItemParams := &rakuten.SearchItemParams{
 				GenreID:  genreID,
 				MinPrice: curMinPrice,
 				Page:     curPage,
 				SortType: rakuten.SearchItemSortTypeItemPriceAsc,
-			})
+			}
+			var searchItemRes *rakuten.SearchItemResponse
+			b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 5)
+			err := backoff.Retry(func() error {
+				var err error
+				searchItemRes, err = r.rakutenIchibaAPIClient.SearchItem(ctx, searchItemParams)
+				return err
+			}, b)
 			if err != nil {
+				r.logger.Error("rakutenIchibaAPIClient.SearchItem failed", zap.Error(err), zap.Any("params", searchItemParams))
 				return fmt.Errorf("rakutenIchibaAPIClient.SearchItem: %w", err)
+			}
+
+			rakutenItems := make([]*rakuten.Item, 0, len(searchItemRes.Items))
+			for _, item := range searchItemRes.Items {
+				rakutenItems = append(rakutenItems, item.Item)
+			}
+			items, err := mapRakutenItemsToIndexItems(rakutenItems)
+			if err != nil {
+				r.logger.Error("mapRakutenItemsToIndexItems failed", zap.Error(err))
+			}
+
+			if err := r.itemIndexer.BulkIndex(ctx, items); err != nil {
+				// skip if indexing failed
+				r.logger.Error("itemIndexer.BulkIndex failed", zap.Error(err))
+			} else {
+				totalIndexCount += len(items)
+				if totalIndexCount%300 == 0 {
+					r.logger.Info(fmt.Sprintf(
+						"indexed %d items", totalIndexCount),
+						zap.Int("genreID", genreID),
+						zap.Int("minPrice", curMinPrice),
+						zap.Int("page", curPage),
+					)
+				}
 			}
 
 			// when finished to get all items in the genre
@@ -84,28 +119,7 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 				if curGenreIdx == len(furnitureGenreIDs)-1 {
 					curGenreIdx = 0
 				}
-			}
-
-			if len(searchItemRes.Items) > 0 {
-				rakutenItems := make([]*rakuten.Item, 0, len(searchItemRes.Items))
-				for _, item := range searchItemRes.Items {
-					rakutenItems = append(rakutenItems, item.Item)
-				}
-				items, err := mapRakutenItemsToIndexItems(rakutenItems)
-				if err != nil {
-					return fmt.Errorf("mapRakutenItemsToIndexItems: %w", err)
-				}
-
-				if err := r.itemIndexer.BulkIndex(ctx, items); err != nil {
-					return fmt.Errorf("itemIndexer.BulkIndex: %w", err)
-				}
-
-				r.logger.Info(fmt.Sprintf(
-					"indexed %d items", len(items)),
-					zap.Int("genreID", genreID),
-					zap.Int("minPrice", curMinPrice),
-					zap.Int("page", curPage),
-				)
+				continue
 			}
 
 			if curPage == searchItemRes.PageCount {

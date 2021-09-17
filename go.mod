@@ -7,6 +7,7 @@ require (
 	github.com/99designs/gqlgen v0.14.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2
 	github.com/blendle/zapdriver v1.3.1
+	github.com/cenkalti/backoff/v4 v4.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.14.0
 	github.com/go-chi/chi/v5 v5.0.4
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0

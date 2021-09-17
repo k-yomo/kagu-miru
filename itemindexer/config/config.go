@@ -8,9 +8,11 @@ type Config struct {
 	ElasticSearchURL      string `default:"http://localhost:9200" envconfig:"ELASTICSEARCH_URL"`
 	ItemsIndexName        string `default:"items" envconfig:"ITEMS_INDEX_NAME"`
 
-	RakutenApplicationID string `required:"true" envconfig:"RAKUTEN_APPLICATION_ID"`
-	RakutenStartGenreID  int    `default:"0" envconfig:"RAKUTEN_START_GENRE_ID"`
-	RakutenMinPrice      int    `default:"0" envconfig:"RAKUTEN_MIN_PRICE"`
+	// To avoid late limit, we use multiple ids
+	RakutenApplicationIDs []string `required:"true" envconfig:"RAKUTEN_APPLICATION_IDS"`
+	RakutenAffiliateID    string   `required:"true" envconfig:"RAKUTEN_AFFILIATE_ID"`
+	RakutenStartGenreID   int      `default:"0" envconfig:"RAKUTEN_START_GENRE_ID"`
+	RakutenMinPrice       int      `default:"0" envconfig:"RAKUTEN_MIN_PRICE"`
 }
 
 func NewConfig() (*Config, error) {
