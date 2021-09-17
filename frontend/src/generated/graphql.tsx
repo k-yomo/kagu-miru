@@ -21,6 +21,7 @@ export type Scalars = {
 };
 
 export type Item = {
+  affiliateUrl: Scalars['String'];
   averageRating: Scalars['Float'];
   description: Scalars['String'];
   id: Scalars['ID'];
@@ -29,8 +30,8 @@ export type Item = {
   platform: ItemSellingPlatform;
   price: Scalars['Int'];
   reviewCount: Scalars['Int'];
-  sellingPageURL: Scalars['String'];
   status: ItemStatus;
+  url: Scalars['String'];
 };
 
 export enum ItemSellingPlatform {
@@ -73,7 +74,8 @@ export type HomePageSearchItemsQuery = {
     name: string;
     description: string;
     status: ItemStatus;
-    sellingPageURL: string;
+    url: string;
+    affiliateUrl: string;
     price: number;
     imageUrls: Array<string>;
     averageRating: number;
@@ -89,7 +91,8 @@ export const HomePageSearchItemsDocument = gql`
       name
       description
       status
-      sellingPageURL
+      url
+      affiliateUrl
       price
       imageUrls
       averageRating

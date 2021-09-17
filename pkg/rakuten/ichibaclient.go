@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/k-yomo/kagu-miru/pkg/urlutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"sync"
+
+	"github.com/k-yomo/kagu-miru/pkg/urlutil"
 )
 
 const (

@@ -16,7 +16,8 @@ type Item {
     name: String!
     description: String!
     status: ItemStatus!
-    sellingPageURL: String!
+    url: String!
+    affiliateUrl: String!
     price: Int!
     imageUrls: [String!]!
     averageRating: Float!

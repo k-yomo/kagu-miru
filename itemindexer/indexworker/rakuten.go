@@ -24,8 +24,8 @@ type genreIndexWorker struct {
 
 type RakutenWorker struct {
 	rakutenIchibaAPIClient *rakuten.IchibaClient
-	pool    <-chan *genreIndexWorker
-	workers []*genreIndexWorker
+	pool                   <-chan *genreIndexWorker
+	workers                []*genreIndexWorker
 }
 
 func NewRakutenItemWorker(indexer *index.ItemIndexer, rakutenIchibaAPIClient *rakuten.IchibaClient, logger *zap.Logger) *RakutenWorker {
@@ -42,8 +42,8 @@ func NewRakutenItemWorker(indexer *index.ItemIndexer, rakutenIchibaAPIClient *ra
 	}
 	return &RakutenWorker{
 		rakutenIchibaAPIClient: rakutenIchibaAPIClient,
-		pool:    pool,
-		workers: workers,
+		pool:                   pool,
+		workers:                workers,
 	}
 }
 
@@ -54,7 +54,7 @@ type RakutenWorkerOption struct {
 
 // Run starts rakuten item indexing genreIndexWorker
 func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) error {
-	for  _, w := range r.workers {
+	for _, w := range r.workers {
 		w.start(ctx)
 	}
 
@@ -216,15 +216,16 @@ func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*es.Item, error) {
 	}
 
 	return &es.Item{
-		ID:             rakutenItem.ID(),
-		Name:           rakutenItem.ItemName,
-		Description:    rakutenItem.ItemCaption,
-		Status:         status,
-		SellingPageURL: rakutenItem.ItemURL,
-		Price:          rakutenItem.ItemPrice,
-		ImageURLs:      imageURLs,
-		AverageRating:  rakutenItem.ReviewAverage,
-		ReviewCount:    rakutenItem.ReviewCount,
-		Platform:       es.PlatformRakuten,
+		ID:            rakutenItem.ID(),
+		Name:          rakutenItem.ItemName,
+		Description:   rakutenItem.ItemCaption,
+		Status:        status,
+		URL:           rakutenItem.ItemURL,
+		AffiliateURL:  rakutenItem.AffiliateUrl,
+		Price:         rakutenItem.ItemPrice,
+		ImageURLs:     imageURLs,
+		AverageRating: rakutenItem.ReviewAverage,
+		ReviewCount:   rakutenItem.ReviewCount,
+		Platform:      es.PlatformRakuten,
 	}, nil
 }

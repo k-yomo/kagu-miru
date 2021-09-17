@@ -43,16 +43,17 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Item struct {
-		AverageRating  func(childComplexity int) int
-		Description    func(childComplexity int) int
-		ID             func(childComplexity int) int
-		ImageUrls      func(childComplexity int) int
-		Name           func(childComplexity int) int
-		Platform       func(childComplexity int) int
-		Price          func(childComplexity int) int
-		ReviewCount    func(childComplexity int) int
-		SellingPageURL func(childComplexity int) int
-		Status         func(childComplexity int) int
+		AffiliateURL  func(childComplexity int) int
+		AverageRating func(childComplexity int) int
+		Description   func(childComplexity int) int
+		ID            func(childComplexity int) int
+		ImageUrls     func(childComplexity int) int
+		Name          func(childComplexity int) int
+		Platform      func(childComplexity int) int
+		Price         func(childComplexity int) int
+		ReviewCount   func(childComplexity int) int
+		Status        func(childComplexity int) int
+		URL           func(childComplexity int) int
 	}
 
 	Query struct {
@@ -78,6 +79,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Item.affiliateUrl":
+		if e.complexity.Item.AffiliateURL == nil {
+			break
+		}
+
+		return e.complexity.Item.AffiliateURL(childComplexity), true
 
 	case "Item.averageRating":
 		if e.complexity.Item.AverageRating == nil {
@@ -135,19 +143,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.ReviewCount(childComplexity), true
 
-	case "Item.sellingPageURL":
-		if e.complexity.Item.SellingPageURL == nil {
-			break
-		}
-
-		return e.complexity.Item.SellingPageURL(childComplexity), true
-
 	case "Item.status":
 		if e.complexity.Item.Status == nil {
 			break
 		}
 
 		return e.complexity.Item.Status(childComplexity), true
+
+	case "Item.url":
+		if e.complexity.Item.URL == nil {
+			break
+		}
+
+		return e.complexity.Item.URL(childComplexity), true
 
 	case "Query.searchItems":
 		if e.complexity.Query.SearchItems == nil {
@@ -229,7 +237,8 @@ type Item {
     name: String!
     description: String!
     status: ItemStatus!
-    sellingPageURL: String!
+    url: String!
+    affiliateUrl: String!
     price: Int!
     imageUrls: [String!]!
     averageRating: Float!
@@ -465,7 +474,7 @@ func (ec *executionContext) _Item_status(ctx context.Context, field graphql.Coll
 	return ec.marshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_sellingPageURL(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_url(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -483,7 +492,42 @@ func (ec *executionContext) _Item_sellingPageURL(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.SellingPageURL, nil
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Item_affiliateUrl(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AffiliateURL, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1996,8 +2040,13 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "sellingPageURL":
-			out.Values[i] = ec._Item_sellingPageURL(ctx, field, obj)
+		case "url":
+			out.Values[i] = ec._Item_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "affiliateUrl":
+			out.Values[i] = ec._Item_affiliateUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

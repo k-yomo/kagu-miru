@@ -25,7 +25,10 @@
       "status": {
         "type": "long"
       },
-      "sellingPageUrl": {
+      "url": {
+        "type": "keyword"
+      },
+      "affiliateUrl": {
         "type": "keyword"
       },
       "price": {

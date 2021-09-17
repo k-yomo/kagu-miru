@@ -9,16 +9,17 @@ import (
 )
 
 type Item struct {
-	ID             string              `json:"id"`
-	Name           string              `json:"name"`
-	Description    string              `json:"description"`
-	Status         ItemStatus          `json:"status"`
-	SellingPageURL string              `json:"sellingPageURL"`
-	Price          int                 `json:"price"`
-	ImageUrls      []string            `json:"imageUrls"`
-	AverageRating  float64             `json:"averageRating"`
-	ReviewCount    int                 `json:"reviewCount"`
-	Platform       ItemSellingPlatform `json:"platform"`
+	ID            string              `json:"id"`
+	Name          string              `json:"name"`
+	Description   string              `json:"description"`
+	Status        ItemStatus          `json:"status"`
+	URL           string              `json:"url"`
+	AffiliateURL  string              `json:"affiliateUrl"`
+	Price         int                 `json:"price"`
+	ImageUrls     []string            `json:"imageUrls"`
+	AverageRating float64             `json:"averageRating"`
+	ReviewCount   int                 `json:"reviewCount"`
+	Platform      ItemSellingPlatform `json:"platform"`
 }
 
 type SearchItemsInput struct {

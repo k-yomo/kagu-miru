@@ -1,13 +1,12 @@
 import {
   ChangeEvent,
   KeyboardEvent,
+  memo,
   useCallback,
   useEffect,
   useState,
-  memo,
 } from 'react';
 import type { NextPage } from 'next';
-import Link from 'next/link';
 import Image from 'next/image';
 import gql from 'graphql-tag';
 import { SearchIcon } from '@heroicons/react/solid';
@@ -28,7 +27,8 @@ gql`
       name
       description
       status
-      sellingPageURL
+      url
+      affiliateUrl
       price
       imageUrls
       averageRating
@@ -182,28 +182,26 @@ const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
   return (
     <>
       {items.map((item) => (
-        <Link key={item.id} href={item.sellingPageURL}>
-          <a>
-            <div className="rounded-md sm:shadow">
-              <Image
-                src={item.imageUrls[0] || 'https://via.placeholder.com/300'}
-                alt={item.name}
-                width={300}
-                height={300}
-                layout="responsive"
-                objectFit="cover"
-                className="w-20 h-20"
-              />
-              <div className="py-0.5 sm:p-2">
-                <PlatformBadge platform={item.platform} />
-                <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
-                  {item.name}
-                </h4>
-                <div className="font-bold">￥{item.price}</div>
-              </div>
+        <a key={item.id} href={!!item.affiliateUrl ? item.affiliateUrl : item.url}>
+          <div className="rounded-md sm:shadow">
+            <Image
+              src={item.imageUrls[0] || 'https://via.placeholder.com/300'}
+              alt={item.name}
+              width={300}
+              height={300}
+              layout="responsive"
+              objectFit="cover"
+              className="w-20 h-20"
+            />
+            <div className="py-0.5 sm:p-2">
+              <PlatformBadge platform={item.platform} />
+              <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
+                {item.name}
+              </h4>
+              <div className="font-bold">￥{item.price}</div>
             </div>
-          </a>
-        </Link>
+          </div>
+        </a>
       ))}
     </>
   );
