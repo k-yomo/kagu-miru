@@ -144,7 +144,7 @@ const Home: NextPage = () => {
             <select
               id="location"
               name="location"
-              className="mt-1 block w-full pl-3 pr-10 py-2 rounded-md text-base border border-gray-700 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
+              className="appearance-none mt-1 block w-full pl-3 pr-10 py-2 rounded-md text-base border border-gray-700 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
               value={sortType}
               onChange={onChangeSortBy}
             >
