@@ -31,10 +31,12 @@ export default function Pagination({ page, totalPage, onClickPage }: Props) {
         <button
           disabled={page === 1}
           onClick={() => onClickPage(page - 1)}
-          className="border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          className="border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500 disabled:text-gray-300 hover:text-gray-700 disabled:hover:text-gray-300 disabled:hover:border-transparent"
         >
           <ArrowNarrowLeftIcon
-            className="mr-3 h-5 w-5 text-gray-400"
+            className={`mr-3 h-5 w-5 ${
+              page === 1 ? 'text-gray-300' : 'text-gray-400'
+            }`}
             aria-hidden="true"
           />
           前へ
@@ -59,11 +61,13 @@ export default function Pagination({ page, totalPage, onClickPage }: Props) {
         <button
           disabled={page === totalPage}
           onClick={() => onClickPage(page + 1)}
-          className="border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          className="border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500 disabled:text-gray-300 hover:text-gray-700 disabled:hover:text-gray-300 disabled:hover:border-transparent"
         >
           次へ
           <ArrowNarrowRightIcon
-            className="ml-3 h-5 w-5 text-gray-400"
+            className={`ml-3 h-5 w-5 ${
+              page === 1 ? 'text-gray-300' : 'text-gray-400'
+            }`}
             aria-hidden="true"
           />
         </button>
