@@ -34,6 +34,11 @@ export type Item = {
   url: Scalars['String'];
 };
 
+export type ItemConnection = {
+  nodes: Array<Item>;
+  pageInfo: PageInfo;
+};
+
 export enum ItemSellingPlatform {
   Rakuten = 'RAKUTEN',
 }
@@ -43,8 +48,13 @@ export enum ItemStatus {
   Inactive = 'INACTIVE',
 }
 
+export type PageInfo = {
+  page: Scalars['Int'];
+  totalPage: Scalars['Int'];
+};
+
 export type Query = {
-  searchItems: Array<Item>;
+  searchItems: ItemConnection;
 };
 
 export type QuerySearchItemsArgs = {
@@ -69,35 +79,44 @@ export type HomePageSearchItemsQueryVariables = Exact<{
 }>;
 
 export type HomePageSearchItemsQuery = {
-  searchItems: Array<{
-    id: string;
-    name: string;
-    description: string;
-    status: ItemStatus;
-    url: string;
-    affiliateUrl: string;
-    price: number;
-    imageUrls: Array<string>;
-    averageRating: number;
-    reviewCount: number;
-    platform: ItemSellingPlatform;
-  }>;
+  searchItems: {
+    pageInfo: { page: number; totalPage: number };
+    nodes: Array<{
+      id: string;
+      name: string;
+      description: string;
+      status: ItemStatus;
+      url: string;
+      affiliateUrl: string;
+      price: number;
+      imageUrls: Array<string>;
+      averageRating: number;
+      reviewCount: number;
+      platform: ItemSellingPlatform;
+    }>;
+  };
 };
 
 export const HomePageSearchItemsDocument = gql`
   query homePageSearchItems($input: SearchItemsInput!) {
     searchItems(input: $input) {
-      id
-      name
-      description
-      status
-      url
-      affiliateUrl
-      price
-      imageUrls
-      averageRating
-      reviewCount
-      platform
+      pageInfo {
+        page
+        totalPage
+      }
+      nodes {
+        id
+        name
+        description
+        status
+        url
+        affiliateUrl
+        price
+        imageUrls
+        averageRating
+        reviewCount
+        platform
+      }
     }
   }
 `;

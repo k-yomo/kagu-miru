@@ -1,5 +1,10 @@
 type Query {
-    searchItems(input: SearchItemsInput): [Item!]!
+    searchItems(input: SearchItemsInput): ItemConnection!
+}
+
+type PageInfo {
+    page: Int!
+    totalPage: Int!
 }
 
 enum ItemStatus {
@@ -23,6 +28,11 @@ type Item {
     averageRating: Float!
     reviewCount: Int!
     platform: ItemSellingPlatform!
+}
+
+type ItemConnection {
+    pageInfo: PageInfo!
+    nodes: [Item!]!
 }
 
 enum SearchItemsSortType {

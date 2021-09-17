@@ -48,7 +48,7 @@ func main() {
 		if err != nil {
 			logger.Error("set trace provider failed", zap.Error(err))
 		} else {
-			defer shutdown(ctx)
+			defer func() { _ = shutdown(ctx) }()
 		}
 
 		if err := profiler.Start(profiler.Config{}); err != nil {

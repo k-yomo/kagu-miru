@@ -22,6 +22,16 @@ type Item struct {
 	Platform      ItemSellingPlatform `json:"platform"`
 }
 
+type ItemConnection struct {
+	PageInfo *PageInfo `json:"pageInfo"`
+	Nodes    []*Item   `json:"nodes"`
+}
+
+type PageInfo struct {
+	Page      int `json:"page"`
+	TotalPage int `json:"totalPage"`
+}
+
 type SearchItemsInput struct {
 	Query    string              `json:"query"`
 	SortType SearchItemsSortType `json:"sortType"`

@@ -19,21 +19,28 @@ import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
 import { useRouter } from 'next/router';
 import PlatformBadge from '@src/components/PlatformBadge';
+import Pagination from '@src/components/Pagination';
 
 gql`
   query homePageSearchItems($input: SearchItemsInput!) {
     searchItems(input: $input) {
-      id
-      name
-      description
-      status
-      url
-      affiliateUrl
-      price
-      imageUrls
-      averageRating
-      reviewCount
-      platform
+      pageInfo {
+        page
+        totalPage
+      }
+      nodes {
+        id
+        name
+        description
+        status
+        url
+        affiliateUrl
+        price
+        imageUrls
+        averageRating
+        reviewCount
+        platform
+      }
     }
   }
 `;
@@ -161,8 +168,19 @@ const Home: NextPage = () => {
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
-            {data && <ItemList items={data.searchItems} loading={loading} />}
+            {data && (
+              <ItemList items={data.searchItems.nodes} loading={loading} />
+            )}
           </div>
+          {data && (
+            <div className="my-4 w-full">
+              <Pagination
+                page={data.searchItems.pageInfo.page}
+                totalPage={data.searchItems.pageInfo.totalPage}
+                onClickPage={(page) => setPage(page)}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -170,7 +188,7 @@ const Home: NextPage = () => {
 };
 
 interface ItemListProps {
-  items: HomePageSearchItemsQuery['searchItems'];
+  items: HomePageSearchItemsQuery['searchItems']['nodes'];
   loading: boolean;
 }
 
@@ -182,7 +200,10 @@ const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
   return (
     <>
       {items.map((item) => (
-        <a key={item.id} href={!!item.affiliateUrl ? item.affiliateUrl : item.url}>
+        <a
+          key={item.id}
+          href={!!item.affiliateUrl ? item.affiliateUrl : item.url}
+        >
           <div className="rounded-md sm:shadow">
             <Image
               src={item.imageUrls[0] || 'https://via.placeholder.com/300'}

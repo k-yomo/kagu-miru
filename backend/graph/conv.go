@@ -22,18 +22,6 @@ func mapGraphqlSortTypeToSearchSortType(st gqlmodel.SearchItemsSortType) (search
 	}
 }
 
-func mapSearchItemsToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
-	gqlItems := make([]*gqlmodel.Item, 0, len(items))
-	for _, item := range items {
-		gqlItem, err := mapSearchItemToGraphqlItem(item)
-		if err != nil {
-			return nil, err
-		}
-		gqlItems = append(gqlItems, gqlItem)
-	}
-	return gqlItems, nil
-}
-
 func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 	var status gqlmodel.ItemStatus
 	switch item.Status {
@@ -65,5 +53,36 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 		AverageRating: item.AverageRating,
 		ReviewCount:   item.ReviewCount,
 		Platform:      platform,
+	}, nil
+}
+
+func mapSearchItemsToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
+	gqlItems := make([]*gqlmodel.Item, 0, len(items))
+	for _, item := range items {
+		gqlItem, err := mapSearchItemToGraphqlItem(item)
+		if err != nil {
+			return nil, err
+		}
+		gqlItems = append(gqlItems, gqlItem)
+	}
+	return gqlItems, nil
+}
+
+func mapSearchResponseToGraphqlItemConnection(res *search.Response) (*gqlmodel.ItemConnection, error) {
+	items := make([]*es.Item, 0, len(res.Result.Hits.Hits))
+	for _, hit := range res.Result.Hits.Hits {
+		items = append(items, hit.Source)
+	}
+
+	graphqlItems, err := mapSearchItemsToGraphqlItems(items)
+	if err != nil {
+		return nil, err
+	}
+	return &gqlmodel.ItemConnection{
+		PageInfo: &gqlmodel.PageInfo{
+			Page:      int(res.Page),
+			TotalPage: int(res.TotalPage),
+		},
+		Nodes: graphqlItems,
 	}, nil
 }

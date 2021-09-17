@@ -10,10 +10,9 @@ import (
 	gqlgend "github.com/k-yomo/kagu-miru/backend/graph/gqlgen"
 	gqlmodell "github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/search"
-	"github.com/k-yomo/kagu-miru/internal/es"
 )
 
-func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.SearchItemsInput) ([]*gqlmodell.Item, error) {
+func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.SearchItemsInput) (*gqlmodell.ItemConnection, error) {
 	sortType, err := mapGraphqlSortTypeToSearchSortType(input.SortType)
 	if err != nil {
 		return nil, fmt.Errorf("mapGraphqlSortTypeToSearchSortType: %w", err)
@@ -32,12 +31,7 @@ func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.Search
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
 	}
 
-	items := make([]*es.Item, 0, len(searchResponse.Result.Hits.Hits))
-	for _, hit := range searchResponse.Result.Hits.Hits {
-		items = append(items, hit.Source)
-	}
-
-	return mapSearchItemsToGraphqlItems(items)
+	return mapSearchResponseToGraphqlItemConnection(searchResponse)
 }
 
 // Query returns gqlgend.QueryResolver implementation.

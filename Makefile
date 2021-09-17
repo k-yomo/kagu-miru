@@ -9,7 +9,9 @@ setup:
 
 .PHONY: run
 run:
-	goreman -set-ports=false start
+	docker compose up elasticsearch & \
+	goreman -set-ports=false start & \
+	wait
 
 lint:
 	@golangci-lint run & \
@@ -21,6 +23,11 @@ fmt:
 	goimports -w . & \
 	cd frontend && npm run fmt & \
 	cd terraform && terraform fmt -recursive & \
+	wait
+
+gen-graphql:
+	go generate ./... & \
+	cd frontend && npm run codegen & \
 	wait
 
 .PHONY: tf-symlink
