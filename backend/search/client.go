@@ -15,13 +15,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Client struct {
+type Client interface {
+	SearchItems(ctx context.Context, req *Request) (*Response, error)
+}
+
+type client struct {
 	itemsIndexName string
 	esClient       *elasticsearch.Client
 }
 
-func NewSearchClient(itemsIndexName string, esClient *elasticsearch.Client) *Client {
-	return &Client{
+func NewSearchClient(itemsIndexName string, esClient *elasticsearch.Client) Client {
+	return &client{
 		itemsIndexName: itemsIndexName,
 		esClient:       esClient,
 	}
@@ -51,7 +55,7 @@ type Response struct {
 	TotalPage uint64
 }
 
-func (p *Client) SearchItems(ctx context.Context, req *Request) (*Response, error) {
+func (p *client) SearchItems(ctx context.Context, req *Request) (*Response, error) {
 	ctx, span := otel.Tracer("search").Start(ctx, "search.Client_SearchItems")
 	defer span.End()
 
@@ -149,9 +153,9 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) io
 }
 
 func calcTotalPage(totalItems, pageSize uint64) uint64 {
-	total := totalItems + pageSize - 1
-	if total == 0 {
-		return 0
+	if totalItems == 0 {
+		return 1
 	}
+	total := totalItems + pageSize - 1
 	return total / pageSize
 }
