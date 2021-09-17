@@ -130,16 +130,18 @@ const Home: NextPage = () => {
             <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
               <SearchIcon className="h-5 w-5" aria-hidden="true" />
             </div>
-            <input
-              id="search"
-              className="appearance-none lock w-full bg-white py-3 pl-10 pr-3 dark:bg-gray-800 border border-gray-700 rounded-md leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
-              placeholder="Search"
-              type="search"
-              name="search"
-              value={searchQuery}
-              onChange={onChangeSearchInput}
-              onKeyPress={onSearchKeyPress}
-            />
+            <form action=".">
+              <input
+                id="search"
+                className="appearance-none lock w-full bg-white py-3 pl-10 pr-3 dark:bg-gray-800 border border-gray-700 rounded-md leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
+                placeholder="Search"
+                type="search"
+                name="search"
+                value={searchQuery}
+                onChange={onChangeSearchInput}
+                onKeyPress={onSearchKeyPress}
+              />
+            </form>
           </div>
           <div>
             <label
