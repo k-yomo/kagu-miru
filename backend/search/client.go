@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"strings"
 	"time"
+
+	"github.com/k-yomo/kagu-miru/pkg/esutil"
+
+	"github.com/aquasecurity/esquery"
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
@@ -80,10 +83,15 @@ func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 	if req.PageSize != nil {
 		pageSize = uint64(*req.PageSize)
 	}
+
+	esQuery, err := buildSearchQuery(req.Query, req.SortType, page, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("buildSearchQuery: %w", err)
+	}
 	response, err := c.esClient.Search(
 		c.esClient.Search.WithContext(ctx),
 		c.esClient.Search.WithIndex(c.itemsIndexName),
-		c.esClient.Search.WithBody(buildSearchQuery(req.Query, req.SortType, page, pageSize)),
+		c.esClient.Search.WithBody(esQuery),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)
@@ -118,85 +126,56 @@ func mapResponseToSearchResult(response *esapi.Response) (*Result, error) {
 	return sr, nil
 }
 
-func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) io.Reader {
-	var sort string
+func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (io.Reader, error) {
+	esQuery := esquery.Search().
+		Query(
+			esquery.MultiMatch(query).
+				Type(esquery.MatchTypeMostFields).
+				Fields(esutil.BoostFieldForMultiMatch(es.ItemFieldName, 100), es.ItemFieldDescription)).
+		SourceIncludes(es.AllItemFields...).
+		From(page * pageSize).
+		Size(pageSize)
+
 	switch sortType {
 	case SortTypePriceAsc:
-		sort = `[{ "price" : "asc" }]`
+		esQuery.Sort(es.ItemFieldPrice, esquery.OrderAsc)
 	case SortTypePriceDesc:
-		sort = `[{ "price" : "desc" }]`
+		esQuery.Sort(es.ItemFieldPrice, esquery.OrderDesc)
 	default:
-		sort = `[{ "_score" : "desc" }]`
+		esQuery.Sort("_score", esquery.OrderDesc)
 	}
 
-	// TODO: refactor query construction
-	esQuery := fmt.Sprintf(`{
-	"_source": [
-		"id", 
-		"name", 
-		"description", 
-		"status", 
-		"url", 
-		"affiliateUrl", 
-		"price",
-		"imageUrls",
-		"averageRating",
-		"reviewCount",
-		"platform"
-	],
-	"query": {
-		"multi_match" : {
-			"query": %q,
-			"type": "most_fields",
-			"fields": ["name^100", "description"]
-		}
-	},
-	"sort": %s,
-	"from": %d,
-	"size": %d
-}`, query, sort, page*pageSize, pageSize)
+	esQueryJSON, err := esQuery.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("esQuery.MarshalJSON(): %w", err)
+	}
 
-	return strings.NewReader(esQuery)
+	return bytes.NewReader(esQueryJSON), nil
 }
 
 func (c *client) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
-	esQuery := fmt.Sprintf(`{
-  "size": 0,
-  "query": {
-    "bool": {
-      "should": [{
-        "match": {
-          "query.autocomplete": {
-            "query": %q
-          }
-        }
-      }, {
-        "match": {
-          "query.readingform": {
-            "query":  %q,
-            "fuzziness": "AUTO",
-            "operator": "and"
-          }
-        }
-      }]
-    }
-  },
-  "aggs": {
-    "queries": {
-      "terms": {
-        "field": "query",
-        "order": {
-          "_count": "desc"
-        },
-        "size": "10"
-      }
-    }
-  }
-}`, query, query)
+	esQuery, err := esquery.Search().
+		Query(
+			esquery.Bool().Should(
+				esquery.Match("query.autocomplete", query),
+				esquery.Match("query.readingform", query).Fuzziness("AUTO").Operator(esquery.OperatorAnd),
+			),
+		).
+		Aggs(
+			esquery.TermsAgg("queries", "query").
+				Order(map[string]string{"_count": string(esquery.OrderDesc)}).
+				Size(10),
+		).
+		Size(0).
+		MarshalJSON()
+
+	if err != nil {
+		return nil, fmt.Errorf("esquery.MarshalJSON(): %w", err)
+	}
 	esResponse, err := c.esClient.Search(
 		c.esClient.Search.WithContext(ctx),
 		c.esClient.Search.WithIndex(c.itemsQuerySuggestionsIndexName),
-		c.esClient.Search.WithBody(strings.NewReader(esQuery)),
+		c.esClient.Search.WithBody(bytes.NewReader(esQuery)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)

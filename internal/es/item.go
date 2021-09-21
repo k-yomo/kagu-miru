@@ -26,3 +26,31 @@ type Item struct {
 	ReviewCount   int      `json:"reviewCount"`
 	Platform      Platform `json:"platform"`
 }
+
+const (
+	ItemFieldID            = "id"
+	ItemFieldName          = "name"
+	ItemFieldDescription   = "description"
+	ItemFieldStatus        = "status"
+	ItemFieldURL           = "url"
+	ItemFieldAffiliateURL  = "affiliateUrl"
+	ItemFieldPrice         = "price"
+	ItemFieldImageURLs     = "imageUrls"
+	ItemFieldAverageRating = "averageRating"
+	ItemFieldReviewCount   = "reviewCount"
+	ItemFieldPlatform      = "platform"
+)
+
+var AllItemFields = []string{
+	ItemFieldID,
+	ItemFieldName,
+	ItemFieldDescription,
+	ItemFieldStatus,
+	ItemFieldURL,
+	ItemFieldAffiliateURL,
+	ItemFieldPrice,
+	ItemFieldImageURLs,
+	ItemFieldAverageRating,
+	ItemFieldReviewCount,
+	ItemFieldPlatform,
+}
