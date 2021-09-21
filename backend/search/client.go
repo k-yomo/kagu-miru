@@ -21,7 +21,7 @@ import (
 
 type Client interface {
 	SearchItems(ctx context.Context, req *Request) (*Response, error)
-	GetQuerySuggestions(ctx context.Context, query string) (*GetQuerySuggestionsResponse, error)
+	GetQuerySuggestions(ctx context.Context, query string) ([]string, error)
 }
 
 type client struct {
@@ -159,18 +159,7 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) io
 	return strings.NewReader(esQuery)
 }
 
-type GetQuerySuggestionsResponse struct {
-	Aggregations struct {
-		Queries struct {
-			Buckets []struct {
-				Key      string `json:"key"`
-				DocCount int    `json:"doc_count"`
-			} `json:"buckets"`
-		} `json:"queries"`
-	} `json:"aggregations"`
-}
-
-func (c *client) GetQuerySuggestions(ctx context.Context, query string) (*GetQuerySuggestionsResponse, error) {
+func (c *client) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
 	esQuery := fmt.Sprintf(`{
   "size": 0,
   "query": {
@@ -222,12 +211,30 @@ func (c *client) GetQuerySuggestions(ctx context.Context, query string) (*GetQue
 		return nil, fmt.Errorf("search request to elasticsearch failed with status %s, body: %s", esResponse.Status(), body)
 	}
 
-	var response GetQuerySuggestionsResponse
+	var response struct {
+		Aggregations struct {
+			Queries struct {
+				Buckets []struct {
+					Key      string `json:"key"`
+					DocCount int    `json:"doc_count"`
+				} `json:"buckets"`
+			} `json:"queries"`
+		} `json:"aggregations"`
+	}
+
 	if err := json.Unmarshal(body, &response); err != nil {
 		return nil, fmt.Errorf("search request to elasticsearch failed with body: %s: %w", body, err)
 	}
 
-	return &response, nil
+	suggestedQueries := make([]string, 0, len(response.Aggregations.Queries.Buckets))
+	for _, bucket := range response.Aggregations.Queries.Buckets {
+		if bucket.Key == query {
+			continue
+		}
+		suggestedQueries = append(suggestedQueries, bucket.Key)
+	}
+
+	return suggestedQueries, nil
 }
 
 func (c *client) insertQuerySuggestion(ctx context.Context, query string) error {
