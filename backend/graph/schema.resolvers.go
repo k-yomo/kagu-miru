@@ -37,7 +37,6 @@ func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.Search
 func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
 	querySuggestions, err := r.SearchClient.GetQuerySuggestions(ctx, query)
 	if err != nil {
-		fmt.Println(err)
 		return nil, fmt.Errorf("SearchClient.GetQuerySuggestions: %w", err)
 	}
 
@@ -45,7 +44,6 @@ func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (
 	for _, bucket := range querySuggestions.Aggregations.Queries.Buckets {
 		suggestedQueries = append(suggestedQueries, bucket.Key)
 	}
-	fmt.Println(suggestedQueries)
 
 	return suggestedQueries, nil
 }
