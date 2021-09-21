@@ -264,11 +264,11 @@ const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
             />
             <div className="py-0.5 sm:p-2">
               <PlatformBadge platform={item.platform} />
-              <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
+              <h4 className="mt-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
               </h4>
               <div className="sm:text-lg font-bold">￥{item.price}</div>
-              <div className="flex items-center my-1">
+              <div className="flex items-center">
                 <Rating rating={item.averageRating} maxRating={5} />
                 <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
                   {item.reviewCount}
