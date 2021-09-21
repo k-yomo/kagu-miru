@@ -102,12 +102,15 @@ const Home: NextPage = () => {
     refreshPageWithSearchParams(query, sortType, 1);
   };
 
-  const onSearchKeyPress = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key == 'Enter') {
-      e.preventDefault();
-      refreshPageWithSearchParams(searchQuery, sortType, page);
-    }
-  }, [searchQuery]);
+  const onSearchKeyPress = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key == 'Enter') {
+        e.preventDefault();
+        refreshPageWithSearchParams(searchQuery, sortType, page);
+      }
+    },
+    [searchQuery]
+  );
 
   useEffect(() => {
     refreshPageWithSearchParams(searchQuery, sortType, page);
