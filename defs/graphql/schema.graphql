@@ -1,5 +1,6 @@
 type Query {
     searchItems(input: SearchItemsInput): ItemConnection!
+    getQuerySuggestions(query: String!): [String!]!
 }
 
 type PageInfo {

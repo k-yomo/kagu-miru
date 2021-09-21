@@ -70,7 +70,7 @@ func main() {
 	}
 
 	gqlConfig := gqlgen.Config{
-		Resolvers: graph.NewResolver(search.NewSearchClient(cfg.ItemsIndexName, esClient)),
+		Resolvers: graph.NewResolver(search.NewSearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient)),
 	}
 	gqlServer := handler.NewDefaultServer(gqlgen.NewExecutableSchema(gqlConfig))
 	gqlServer.Use(tracing.GraphqlExtension{})

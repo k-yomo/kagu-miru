@@ -54,7 +54,12 @@ export type PageInfo = {
 };
 
 export type Query = {
+  getQuerySuggestions: Array<Scalars['String']>;
   searchItems: ItemConnection;
+};
+
+export type QueryGetQuerySuggestionsArgs = {
+  query: Scalars['String'];
 };
 
 export type QuerySearchItemsArgs = {
@@ -95,6 +100,14 @@ export type HomePageSearchItemsQuery = {
       platform: ItemSellingPlatform;
     }>;
   };
+};
+
+export type HomePageGetQuerySuggestionsQueryVariables = Exact<{
+  query: Scalars['String'];
+}>;
+
+export type HomePageGetQuerySuggestionsQuery = {
+  getQuerySuggestions: Array<string>;
 };
 
 export const HomePageSearchItemsDocument = gql`
@@ -170,4 +183,60 @@ export type HomePageSearchItemsLazyQueryHookResult = ReturnType<
 export type HomePageSearchItemsQueryResult = Apollo.QueryResult<
   HomePageSearchItemsQuery,
   HomePageSearchItemsQueryVariables
+>;
+export const HomePageGetQuerySuggestionsDocument = gql`
+  query homePageGetQuerySuggestions($query: String!) {
+    getQuerySuggestions(query: $query)
+  }
+`;
+
+/**
+ * __useHomePageGetQuerySuggestionsQuery__
+ *
+ * To run a query within a React component, call `useHomePageGetQuerySuggestionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useHomePageGetQuerySuggestionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useHomePageGetQuerySuggestionsQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useHomePageGetQuerySuggestionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    HomePageGetQuerySuggestionsQuery,
+    HomePageGetQuerySuggestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    HomePageGetQuerySuggestionsQuery,
+    HomePageGetQuerySuggestionsQueryVariables
+  >(HomePageGetQuerySuggestionsDocument, options);
+}
+export function useHomePageGetQuerySuggestionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    HomePageGetQuerySuggestionsQuery,
+    HomePageGetQuerySuggestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    HomePageGetQuerySuggestionsQuery,
+    HomePageGetQuerySuggestionsQueryVariables
+  >(HomePageGetQuerySuggestionsDocument, options);
+}
+export type HomePageGetQuerySuggestionsQueryHookResult = ReturnType<
+  typeof useHomePageGetQuerySuggestionsQuery
+>;
+export type HomePageGetQuerySuggestionsLazyQueryHookResult = ReturnType<
+  typeof useHomePageGetQuerySuggestionsLazyQuery
+>;
+export type HomePageGetQuerySuggestionsQueryResult = Apollo.QueryResult<
+  HomePageGetQuerySuggestionsQuery,
+  HomePageGetQuerySuggestionsQueryVariables
 >;

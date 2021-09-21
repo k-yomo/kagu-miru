@@ -1,33 +1,40 @@
 package search
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"strings"
-
-	"go.opentelemetry.io/otel"
+	"time"
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
+	"github.com/k-yomo/kagu-miru/internal/es"
+	"github.com/k-yomo/kagu-miru/pkg/logging"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel"
+	"go.uber.org/zap"
 )
 
 type Client interface {
 	SearchItems(ctx context.Context, req *Request) (*Response, error)
+	GetQuerySuggestions(ctx context.Context, query string) (*GetQuerySuggestionsResponse, error)
 }
 
 type client struct {
-	itemsIndexName string
-	esClient       *elasticsearch.Client
+	itemsIndexName                 string
+	itemsQuerySuggestionsIndexName string
+	esClient                       *elasticsearch.Client
 }
 
-func NewSearchClient(itemsIndexName string, esClient *elasticsearch.Client) Client {
+func NewSearchClient(itemsIndexName string, itemsQuerySuggestionsIndexName string, esClient *elasticsearch.Client) Client {
 	return &client{
-		itemsIndexName: itemsIndexName,
-		esClient:       esClient,
+		itemsIndexName:                 itemsIndexName,
+		itemsQuerySuggestionsIndexName: itemsQuerySuggestionsIndexName,
+		esClient:                       esClient,
 	}
 }
 
@@ -55,9 +62,15 @@ type Response struct {
 	TotalPage uint64
 }
 
-func (p *client) SearchItems(ctx context.Context, req *Request) (*Response, error) {
+func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, error) {
 	ctx, span := otel.Tracer("search").Start(ctx, "search.Client_SearchItems")
 	defer span.End()
+
+	go func() {
+		if err := c.insertQuerySuggestion(context.Background(), req.Query); err != nil {
+			logging.Logger(ctx).Error("insertQuerySuggestion failed", zap.Error(err))
+		}
+	}()
 
 	var page uint64
 	if req.Page > 1 {
@@ -67,10 +80,10 @@ func (p *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 	if req.PageSize != nil {
 		pageSize = uint64(*req.PageSize)
 	}
-	response, err := p.esClient.Search(
-		p.esClient.Search.WithContext(ctx),
-		p.esClient.Search.WithIndex(p.itemsIndexName),
-		p.esClient.Search.WithBody(buildSearchQuery(req.Query, req.SortType, page, pageSize)),
+	response, err := c.esClient.Search(
+		c.esClient.Search.WithContext(ctx),
+		c.esClient.Search.WithIndex(c.itemsIndexName),
+		c.esClient.Search.WithBody(buildSearchQuery(req.Query, req.SortType, page, pageSize)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)
@@ -90,18 +103,14 @@ func (p *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 }
 
 func mapResponseToSearchResult(response *esapi.Response) (*Result, error) {
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, errors.Wrapf(err, "read response body failed, response: %s", response.String())
+	}
 	if response.StatusCode >= 400 {
-		body, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			return nil, errors.Wrapf(err, "read error response failed, response: %s", response.String())
-		}
 		return nil, errors.Errorf("search request to elasticsearch failed with status %s, body: %s", response.Status(), body)
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "read response body failed")
-	}
 	sr := &Result{}
 	if err := json.Unmarshal(body, sr); err != nil {
 		return nil, errors.Wrapf(err, "unmarshal response body json failed, body: %s", body)
@@ -120,10 +129,8 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) io
 		sort = `[{ "_score" : "desc" }]`
 	}
 
-	var b strings.Builder
-
 	// TODO: refactor query construction
-	b.WriteString(fmt.Sprintf(`{
+	esQuery := fmt.Sprintf(`{
 	"_source": [
 		"id", 
 		"name", 
@@ -147,9 +154,106 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) io
 	"sort": %s,
 	"from": %d,
 	"size": %d
-}`, query, sort, page*pageSize, pageSize))
+}`, query, sort, page*pageSize, pageSize)
 
-	return strings.NewReader(b.String())
+	return strings.NewReader(esQuery)
+}
+
+type GetQuerySuggestionsResponse struct {
+	Aggregations struct {
+		Queries struct {
+			Buckets []struct {
+				Key      string `json:"key"`
+				DocCount int    `json:"doc_count"`
+			} `json:"buckets"`
+		} `json:"queries"`
+	} `json:"aggregations"`
+}
+
+func (c *client) GetQuerySuggestions(ctx context.Context, query string) (*GetQuerySuggestionsResponse, error) {
+	esQuery := fmt.Sprintf(`{
+  "size": 0,
+  "query": {
+    "bool": {
+      "should": [{
+        "match": {
+          "query.autocomplete": {
+            "query": %q
+          }
+        }
+      }, {
+        "match": {
+          "query.readingform": {
+            "query":  %q,
+            "fuzziness": "AUTO",
+            "operator": "and"
+          }
+        }
+      }]
+    }
+  },
+  "aggs": {
+    "queries": {
+      "terms": {
+        "field": "query",
+        "order": {
+          "_count": "desc"
+        },
+        "size": "10"
+      }
+    }
+  }
+}`, query, query)
+	esResponse, err := c.esClient.Search(
+		c.esClient.Search.WithContext(ctx),
+		c.esClient.Search.WithIndex(c.itemsQuerySuggestionsIndexName),
+		c.esClient.Search.WithBody(strings.NewReader(esQuery)),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("esClient.Search: %w", err)
+	}
+	defer esResponse.Body.Close()
+
+	body, err := ioutil.ReadAll(esResponse.Body)
+	if err != nil {
+		return nil, errors.Wrapf(err, "read response body failed, response: %s", esResponse.String())
+	}
+	if esResponse.StatusCode >= 400 {
+		return nil, fmt.Errorf("search request to elasticsearch failed with status %s, body: %s", esResponse.Status(), body)
+	}
+
+	var response GetQuerySuggestionsResponse
+	if err := json.Unmarshal(body, &response); err != nil {
+		return nil, fmt.Errorf("search request to elasticsearch failed with body: %s: %w", body, err)
+	}
+
+	return &response, nil
+}
+
+func (c *client) insertQuerySuggestion(ctx context.Context, query string) error {
+	querySuggestion := es.QuerySuggestion{Query: query, CreatedAt: time.Now()}
+	querySuggestionJSON, err := json.Marshal(querySuggestion)
+	if err != nil {
+		return fmt.Errorf("json.Marshal: %w", err)
+	}
+
+	response, err := c.esClient.Index(
+		c.itemsQuerySuggestionsIndexName,
+		bytes.NewBuffer(querySuggestionJSON),
+		c.esClient.Index.WithContext(ctx),
+	)
+	if err != nil {
+		return fmt.Errorf("esClient.Index failed: %w", err)
+	}
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return fmt.Errorf("read body failed: %w", err)
+	}
+	if response.StatusCode >= 400 {
+		return fmt.Errorf("index failed, body: %s: %w", body, err)
+	}
+
+	return nil
 }
 
 func calcTotalPage(totalItems, pageSize uint64) uint64 {

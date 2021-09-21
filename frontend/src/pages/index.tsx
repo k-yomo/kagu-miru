@@ -13,6 +13,7 @@ import { SearchIcon } from '@heroicons/react/solid';
 import {
   HomePageSearchItemsQuery,
   SearchItemsSortType,
+  useHomePageGetQuerySuggestionsLazyQuery,
   useHomePageSearchItemsLazyQuery,
 } from '@src/generated/graphql';
 import SEOMeta from '@src/components/SEOMeta';
@@ -20,6 +21,7 @@ import Loading from '@src/components/Loading';
 import { useRouter } from 'next/router';
 import PlatformBadge from '@src/components/PlatformBadge';
 import Pagination from '@src/components/Pagination';
+import QuerySuggestionsDropdown from '@src/components/QuerySuggestionsDropdown';
 
 gql`
   query homePageSearchItems($input: SearchItemsInput!) {
@@ -43,6 +45,10 @@ gql`
       }
     }
   }
+
+  query homePageGetQuerySuggestions($query: String!) {
+    getQuerySuggestions(query: $query)
+  }
 `;
 
 const Home: NextPage = () => {
@@ -50,15 +56,26 @@ const Home: NextPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortType, setSortType] = useState(SearchItemsSortType.BestMatch);
   const [page, setPage] = useState<number>(1);
+  const [suggestedQueries, setSuggestedQueries] = useState<string[]>([]);
+  const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
   const [searchItems, { data, loading, error }] =
     useHomePageSearchItemsLazyQuery({
       fetchPolicy: 'no-cache',
       nextFetchPolicy: 'no-cache',
     });
+  const [getQuerySuggestions, { data: getQuerySuggestionsData }] =
+    useHomePageGetQuerySuggestionsLazyQuery({
+      fetchPolicy: 'no-cache',
+      nextFetchPolicy: 'no-cache',
+    });
 
-  const refreshPageWithParams = () => {
+  const refreshPageWithSearchParams = (
+    query: string,
+    sort: SearchItemsSortType,
+    page: number
+  ) => {
     router.push(
-      `${router.pathname}?q=${searchQuery}&sort=${sortType}&page=${page}`,
+      `${router.pathname}?q=${query}&sort=${sort}&page=${page}`,
       undefined,
       {
         shallow: true,
@@ -73,25 +90,27 @@ const Home: NextPage = () => {
     [setSortType]
   );
 
-  const onChangeSearchInput = useCallback(
+  const onChangeSearchQuery = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setSearchQuery(e.target.value);
+      getQuerySuggestions({ variables: { query: e.target.value } });
     },
-    [setSearchQuery]
+    [setSearchQuery, getQuerySuggestions]
   );
 
-  const onSearchKeyPress = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key == 'Enter') {
-        e.preventDefault();
-        refreshPageWithParams();
-      }
-    },
-    [searchQuery]
-  );
+  const onClickSuggestedQuery = (query: string) => {
+    refreshPageWithSearchParams(query, sortType, 1);
+  };
+
+  const onSearchKeyPress = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key == 'Enter') {
+      e.preventDefault();
+      refreshPageWithSearchParams(searchQuery, sortType, page);
+    }
+  }, []);
 
   useEffect(() => {
-    refreshPageWithParams();
+    refreshPageWithSearchParams(searchQuery, sortType, page);
   }, [page, sortType]);
 
   useEffect(() => {
@@ -115,6 +134,12 @@ const Home: NextPage = () => {
     }
   }, [router.query]);
 
+  useEffect(() => {
+    if (getQuerySuggestionsData?.getQuerySuggestions) {
+      setSuggestedQueries(getQuerySuggestionsData.getQuerySuggestions);
+    }
+  }, [getQuerySuggestionsData?.getQuerySuggestions]);
+
   return (
     <div className="max-w-[1200px] mx-auto">
       <SEOMeta
@@ -126,7 +151,7 @@ const Home: NextPage = () => {
       <div className="m-4">
         <h1 className="text-2xl text-black dark:text-white">商品検索</h1>
         <div className="flex flex-col sm:flex-row items-end justify-between gap-2 my-4 w-full">
-          <div className="relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400  focus-within:text-gray-600">
+          <div className="z-10 relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400  focus-within:text-gray-600">
             <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
               <SearchIcon className="h-5 w-5" aria-hidden="true" />
             </div>
@@ -138,8 +163,19 @@ const Home: NextPage = () => {
                 type="search"
                 name="search"
                 value={searchQuery}
-                onChange={onChangeSearchInput}
+                onChange={onChangeSearchQuery}
                 onKeyPress={onSearchKeyPress}
+                onFocus={() => setShowQuerySuggestions(true)}
+                onBlur={() => {
+                  setTimeout(() => {
+                    setShowQuerySuggestions(false);
+                  }, 100);
+                }}
+              />
+              <QuerySuggestionsDropdown
+                show={showQuerySuggestions && suggestedQueries.length > 0}
+                suggestedQueries={suggestedQueries}
+                onClickQuery={onClickSuggestedQuery}
               />
             </form>
           </div>
@@ -215,6 +251,7 @@ const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
               layout="responsive"
               objectFit="cover"
               className="w-20 h-20"
+              unoptimized
             />
             <div className="py-0.5 sm:p-2">
               <PlatformBadge platform={item.platform} />

@@ -34,6 +34,22 @@ func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.Search
 	return mapSearchResponseToGraphqlItemConnection(searchResponse)
 }
 
+func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
+	querySuggestions, err := r.SearchClient.GetQuerySuggestions(ctx, query)
+	if err != nil {
+		fmt.Println(err)
+		return nil, fmt.Errorf("SearchClient.GetQuerySuggestions: %w", err)
+	}
+
+	suggestedQueries := make([]string, 0, len(querySuggestions.Aggregations.Queries.Buckets))
+	for _, bucket := range querySuggestions.Aggregations.Queries.Buckets {
+		suggestedQueries = append(suggestedQueries, bucket.Key)
+	}
+	fmt.Println(suggestedQueries)
+
+	return suggestedQueries, nil
+}
+
 // Query returns gqlgend.QueryResolver implementation.
 func (r *Resolver) Query() gqlgend.QueryResolver { return &queryResolver{r} }
 

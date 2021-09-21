@@ -21,10 +21,11 @@ type Config struct {
 	GCPProjectID   string   `default:"local" envconfig:"GCP_PROJECT_ID"`
 	AllowedOrigins []string `default:"http://localhost:3000" envconfig:"ALLOWED_ORIGINS"`
 
-	ElasticSearchUsername string `envconfig:"ELASTICSEARCH_USERNAME"`
-	ElasticSearchPassword string `envconfig:"ELASTICSEARCH_PASSWORD"`
-	ElasticSearchURL      string `default:"http://localhost:9200" envconfig:"ELASTICSEARCH_URL"`
-	ItemsIndexName        string `default:"items" envconfig:"ITEMS_INDEX_NAME"`
+	ElasticSearchUsername          string `envconfig:"ELASTICSEARCH_USERNAME"`
+	ElasticSearchPassword          string `envconfig:"ELASTICSEARCH_PASSWORD"`
+	ElasticSearchURL               string `default:"http://localhost:9200" envconfig:"ELASTICSEARCH_URL"`
+	ItemsIndexName                 string `default:"items" envconfig:"ITEMS_INDEX_NAME"`
+	ItemsQuerySuggestionsIndexName string `default:"items.query_suggestions" envconfig:"ITEMS_QUERY_SUGGESTIONS_INDEX_NAME"`
 }
 
 func NewConfig() (*Config, error) {
