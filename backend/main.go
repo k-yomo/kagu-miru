@@ -77,8 +77,11 @@ func main() {
 	gqlServer.Use(logging.GraphQLResponseInterceptor{})
 
 	r := newBaseRouter(cfg, logger)
-	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	r.Handle("/query", gqlServer)
+	r.Route("/api", func(r chi.Router) {
+		r.Handle("/graphql/playground", playground.Handler("GraphQL playground", "/api/graphql"))
+		r.Handle("/graphql", gqlServer)
+	})
+
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
 		Handler: otelhttp.NewHandler(r, "server"),
