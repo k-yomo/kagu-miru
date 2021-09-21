@@ -4,7 +4,7 @@ ENV NODE_ENV=production
 WORKDIR /build
 
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm install
+RUN npm install --production=false
 
 COPY ./frontend .
 RUN npm run build
