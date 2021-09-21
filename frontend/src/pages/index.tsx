@@ -22,6 +22,7 @@ import { useRouter } from 'next/router';
 import PlatformBadge from '@src/components/PlatformBadge';
 import Pagination from '@src/components/Pagination';
 import QuerySuggestionsDropdown from '@src/components/QuerySuggestionsDropdown';
+import Rating from '@src/components/Rating';
 
 gql`
   query homePageSearchItems($input: SearchItemsInput!) {
@@ -152,7 +153,7 @@ const Home: NextPage = () => {
         description="カグミルはオンラインで買える家具を横断で検索出来るサービスです。"
         // img={{ srcPath: TopImg.src }}
       />
-      <div className="m-4">
+      <div className="m-3">
         <h1 className="text-2xl text-black dark:text-white">商品検索</h1>
         <div className="flex flex-col sm:flex-row items-end justify-between gap-2 my-4 w-full">
           <div className="z-10 relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400  focus-within:text-gray-600">
@@ -266,7 +267,13 @@ const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
               <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
               </h4>
-              <div className="font-bold">￥{item.price}</div>
+              <div className="text-lg font-bold">￥{item.price}</div>
+              <div className="flex items-center my-1 ">
+                <Rating rating={item.averageRating} maxRating={5} />
+                <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
+                  {item.reviewCount}
+                </div>
+              </div>
             </div>
           </div>
         </a>
