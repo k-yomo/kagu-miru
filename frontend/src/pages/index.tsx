@@ -267,8 +267,8 @@ const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
               <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
               </h4>
-              <div className="text-lg font-bold">￥{item.price}</div>
-              <div className="flex items-center my-1 ">
+              <div className="sm:text-lg font-bold">￥{item.price}</div>
+              <div className="flex items-center my-1">
                 <Rating rating={item.averageRating} maxRating={5} />
                 <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
                   {item.reviewCount}
