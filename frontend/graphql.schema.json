@@ -538,13 +538,25 @@
             "deprecationReason": null
           },
           {
-            "name": "SORT_BY_PRICE_ASC",
+            "name": "PRICE_ASC",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "SORT_BY_PRICE_DESC",
+            "name": "PRICE_DESC",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RATING",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "REVIEW_COUNT",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

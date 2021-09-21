@@ -13,10 +13,14 @@ func mapGraphqlSortTypeToSearchSortType(st gqlmodel.SearchItemsSortType) (search
 	switch st {
 	case gqlmodel.SearchItemsSortTypeBestMatch:
 		return search.SortTypeBestMatch, nil
-	case gqlmodel.SearchItemsSortTypeSortByPriceAsc:
+	case gqlmodel.SearchItemsSortTypePriceAsc:
 		return search.SortTypePriceAsc, nil
-	case gqlmodel.SearchItemsSortTypeSortByPriceDesc:
+	case gqlmodel.SearchItemsSortTypePriceDesc:
 		return search.SortTypePriceDesc, nil
+	case gqlmodel.SearchItemsSortTypeReviewCount:
+		return search.SortTypeReviewCount, nil
+	case gqlmodel.SearchItemsSortTypeRating:
+		return search.SortTypeRating, nil
 	default:
 		return 0, fmt.Errorf("unknown sort type '%s' is given", st)
 	}

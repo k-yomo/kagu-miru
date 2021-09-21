@@ -38,8 +38,10 @@ type ItemConnection {
 
 enum SearchItemsSortType {
     BEST_MATCH
-    SORT_BY_PRICE_ASC
-    SORT_BY_PRICE_DESC
+    PRICE_ASC
+    PRICE_DESC
+    REVIEW_COUNT
+    RATING
 }
 
 input SearchItemsInput {

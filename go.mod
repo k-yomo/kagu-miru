@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/profiler v0.1.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2
+	github.com/aquasecurity/esquery v0.2.0
 	github.com/blendle/zapdriver v1.3.1
 	github.com/cenkalti/backoff/v4 v4.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.14.0
@@ -26,7 +27,6 @@ require (
 	cloud.google.com/go v0.94.1 // indirect
 	cloud.google.com/go/trace v0.1.0 // indirect
 	github.com/agnivade/levenshtein v1.1.0 // indirect
-	github.com/aquasecurity/esquery v0.2.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect

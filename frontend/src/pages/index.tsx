@@ -92,7 +92,7 @@ const Home: NextPage = () => {
 
   const onChangeSearchQuery = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const query  = e.target.value as string
+      const query = e.target.value as string;
       setSearchQuery(query);
       getQuerySuggestions({ variables: { query: query.trim() } });
     },
@@ -198,11 +198,15 @@ const Home: NextPage = () => {
               onChange={onChangeSortBy}
             >
               <option value={SearchItemsSortType.BestMatch}>関連度順</option>
-              <option value={SearchItemsSortType.SortByPriceAsc}>
-                価格の安い順
-              </option>
-              <option value={SearchItemsSortType.SortByPriceDesc}>
+              <option value={SearchItemsSortType.PriceAsc}>価格の安い順</option>
+              <option value={SearchItemsSortType.PriceDesc}>
                 価格の高い順
+              </option>
+              <option value={SearchItemsSortType.ReviewCount}>
+                レビューの件数順
+              </option>
+              <option value={SearchItemsSortType.Rating}>
+                レビューの評価順
               </option>
             </select>
           </div>

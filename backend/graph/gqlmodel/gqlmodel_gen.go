@@ -122,20 +122,24 @@ func (e ItemStatus) MarshalGQL(w io.Writer) {
 type SearchItemsSortType string
 
 const (
-	SearchItemsSortTypeBestMatch       SearchItemsSortType = "BEST_MATCH"
-	SearchItemsSortTypeSortByPriceAsc  SearchItemsSortType = "SORT_BY_PRICE_ASC"
-	SearchItemsSortTypeSortByPriceDesc SearchItemsSortType = "SORT_BY_PRICE_DESC"
+	SearchItemsSortTypeBestMatch   SearchItemsSortType = "BEST_MATCH"
+	SearchItemsSortTypePriceAsc    SearchItemsSortType = "PRICE_ASC"
+	SearchItemsSortTypePriceDesc   SearchItemsSortType = "PRICE_DESC"
+	SearchItemsSortTypeReviewCount SearchItemsSortType = "REVIEW_COUNT"
+	SearchItemsSortTypeRating      SearchItemsSortType = "RATING"
 )
 
 var AllSearchItemsSortType = []SearchItemsSortType{
 	SearchItemsSortTypeBestMatch,
-	SearchItemsSortTypeSortByPriceAsc,
-	SearchItemsSortTypeSortByPriceDesc,
+	SearchItemsSortTypePriceAsc,
+	SearchItemsSortTypePriceDesc,
+	SearchItemsSortTypeReviewCount,
+	SearchItemsSortTypeRating,
 }
 
 func (e SearchItemsSortType) IsValid() bool {
 	switch e {
-	case SearchItemsSortTypeBestMatch, SearchItemsSortTypeSortByPriceAsc, SearchItemsSortTypeSortByPriceDesc:
+	case SearchItemsSortTypeBestMatch, SearchItemsSortTypePriceAsc, SearchItemsSortTypePriceDesc, SearchItemsSortTypeReviewCount, SearchItemsSortTypeRating:
 		return true
 	}
 	return false

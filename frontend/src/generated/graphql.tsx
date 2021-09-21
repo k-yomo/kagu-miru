@@ -75,8 +75,10 @@ export type SearchItemsInput = {
 
 export enum SearchItemsSortType {
   BestMatch = 'BEST_MATCH',
-  SortByPriceAsc = 'SORT_BY_PRICE_ASC',
-  SortByPriceDesc = 'SORT_BY_PRICE_DESC',
+  PriceAsc = 'PRICE_ASC',
+  PriceDesc = 'PRICE_DESC',
+  Rating = 'RATING',
+  ReviewCount = 'REVIEW_COUNT',
 }
 
 export type HomePageSearchItemsQueryVariables = Exact<{

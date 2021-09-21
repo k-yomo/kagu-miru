@@ -50,6 +50,8 @@ const (
 	SortTypeBestMatch SortType = iota
 	SortTypePriceAsc
 	SortTypePriceDesc
+	SortTypeReviewCount
+	SortTypeRating
 )
 
 type Request struct {
@@ -141,6 +143,10 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (i
 		esQuery.Sort(es.ItemFieldPrice, esquery.OrderAsc)
 	case SortTypePriceDesc:
 		esQuery.Sort(es.ItemFieldPrice, esquery.OrderDesc)
+	case SortTypeReviewCount:
+		esQuery.Sort(es.ItemFieldReviewCount, esquery.OrderDesc)
+	case SortTypeRating:
+		esQuery.Sort(es.ItemFieldAverageRating, esquery.OrderDesc)
 	default:
 		esQuery.Sort("_score", esquery.OrderDesc)
 	}
