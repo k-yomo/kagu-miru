@@ -107,7 +107,7 @@ const Home: NextPage = () => {
       e.preventDefault();
       refreshPageWithSearchParams(searchQuery, sortType, page);
     }
-  }, []);
+  }, [searchQuery]);
 
   useEffect(() => {
     refreshPageWithSearchParams(searchQuery, sortType, page);
