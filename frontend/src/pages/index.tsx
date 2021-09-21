@@ -92,8 +92,9 @@ const Home: NextPage = () => {
 
   const onChangeSearchQuery = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value);
-      getQuerySuggestions({ variables: { query: e.target.value } });
+      const query  = e.target.value as string
+      setSearchQuery(query);
+      getQuerySuggestions({ variables: { query: query.trim() } });
     },
     [setSearchQuery, getQuerySuggestions]
   );
@@ -128,7 +129,7 @@ const Home: NextPage = () => {
       searchItems({
         variables: {
           input: {
-            query,
+            query: query.trim(),
             sortType,
             page,
           },
