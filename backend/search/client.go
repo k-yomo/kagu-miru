@@ -144,9 +144,9 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (i
 	case SortTypePriceDesc:
 		esQuery.Sort(es.ItemFieldPrice, esquery.OrderDesc)
 	case SortTypeReviewCount:
-		esQuery.Sort(es.ItemFieldReviewCount, esquery.OrderDesc)
+		esQuery.Sort(es.ItemFieldReviewCount, esquery.OrderDesc).Sort(es.ItemFieldAverageRating, esquery.OrderDesc)
 	case SortTypeRating:
-		esQuery.Sort(es.ItemFieldAverageRating, esquery.OrderDesc)
+		esQuery.Sort(es.ItemFieldAverageRating, esquery.OrderDesc).Sort(es.ItemFieldReviewCount, esquery.OrderDesc)
 	default:
 		esQuery.Sort("_score", esquery.OrderDesc)
 	}
