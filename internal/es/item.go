@@ -1,5 +1,7 @@
 package es
 
+import "time"
+
 type Platform string
 
 const (
@@ -19,12 +21,19 @@ type Item struct {
 	Description   string   `json:"description"`
 	Status        Status   `json:"status"`
 	URL           string   `json:"url"`
-	AffiliateURL  string   `json:"affiliateUrl"`
+	AffiliateURL  string   `json:"affiliate_url"`
 	Price         int      `json:"price"`
-	ImageURLs     []string `json:"imageUrls"`
-	AverageRating float64  `json:"averageRating"`
-	ReviewCount   int      `json:"reviewCount"`
+	ImageURLs     []string `json:"image_urls"`
+	AverageRating float64  `json:"average_rating"`
+	ReviewCount   int      `json:"review_count"`
+	GenreID       int      `json:"genre_id"`
+	TagIDs        []int    `json:"tag_ids"`
 	Platform      Platform `json:"platform"`
+	IndexedAt     int64    `json:"indexed_at"` // unix millis
+}
+
+func (i *Item) IndexedTime() time.Time {
+	return time.UnixMilli(i.IndexedAt)
 }
 
 const (
@@ -33,12 +42,15 @@ const (
 	ItemFieldDescription   = "description"
 	ItemFieldStatus        = "status"
 	ItemFieldURL           = "url"
-	ItemFieldAffiliateURL  = "affiliateUrl"
+	ItemFieldAffiliateURL  = "affiliate_url"
 	ItemFieldPrice         = "price"
-	ItemFieldImageURLs     = "imageUrls"
-	ItemFieldAverageRating = "averageRating"
-	ItemFieldReviewCount   = "reviewCount"
+	ItemFieldImageURLs     = "image_urls"
+	ItemFieldAverageRating = "average_rating"
+	ItemFieldReviewCount   = "review_count"
+	ItemFieldGenreID       = "genre_id"
+	ItemFieldTagIDs        = "tag_ids"
 	ItemFieldPlatform      = "platform"
+	ItemFieldIndexedAt     = "indexed_at"
 )
 
 var AllItemFields = []string{
@@ -52,5 +64,8 @@ var AllItemFields = []string{
 	ItemFieldImageURLs,
 	ItemFieldAverageRating,
 	ItemFieldReviewCount,
+	ItemFieldGenreID,
+	ItemFieldTagIDs,
 	ItemFieldPlatform,
+	ItemFieldIndexedAt,
 }

@@ -28,23 +28,33 @@
       "url": {
         "type": "keyword"
       },
-      "affiliateUrl": {
+      "affiliate_url": {
         "type": "keyword"
       },
       "price": {
         "type": "long"
       },
-      "imageUrls": {
+      "image_urls": {
         "type": "keyword"
       },
-      "averageRating": {
+      "average_rating": {
         "type": "float"
       },
-      "reviewCount": {
+      "review_count": {
+        "type": "long"
+      },
+      "genre_id": {
+        "type": "long"
+      },
+      "tag_ids": {
         "type": "long"
       },
       "platform": {
         "type": "keyword"
+      },
+      "indexed_at": {
+        "type": "date",
+        "format": "epoch_millis"
       }
     }
   }

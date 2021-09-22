@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strconv"
+	"time"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/k-yomo/kagu-miru/internal/es"
@@ -215,6 +217,11 @@ func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*es.Item, error) {
 		imageURLs = append(imageURLs, mediumImage.ImageURL)
 	}
 
+	genreID, err := strconv.Atoi(rakutenItem.GenreID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid genreId '%s': %w", genreID, err)
+	}
+
 	return &es.Item{
 		ID:            rakutenItem.ID(),
 		Name:          rakutenItem.ItemName,
@@ -226,6 +233,9 @@ func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*es.Item, error) {
 		ImageURLs:     imageURLs,
 		AverageRating: rakutenItem.ReviewAverage,
 		ReviewCount:   rakutenItem.ReviewCount,
+		GenreID:       genreID,
+		TagIDs:        rakutenItem.TagIDs,
 		Platform:      es.PlatformRakuten,
+		IndexedAt:     time.Now().UnixMilli(),
 	}, nil
 }

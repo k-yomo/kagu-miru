@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/k-yomo/kagu-miru/pkg/urlutil"
@@ -125,7 +126,8 @@ type Item struct {
 }
 
 func (i *Item) ID() string {
-	return fmt.Sprintf("rakuten_%s", i.ItemCode)
+	itemID := strings.Split(i.ItemCode, ":")[1]
+	return fmt.Sprintf("rakuten:%s", itemID)
 }
 
 type SearchItemParams struct {
