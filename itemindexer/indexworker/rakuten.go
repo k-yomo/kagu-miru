@@ -238,7 +238,7 @@ func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*es.Item, error) {
 
 	genreID, err := strconv.Atoi(rakutenItem.GenreID)
 	if err != nil {
-		return nil, fmt.Errorf("invalid genreId '%s': %w", genreID, err)
+		return nil, fmt.Errorf("invalid genreId '%d': %w", genreID, err)
 	}
 
 	return &es.Item{
