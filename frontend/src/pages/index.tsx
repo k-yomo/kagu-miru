@@ -12,6 +12,7 @@ import gql from 'graphql-tag';
 import { SearchIcon } from '@heroicons/react/solid';
 import {
   HomePageSearchItemsQuery,
+  SearchItemsInput,
   SearchItemsSortType,
   useHomePageGetQuerySuggestionsLazyQuery,
   useHomePageSearchItemsLazyQuery,
@@ -54,9 +55,12 @@ gql`
 
 const Home: NextPage = () => {
   const router = useRouter();
+  const [searchInput, setSearchInput] = useState<SearchItemsInput>({
+    query: '',
+    sortType: SearchItemsSortType.BestMatch,
+    page: 1,
+  });
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortType, setSortType] = useState(SearchItemsSortType.BestMatch);
-  const [page, setPage] = useState<number>(1);
   const [suggestedQueries, setSuggestedQueries] = useState<string[]>([]);
   const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
   const [searchItems, { data, loading, error }] =
@@ -70,25 +74,27 @@ const Home: NextPage = () => {
       nextFetchPolicy: 'no-cache',
     });
 
-  const refreshPageWithSearchParams = (
-    query: string,
-    sort: SearchItemsSortType,
-    page: number
-  ) => {
-    router.push(
-      `${router.pathname}?q=${query}&sort=${sort}&page=${page}`,
-      undefined,
-      {
-        shallow: true,
-      }
-    );
-  };
+  const updateSearchInput = useCallback(
+    ({ query, sortType, page }: SearchItemsInput) => {
+      router.push(
+        `${router.pathname}?q=${query}&sort=${sortType}&page=${page}`,
+        undefined,
+        {
+          shallow: true,
+        }
+      );
+    },
+    [router]
+  );
 
   const onChangeSortBy = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
-      setSortType(e.target.value as SearchItemsSortType);
+      updateSearchInput({
+        ...searchInput,
+        sortType: e.target.value as SearchItemsSortType,
+      });
     },
-    [setSortType]
+    [searchInput, updateSearchInput]
   );
 
   const onChangeSearchQuery = useCallback(
@@ -101,40 +107,47 @@ const Home: NextPage = () => {
   );
 
   const onClickSuggestedQuery = (query: string) => {
-    refreshPageWithSearchParams(query, sortType, 1);
+    updateSearchInput({ ...searchInput, query, page: 1 });
+  };
+
+  const onClickPage = (page: number) => {
+    updateSearchInput({ ...searchInput, page });
   };
 
   const onSearchKeyPress = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key == 'Enter') {
         e.preventDefault();
-        refreshPageWithSearchParams(searchQuery, sortType, page);
+        updateSearchInput({ ...searchInput, query: searchQuery, page: 1 });
       }
     },
-    [searchQuery]
+    [searchInput, searchQuery, updateSearchInput]
   );
 
   useEffect(() => {
-    refreshPageWithSearchParams(searchQuery, sortType, page);
-  }, [page, sortType]);
+    const { query } = searchInput;
+    searchItems({
+      variables: {
+        input: {
+          ...searchInput,
+          query: query.trim(),
+        },
+      },
+    });
+  }, [searchInput, searchItems]);
 
   useEffect(() => {
     const page = parseInt(router.query.page as string) || 1;
     const sortType =
       (router.query.sort as SearchItemsSortType) ||
       SearchItemsSortType.BestMatch;
-    setPage(page);
     if (router.query.q) {
       const query = router.query.q as string;
       setSearchQuery(query);
-      searchItems({
-        variables: {
-          input: {
-            query: query.trim(),
-            sortType,
-            page,
-          },
-        },
+      setSearchInput({
+        query,
+        sortType,
+        page,
       });
     }
   }, [router.query]);
@@ -195,7 +208,7 @@ const Home: NextPage = () => {
               id="location"
               name="location"
               className="appearance-none mt-1 block w-full pl-3 pr-10 py-2 rounded-md text-base border border-gray-700 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
-              value={sortType}
+              value={searchInput.sortType}
               onChange={onChangeSortBy}
             >
               <option value={SearchItemsSortType.BestMatch}>関連度順</option>
@@ -224,7 +237,7 @@ const Home: NextPage = () => {
               <Pagination
                 page={data.searchItems.pageInfo.page}
                 totalPage={data.searchItems.pageInfo.totalPage}
-                onClickPage={(page) => setPage(page)}
+                onClickPage={onClickPage}
               />
             </div>
           )}

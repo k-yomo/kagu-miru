@@ -1,10 +1,16 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions =  {}
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -34,12 +40,12 @@ export type ItemConnection = {
 };
 
 export enum ItemSellingPlatform {
-  Rakuten = 'RAKUTEN'
+  Rakuten = 'RAKUTEN',
 }
 
 export enum ItemStatus {
   Active = 'ACTIVE',
-  Inactive = 'INACTIVE'
+  Inactive = 'INACTIVE',
 }
 
 export type PageInfo = {
@@ -52,11 +58,9 @@ export type Query = {
   searchItems: ItemConnection;
 };
 
-
 export type QueryGetQuerySuggestionsArgs = {
   query: Scalars['String'];
 };
-
 
 export type QuerySearchItemsArgs = {
   input?: Maybe<SearchItemsInput>;
@@ -74,47 +78,63 @@ export enum SearchItemsSortType {
   PriceAsc = 'PRICE_ASC',
   PriceDesc = 'PRICE_DESC',
   Rating = 'RATING',
-  ReviewCount = 'REVIEW_COUNT'
+  ReviewCount = 'REVIEW_COUNT',
 }
 
 export type HomePageSearchItemsQueryVariables = Exact<{
   input: SearchItemsInput;
 }>;
 
-
-export type HomePageSearchItemsQuery = { searchItems: { pageInfo: { page: number, totalPage: number }, nodes: Array<{ id: string, name: string, description: string, status: ItemStatus, url: string, affiliateUrl: string, price: number, imageUrls: Array<string>, averageRating: number, reviewCount: number, platform: ItemSellingPlatform }> } };
+export type HomePageSearchItemsQuery = {
+  searchItems: {
+    pageInfo: { page: number; totalPage: number };
+    nodes: Array<{
+      id: string;
+      name: string;
+      description: string;
+      status: ItemStatus;
+      url: string;
+      affiliateUrl: string;
+      price: number;
+      imageUrls: Array<string>;
+      averageRating: number;
+      reviewCount: number;
+      platform: ItemSellingPlatform;
+    }>;
+  };
+};
 
 export type HomePageGetQuerySuggestionsQueryVariables = Exact<{
   query: Scalars['String'];
 }>;
 
-
-export type HomePageGetQuerySuggestionsQuery = { getQuerySuggestions: Array<string> };
-
+export type HomePageGetQuerySuggestionsQuery = {
+  getQuerySuggestions: Array<string>;
+};
 
 export const HomePageSearchItemsDocument = gql`
-    query homePageSearchItems($input: SearchItemsInput!) {
-  searchItems(input: $input) {
-    pageInfo {
-      page
-      totalPage
-    }
-    nodes {
-      id
-      name
-      description
-      status
-      url
-      affiliateUrl
-      price
-      imageUrls
-      averageRating
-      reviewCount
-      platform
+  query homePageSearchItems($input: SearchItemsInput!) {
+    searchItems(input: $input) {
+      pageInfo {
+        page
+        totalPage
+      }
+      nodes {
+        id
+        name
+        description
+        status
+        url
+        affiliateUrl
+        price
+        imageUrls
+        averageRating
+        reviewCount
+        platform
+      }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useHomePageSearchItemsQuery__
@@ -132,22 +152,45 @@ export const HomePageSearchItemsDocument = gql`
  *   },
  * });
  */
-export function useHomePageSearchItemsQuery(baseOptions: Apollo.QueryHookOptions<HomePageSearchItemsQuery, HomePageSearchItemsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<HomePageSearchItemsQuery, HomePageSearchItemsQueryVariables>(HomePageSearchItemsDocument, options);
-      }
-export function useHomePageSearchItemsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<HomePageSearchItemsQuery, HomePageSearchItemsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<HomePageSearchItemsQuery, HomePageSearchItemsQueryVariables>(HomePageSearchItemsDocument, options);
-        }
-export type HomePageSearchItemsQueryHookResult = ReturnType<typeof useHomePageSearchItemsQuery>;
-export type HomePageSearchItemsLazyQueryHookResult = ReturnType<typeof useHomePageSearchItemsLazyQuery>;
-export type HomePageSearchItemsQueryResult = Apollo.QueryResult<HomePageSearchItemsQuery, HomePageSearchItemsQueryVariables>;
-export const HomePageGetQuerySuggestionsDocument = gql`
-    query homePageGetQuerySuggestions($query: String!) {
-  getQuerySuggestions(query: $query)
+export function useHomePageSearchItemsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    HomePageSearchItemsQuery,
+    HomePageSearchItemsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    HomePageSearchItemsQuery,
+    HomePageSearchItemsQueryVariables
+  >(HomePageSearchItemsDocument, options);
 }
-    `;
+export function useHomePageSearchItemsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    HomePageSearchItemsQuery,
+    HomePageSearchItemsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    HomePageSearchItemsQuery,
+    HomePageSearchItemsQueryVariables
+  >(HomePageSearchItemsDocument, options);
+}
+export type HomePageSearchItemsQueryHookResult = ReturnType<
+  typeof useHomePageSearchItemsQuery
+>;
+export type HomePageSearchItemsLazyQueryHookResult = ReturnType<
+  typeof useHomePageSearchItemsLazyQuery
+>;
+export type HomePageSearchItemsQueryResult = Apollo.QueryResult<
+  HomePageSearchItemsQuery,
+  HomePageSearchItemsQueryVariables
+>;
+export const HomePageGetQuerySuggestionsDocument = gql`
+  query homePageGetQuerySuggestions($query: String!) {
+    getQuerySuggestions(query: $query)
+  }
+`;
 
 /**
  * __useHomePageGetQuerySuggestionsQuery__
@@ -165,14 +208,37 @@ export const HomePageGetQuerySuggestionsDocument = gql`
  *   },
  * });
  */
-export function useHomePageGetQuerySuggestionsQuery(baseOptions: Apollo.QueryHookOptions<HomePageGetQuerySuggestionsQuery, HomePageGetQuerySuggestionsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<HomePageGetQuerySuggestionsQuery, HomePageGetQuerySuggestionsQueryVariables>(HomePageGetQuerySuggestionsDocument, options);
-      }
-export function useHomePageGetQuerySuggestionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<HomePageGetQuerySuggestionsQuery, HomePageGetQuerySuggestionsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<HomePageGetQuerySuggestionsQuery, HomePageGetQuerySuggestionsQueryVariables>(HomePageGetQuerySuggestionsDocument, options);
-        }
-export type HomePageGetQuerySuggestionsQueryHookResult = ReturnType<typeof useHomePageGetQuerySuggestionsQuery>;
-export type HomePageGetQuerySuggestionsLazyQueryHookResult = ReturnType<typeof useHomePageGetQuerySuggestionsLazyQuery>;
-export type HomePageGetQuerySuggestionsQueryResult = Apollo.QueryResult<HomePageGetQuerySuggestionsQuery, HomePageGetQuerySuggestionsQueryVariables>;
+export function useHomePageGetQuerySuggestionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    HomePageGetQuerySuggestionsQuery,
+    HomePageGetQuerySuggestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    HomePageGetQuerySuggestionsQuery,
+    HomePageGetQuerySuggestionsQueryVariables
+  >(HomePageGetQuerySuggestionsDocument, options);
+}
+export function useHomePageGetQuerySuggestionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    HomePageGetQuerySuggestionsQuery,
+    HomePageGetQuerySuggestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    HomePageGetQuerySuggestionsQuery,
+    HomePageGetQuerySuggestionsQueryVariables
+  >(HomePageGetQuerySuggestionsDocument, options);
+}
+export type HomePageGetQuerySuggestionsQueryHookResult = ReturnType<
+  typeof useHomePageGetQuerySuggestionsQuery
+>;
+export type HomePageGetQuerySuggestionsLazyQueryHookResult = ReturnType<
+  typeof useHomePageGetQuerySuggestionsLazyQuery
+>;
+export type HomePageGetQuerySuggestionsQueryResult = Apollo.QueryResult<
+  HomePageGetQuerySuggestionsQuery,
+  HomePageGetQuerySuggestionsQueryVariables
+>;
