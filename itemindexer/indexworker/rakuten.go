@@ -246,7 +246,7 @@ func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*es.Item, error) {
 	janCode := jancode.ExtractJANCode(rakutenItem.ItemCaption)
 
 	return &es.Item{
-		ID:            rakutenItem.ID(),
+		ID:            es.ItemUniqueID(es.PlatformRakuten, rakutenItem.ID()),
 		Name:          rakutenItem.ItemName,
 		Description:   rakutenItem.ItemCaption,
 		Status:        status,

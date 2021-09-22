@@ -1,6 +1,10 @@
 package es
 
-import "time"
+import (
+	"fmt"
+	"strings"
+	"time"
+)
 
 type Platform string
 
@@ -35,6 +39,15 @@ type Item struct {
 
 func (i *Item) IndexedTime() time.Time {
 	return time.UnixMilli(i.IndexedAt)
+}
+
+// ItemID returns original item's ID on the platform
+func (i *Item) ItemID() string {
+	return strings.Split(":", i.ID)[1]
+}
+
+func ItemUniqueID(platform Platform, itemID string) string {
+	return fmt.Sprintf("%s:%s", platform, itemID)
 }
 
 const (

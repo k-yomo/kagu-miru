@@ -126,8 +126,7 @@ type Item struct {
 }
 
 func (i *Item) ID() string {
-	itemID := strings.Split(i.ItemCode, ":")[1]
-	return fmt.Sprintf("rakuten:%s", itemID)
+	return strings.Split(i.ItemCode, ":")[1]
 }
 
 type SearchItemParams struct {
