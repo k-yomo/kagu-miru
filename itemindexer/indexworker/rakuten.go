@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -18,34 +19,43 @@ import (
 type genreIndexWorker struct {
 	itemIndexer            *index.ItemIndexer
 	rakutenIchibaAPIClient *rakuten.IchibaClient
-	logger                 *zap.Logger
 
+	wg      *sync.WaitGroup
 	pool    chan<- *genreIndexWorker
 	genreID chan int
+
+	logger *zap.Logger
 }
 
 type RakutenWorker struct {
 	rakutenIchibaAPIClient *rakuten.IchibaClient
 	pool                   <-chan *genreIndexWorker
 	workers                []*genreIndexWorker
+	logger                 *zap.Logger
+
+	wg *sync.WaitGroup
 }
 
 func NewRakutenItemWorker(indexer *index.ItemIndexer, rakutenIchibaAPIClient *rakuten.IchibaClient, logger *zap.Logger) *RakutenWorker {
+	wg := &sync.WaitGroup{}
 	pool := make(chan *genreIndexWorker, rakutenIchibaAPIClient.ApplicationIDNum())
 	workers := make([]*genreIndexWorker, 0, cap(pool))
 	for i := 0; i < cap(pool); i++ {
 		workers = append(workers, &genreIndexWorker{
 			itemIndexer:            indexer,
 			rakutenIchibaAPIClient: rakutenIchibaAPIClient,
-			logger:                 logger,
+			wg:                     wg,
 			pool:                   pool,
 			genreID:                make(chan int),
+			logger:                 logger,
 		})
 	}
 	return &RakutenWorker{
 		rakutenIchibaAPIClient: rakutenIchibaAPIClient,
+		wg:                     wg,
 		pool:                   pool,
 		workers:                workers,
+		logger:                 logger,
 	}
 }
 
@@ -78,10 +88,15 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 		}
 	}
 
+	r.logger.Info(fmt.Sprintf("[start] indexing %d genre", len(furnitureGenreIDs[startGenreIdx:])))
+
 	for _, genreID := range furnitureGenreIDs[startGenreIdx:] {
+		r.wg.Add(1)
 		(<-r.pool).genreID <- genreID
 	}
+	r.wg.Wait()
 
+	r.logger.Info(fmt.Sprintf("[end] indexing %d genre", len(furnitureGenreIDs[startGenreIdx:])))
 	return nil
 }
 
@@ -143,15 +158,6 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 					}
 
 					// when finished to get all items in the genre
-					if searchItemRes.Count == 0 {
-						w.logger.Info(fmt.Sprintf(
-							"indexed all items in genre %d", genreID),
-							zap.Int("genreID", genreID),
-							zap.Int("total", totalIndexCount),
-						)
-						break
-					}
-
 					rakutenItems := make([]*rakuten.Item, 0, len(searchItemRes.Items))
 					for _, item := range searchItemRes.Items {
 						rakutenItems = append(rakutenItems, item.Item)
@@ -177,13 +183,26 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 					}
 
 					if curPage == searchItemRes.PageCount {
+						if searchItemRes.PageCount < 100 {
+							w.logger.Info(fmt.Sprintf(
+								"indexed all items in genre %d", genreID),
+								zap.Int("genreID", genreID),
+								zap.Int("total", totalIndexCount),
+							)
+							break
+						}
+						nextPrice := searchItemRes.Items[len(searchItemRes.Items)-1].Item.ItemPrice
+						if curMinPrice == nextPrice {
+							nextPrice++
+						}
 						curPage = 1
-						// this implementation might miss items because the next item might be the same price
-						curMinPrice = searchItemRes.Items[len(searchItemRes.Items)-1].Item.ItemPrice + 1
+						curMinPrice = nextPrice
 					} else {
 						curPage++
 					}
 				}
+
+				w.wg.Done()
 			}
 		}
 	}()
