@@ -5,6 +5,7 @@ go 1.17
 require (
 	cloud.google.com/go/profiler v0.1.0
 	github.com/99designs/gqlgen v0.14.0
+	github.com/Code-Hex/gqldoc v0.0.4
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2
 	github.com/aquasecurity/esquery v0.2.0
 	github.com/blendle/zapdriver v1.3.1
@@ -36,12 +37,14 @@ require (
 	github.com/google/pprof v0.0.0-20210827144239-02619b876842 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/gqlgo/gqlparser/v2 v2.1.1-0.20210410045713-c9e512f85393 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/machinebox/graphql v0.2.2 // indirect
 	github.com/matryer/moq v0.0.0-20200106131100-75d0ddfc0007 // indirect
+	github.com/mattn/go-zglob v0.0.3 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
-	github.com/russross/blackfriday/v2 v2.0.1 // indirect
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
-	github.com/urfave/cli/v2 v2.1.1 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/urfave/cli/v2 v2.3.0 // indirect
 	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/contrib v0.23.0 // indirect

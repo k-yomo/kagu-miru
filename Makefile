@@ -28,6 +28,7 @@ fmt:
 gen-graphql:
 	go generate ./... & \
 	cd frontend && npm run codegen & \
+	gqldoc -s defs/graphql/schema.graphql -o ./docs/graphql & \
 	wait
 
 .PHONY: tf-symlink
