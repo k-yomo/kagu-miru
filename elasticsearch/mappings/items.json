@@ -49,6 +49,9 @@
       "tag_ids": {
         "type": "long"
       },
+      "jan_code": {
+        "type": "keyword"
+      },
       "platform": {
         "type": "keyword"
       },

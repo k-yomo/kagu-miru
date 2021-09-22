@@ -28,6 +28,7 @@ type Item struct {
 	ReviewCount   int      `json:"review_count"`
 	GenreID       int      `json:"genre_id"`
 	TagIDs        []int    `json:"tag_ids"`
+	JANCode       string   `json:"jan_code,omitempty"`
 	Platform      Platform `json:"platform"`
 	IndexedAt     int64    `json:"indexed_at"` // unix millis
 }
@@ -49,6 +50,7 @@ const (
 	ItemFieldReviewCount   = "review_count"
 	ItemFieldGenreID       = "genre_id"
 	ItemFieldTagIDs        = "tag_ids"
+	ItemFieldJANCode       = "jan_code"
 	ItemFieldPlatform      = "platform"
 	ItemFieldIndexedAt     = "indexed_at"
 )
@@ -66,6 +68,7 @@ var AllItemFields = []string{
 	ItemFieldReviewCount,
 	ItemFieldGenreID,
 	ItemFieldTagIDs,
+	ItemFieldJANCode,
 	ItemFieldPlatform,
 	ItemFieldIndexedAt,
 }
