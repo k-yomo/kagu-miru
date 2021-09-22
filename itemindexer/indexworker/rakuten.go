@@ -10,7 +10,6 @@ import (
 
 	"github.com/k-yomo/kagu-miru/pkg/jancode"
 
-	"github.com/cenkalti/backoff/v4"
 	"github.com/k-yomo/kagu-miru/internal/es"
 	"github.com/k-yomo/kagu-miru/itemindexer/index"
 	"github.com/k-yomo/kagu-miru/pkg/rakuten"
@@ -132,36 +131,34 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 			case <-ctx.Done():
 				return
 			case genreID := <-w.genreID:
-				totalIndexCount := 0
-				curPage := 1
-				curMinPrice := 0
 
+				totalIndexCount := 0
+				cursor := w.rakutenIchibaAPIClient.NewGenreItemCursor(genreID)
 				for {
 					if err := rateLimiter.Wait(ctx); err != nil {
 						w.logger.Error("rateLimiter.Wait failed", zap.Error(err))
 					}
 
-					searchItemParams := &rakuten.SearchItemParams{
-						GenreID:  genreID,
-						MinPrice: curMinPrice,
-						Page:     curPage,
-						SortType: rakuten.SearchItemSortTypeItemPriceAsc,
+					res, err := cursor.Next(ctx)
+					if err == rakuten.Done {
+						w.logger.Info(fmt.Sprintf(
+							"indexed all items in genre %d", genreID),
+							zap.Int("genreID", genreID),
+							zap.Int("total", totalIndexCount),
+						)
+						break
 					}
-					var searchItemRes *rakuten.SearchItemResponse
-					b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 5)
-					err := backoff.Retry(func() error {
-						var err error
-						searchItemRes, err = w.rakutenIchibaAPIClient.SearchItem(ctx, searchItemParams)
-						return err
-					}, b)
 					if err != nil {
-						w.logger.Error("rakutenIchibaAPIClient.SearchItem failed", zap.Error(err), zap.Any("params", searchItemParams))
+						w.logger.Error("cursor.Next failed",
+							zap.Int("genreID", genreID),
+							zap.Int("minPrice", cursor.CurMinPrice()),
+							zap.Int("page", cursor.CurPage()),
+						)
 						break
 					}
 
-					// when finished to get all items in the genre
-					rakutenItems := make([]*rakuten.Item, 0, len(searchItemRes.Items))
-					for _, item := range searchItemRes.Items {
+					rakutenItems := make([]*rakuten.Item, 0, len(res.Items))
+					for _, item := range res.Items {
 						rakutenItems = append(rakutenItems, item.Item)
 					}
 					items, err := mapRakutenItemsToIndexItems(rakutenItems)
@@ -178,29 +175,10 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 							w.logger.Info(fmt.Sprintf(
 								"indexed %d items", totalIndexCount),
 								zap.Int("genreID", genreID),
-								zap.Int("minPrice", curMinPrice),
-								zap.Int("page", curPage),
+								zap.Int("minPrice", cursor.CurMinPrice()),
+								zap.Int("page", cursor.CurPage()),
 							)
 						}
-					}
-
-					if curPage == searchItemRes.PageCount {
-						if searchItemRes.PageCount < 100 {
-							w.logger.Info(fmt.Sprintf(
-								"indexed all items in genre %d", genreID),
-								zap.Int("genreID", genreID),
-								zap.Int("total", totalIndexCount),
-							)
-							break
-						}
-						nextPrice := searchItemRes.Items[len(searchItemRes.Items)-1].Item.ItemPrice
-						if curMinPrice == nextPrice {
-							nextPrice++
-						}
-						curPage = 1
-						curMinPrice = nextPrice
-					} else {
-						curPage++
 					}
 				}
 
