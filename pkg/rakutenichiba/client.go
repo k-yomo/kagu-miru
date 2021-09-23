@@ -1,4 +1,4 @@
-package rakuten
+package rakutenichiba
 
 import (
 	"context"
@@ -7,18 +7,19 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 	"sync"
+
+	"github.com/k-yomo/kagu-miru/pkg/httputil"
 
 	"github.com/k-yomo/kagu-miru/pkg/urlutil"
 )
 
 const (
-	ichibaItemAPIBaseURL  = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706"
-	ichibaGenreAPIBaseURL = "https://app.rakuten.co.jp/services/api/IchibaGenre/Search/20140222"
+	itemSearchAPIURL  = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706"
+	genreSearchAPIURL = "https://app.rakuten.co.jp/services/api/IchibaGenre/Search/20140222"
 )
 
-type IchibaClient struct {
+type Client struct {
 	sync.Mutex
 
 	applicationIDs []string
@@ -26,20 +27,20 @@ type IchibaClient struct {
 
 	affiliateID string
 
-	ichibaItemAPIBaseURL  *url.URL
-	ichibaGenreAPIBaseURL *url.URL
-	httpClient            *http.Client
+	itemSearchAPIURL  *url.URL
+	genreSearchAPIURL *url.URL
+	httpClient        *http.Client
 }
 
-func NewIchibaClient(appIDs []string, affiliateID string) *IchibaClient {
-	ichibaItemAPIURL, _ := url.Parse(ichibaItemAPIBaseURL)
-	ichibaGenreAPIURL, _ := url.Parse(ichibaGenreAPIBaseURL)
-	return &IchibaClient{
-		applicationIDs:        appIDs,
-		affiliateID:           affiliateID,
-		ichibaItemAPIBaseURL:  ichibaItemAPIURL,
-		ichibaGenreAPIBaseURL: ichibaGenreAPIURL,
-		httpClient:            http.DefaultClient,
+func NewClient(appIDs []string, affiliateID string) *Client {
+	itemAPIURL, _ := url.Parse(itemSearchAPIURL)
+	genreAPIURL, _ := url.Parse(genreSearchAPIURL)
+	return &Client{
+		applicationIDs:    appIDs,
+		affiliateID:       affiliateID,
+		itemSearchAPIURL:  itemAPIURL,
+		genreSearchAPIURL: genreAPIURL,
+		httpClient:        http.DefaultClient,
 	}
 }
 
@@ -61,10 +62,10 @@ type SearchGenreResponse struct {
 
 // SearchGenre searches parent, current and children genre of given ID
 // https://webservice.rakuten.co.jp/api/ichibagenresearch/
-func (i *IchibaClient) SearchGenre(ctx context.Context, genreID string) (*SearchGenreResponse, error) {
-	u := urlutil.CopyWithQueries(i.ichibaGenreAPIBaseURL, i.buildParams(map[string]string{"genreId": genreID}))
+func (c *Client) SearchGenre(ctx context.Context, genreID string) (*SearchGenreResponse, error) {
+	u := urlutil.CopyWithQueries(c.genreSearchAPIURL, c.buildParams(map[string]string{"genreId": genreID}))
 	var resp SearchGenreResponse
-	if err := getAndUnmarshal(ctx, i.httpClient, u, &resp); err != nil {
+	if err := httputil.GetAndUnmarshal(ctx, c.httpClient, u, &resp); err != nil {
 		return nil, fmt.Errorf("getAndUnmarshal: %w", err)
 	}
 	return &resp, nil
@@ -72,62 +73,12 @@ func (i *IchibaClient) SearchGenre(ctx context.Context, genreID string) (*Search
 
 // ApplicationIDNum returns number of application ids available
 // It's be useful for rate limiting
-func (i *IchibaClient) ApplicationIDNum() int {
-	return len(i.applicationIDs)
+func (c *Client) ApplicationIDNum() int {
+	return len(c.applicationIDs)
 }
 
 const SearchItemCountPerPage = 30
 const SearchItemPageLimit = 100
-
-type Item struct {
-	ItemName        string  `json:"itemName"`
-	Catchcopy       string  `json:"catchcopy"`
-	ItemCaption     string  `json:"itemCaption"`
-	ItemPrice       int     `json:"itemPrice"`
-	PointRate       float64 `json:"pointRate"`
-	ItemCode        string  `json:"itemCode"`
-	ItemURL         string  `json:"itemUrl"`
-	AffiliateRate   int     `json:"affiliateRate"`
-	AffiliateUrl    string  `json:"affiliateUrl"`
-	Availability    int     `json:"availability"`
-	GenreID         string  `json:"genreId"`
-	TagIDs          []int   `json:"tagIds"`
-	MediumImageURLs []struct {
-		ImageURL string `json:"imageUrl"`
-	} `json:"mediumImageUrls"`
-	SmallImageURLs []struct {
-		ImageURL string `json:"imageUrl"`
-	} `json:"SmallImageUrls"`
-	ReviewCount   int     `json:"reviewCount"`
-	ReviewAverage float64 `json:"reviewAverage"`
-
-	// "startTime": "",
-	// "endTime": "",
-	// "asurakuClosingTime": "",
-	// 	"pointRateStartTime": "",
-	// "pointRateEndTime": "",
-
-	ShopName          string `json:"shopName"`
-	ShopCode          string `json:"shopCode"`
-	ShopUrl           string `json:"shopUrl"`
-	ShopAffiliateUrl  string `json:"shopAffiliateUrl"`
-	ShopOfTheYearFlag int    `json:"shopOfTheYearFlag"`
-
-	ShipOverseasFlag int `json:"shipOverseasFlag"`
-	AsurakuFlag      int `json:"asurakuFlag"`
-	ImageFlag        int `json:"imageFlag"`
-	TaxFlag          int `json:"taxFlag"`
-	PostageFlag      int `json:"postageFlag"`
-	GiftFlag         int `json:"giftFlag"`
-	CreditCardFlag   int `json:"creditCardFlag"`
-
-	AsurakuArea      string `json:"asurakuArea"`
-	ShipOverseasArea string `json:"shipOverseasArea"`
-}
-
-func (i *Item) ID() string {
-	return strings.Split(i.ItemCode, ":")[1]
-}
 
 type SearchItemParams struct {
 	// Either one of `Keyword`, `ShopCode`, `ItemCode` or `GenreID` must be supplied
@@ -171,7 +122,7 @@ const (
 
 // SearchItem searches items
 // https://webservice.rakuten.co.jp/api/ichibaitemsearch/
-func (i *IchibaClient) SearchItem(ctx context.Context, params *SearchItemParams) (*SearchItemResponse, error) {
+func (c *Client) SearchItem(ctx context.Context, params *SearchItemParams) (*SearchItemResponse, error) {
 	if params.Keyword == "" && params.ShopCode == "" && params.ItemCode == "" && params.GenreID == 0 {
 		return nil, errors.New("either one of `Keyword`, `ShopCode`, `ItemCode` or `GenreID` must be supplied")
 	}
@@ -182,7 +133,7 @@ func (i *IchibaClient) SearchItem(ctx context.Context, params *SearchItemParams)
 
 	reqParams := map[string]string{
 		"sort":        string(params.SortType),
-		"affiliateId": i.affiliateID,
+		"affiliateId": c.affiliateID,
 	}
 	if params.Keyword != "" {
 		reqParams["keyword"] = params.Keyword
@@ -206,18 +157,18 @@ func (i *IchibaClient) SearchItem(ctx context.Context, params *SearchItemParams)
 		reqParams["page"] = strconv.Itoa(params.Page)
 	}
 
-	u := urlutil.CopyWithQueries(i.ichibaItemAPIBaseURL, i.buildParams(reqParams))
+	u := urlutil.CopyWithQueries(c.itemSearchAPIURL, c.buildParams(reqParams))
 	var resp SearchItemResponse
-	if err := getAndUnmarshal(ctx, i.httpClient, u, &resp); err != nil {
+	if err := httputil.GetAndUnmarshal(ctx, c.httpClient, u, &resp); err != nil {
 		return nil, fmt.Errorf("getAndUnmarshal: %w", err)
 	}
 	return &resp, nil
 }
 
-func (i *IchibaClient) buildParams(params map[string]string) map[string]string {
+func (c *Client) buildParams(params map[string]string) map[string]string {
 	p := map[string]string{
 		"format":        "json",
-		"applicationId": i.getApplicationID(),
+		"applicationId": c.getApplicationID(),
 	}
 	for k, v := range params {
 		p[k] = v
@@ -226,15 +177,15 @@ func (i *IchibaClient) buildParams(params map[string]string) map[string]string {
 	return p
 }
 
-func (i *IchibaClient) getApplicationID() string {
-	i.Lock()
-	defer i.Unlock()
+func (c *Client) getApplicationID() string {
+	c.Lock()
+	defer c.Unlock()
 
-	idx := i.appIDIndex
-	if idx == len(i.applicationIDs)-1 {
-		i.appIDIndex = 0
+	idx := c.appIDIndex
+	if idx == len(c.applicationIDs)-1 {
+		c.appIDIndex = 0
 	} else {
-		i.appIDIndex++
+		c.appIDIndex++
 	}
-	return i.applicationIDs[idx]
+	return c.applicationIDs[idx]
 }

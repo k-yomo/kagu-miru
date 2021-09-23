@@ -1,4 +1,4 @@
-package rakuten
+package httputil
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"net/url"
 )
 
-func getAndUnmarshal(ctx context.Context, httpClient *http.Client, u *url.URL, to interface{}) error {
+func GetAndUnmarshal(ctx context.Context, httpClient *http.Client, u *url.URL, to interface{}) error {
 	req, err := http.NewRequestWithContext(ctx, "GET", u.String(), nil)
 	if err != nil {
 		return fmt.Errorf("http.NewRequestWithContext, url: %s: %w", u.String(), err)

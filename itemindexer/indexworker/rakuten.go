@@ -12,14 +12,14 @@ import (
 
 	"github.com/k-yomo/kagu-miru/internal/es"
 	"github.com/k-yomo/kagu-miru/itemindexer/index"
-	"github.com/k-yomo/kagu-miru/pkg/rakuten"
+	"github.com/k-yomo/kagu-miru/pkg/rakutenichiba"
 	"go.uber.org/zap"
 	"golang.org/x/time/rate"
 )
 
 type genreIndexWorker struct {
 	itemIndexer            *index.ItemIndexer
-	rakutenIchibaAPIClient *rakuten.IchibaClient
+	rakutenIchibaAPIClient *rakutenichiba.Client
 
 	wg      *sync.WaitGroup
 	pool    chan<- *genreIndexWorker
@@ -29,7 +29,7 @@ type genreIndexWorker struct {
 }
 
 type RakutenWorker struct {
-	rakutenIchibaAPIClient *rakuten.IchibaClient
+	rakutenIchibaAPIClient *rakutenichiba.Client
 	pool                   <-chan *genreIndexWorker
 	workers                []*genreIndexWorker
 	logger                 *zap.Logger
@@ -37,7 +37,7 @@ type RakutenWorker struct {
 	wg *sync.WaitGroup
 }
 
-func NewRakutenItemWorker(indexer *index.ItemIndexer, rakutenIchibaAPIClient *rakuten.IchibaClient, logger *zap.Logger) *RakutenWorker {
+func NewRakutenItemWorker(indexer *index.ItemIndexer, rakutenIchibaAPIClient *rakutenichiba.Client, logger *zap.Logger) *RakutenWorker {
 	wg := &sync.WaitGroup{}
 	pool := make(chan *genreIndexWorker, rakutenIchibaAPIClient.ApplicationIDNum())
 	workers := make([]*genreIndexWorker, 0, cap(pool))
@@ -102,7 +102,7 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 }
 
 func (r *RakutenWorker) getFurnitureGenreIDs(ctx context.Context) ([]int, error) {
-	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakuten.GenreFurnitureID)
+	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakutenichiba.GenreFurnitureID)
 	if err != nil {
 		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
 	}
@@ -140,7 +140,7 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 					}
 
 					res, err := cursor.Next(ctx)
-					if err == rakuten.Done {
+					if err == rakutenichiba.Done {
 						w.logger.Info(fmt.Sprintf(
 							"indexed all items in genre %d", genreID),
 							zap.Int("genreID", genreID),
@@ -157,7 +157,7 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 						break
 					}
 
-					rakutenItems := make([]*rakuten.Item, 0, len(res.Items))
+					rakutenItems := make([]*rakutenichiba.Item, 0, len(res.Items))
 					for _, item := range res.Items {
 						rakutenItems = append(rakutenItems, item.Item)
 					}
@@ -188,7 +188,7 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 	}()
 }
 
-func mapRakutenItemsToIndexItems(rakutenItems []*rakuten.Item) ([]*es.Item, error) {
+func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item) ([]*es.Item, error) {
 	items := make([]*es.Item, 0, len(rakutenItems))
 	for _, rakutenItem := range rakutenItems {
 		item, err := mapRakutenItemToIndexItem(rakutenItem)
@@ -200,7 +200,7 @@ func mapRakutenItemsToIndexItems(rakutenItems []*rakuten.Item) ([]*es.Item, erro
 	return items, nil
 }
 
-func mapRakutenItemToIndexItem(rakutenItem *rakuten.Item) (*es.Item, error) {
+func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item) (*es.Item, error) {
 	var status es.Status
 	switch rakutenItem.Availability {
 	case 0:

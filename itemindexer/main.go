@@ -11,7 +11,7 @@ import (
 	"github.com/k-yomo/kagu-miru/itemindexer/config"
 	"github.com/k-yomo/kagu-miru/itemindexer/index"
 	"github.com/k-yomo/kagu-miru/itemindexer/indexworker"
-	"github.com/k-yomo/kagu-miru/pkg/rakuten"
+	"github.com/k-yomo/kagu-miru/pkg/rakutenichiba"
 	"go.uber.org/zap"
 )
 
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	indexer := index.NewItemIndexer(cfg.ItemsIndexName, esClient)
-	rakutenIchibaClient := rakuten.NewIchibaClient(cfg.RakutenApplicationIDs, cfg.RakutenAffiliateID)
+	rakutenIchibaClient := rakutenichiba.NewClient(cfg.RakutenApplicationIDs, cfg.RakutenAffiliateID)
 	rakutenItemWorker := indexworker.NewRakutenItemWorker(indexer, rakutenIchibaClient, logger)
 
 	ctx, cancel := context.WithCancel(context.Background())

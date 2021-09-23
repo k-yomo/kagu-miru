@@ -1,4 +1,4 @@
-package rakuten
+package rakutenichiba
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 var Done = errors.New("DONE")
 
 type GenreItemCursor struct {
-	ichibaClient *IchibaClient
+	ichibaClient *Client
 	genreID      int
 	curPage      int
 	curMinPrice  int
@@ -18,9 +18,9 @@ type GenreItemCursor struct {
 	isDone bool
 }
 
-func (i *IchibaClient) NewGenreItemCursor(genreID int) *GenreItemCursor {
+func (c *Client) NewGenreItemCursor(genreID int) *GenreItemCursor {
 	return &GenreItemCursor{
-		ichibaClient: i,
+		ichibaClient: c,
 		genreID:      genreID,
 		curPage:      1,
 		curMinPrice:  0,
