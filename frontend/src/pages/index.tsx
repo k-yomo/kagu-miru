@@ -118,6 +118,7 @@ const Home: NextPage = () => {
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key == 'Enter') {
         e.preventDefault();
+        setShowQuerySuggestions(false);
         updateSearchInput({ ...searchInput, query: searchQuery, page: 1 });
       }
     },
