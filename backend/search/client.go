@@ -146,6 +146,7 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (i
 }
 
 func (c *client) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
+	const aggregationTerm = "queries"
 	esQuery, err := esquery.Search().
 		Query(
 			esquery.Bool().Should(
@@ -154,7 +155,7 @@ func (c *client) GetQuerySuggestions(ctx context.Context, query string) ([]strin
 			),
 		).
 		Aggs(
-			esquery.TermsAgg("queries", "query").
+			esquery.TermsAgg(aggregationTerm, "query").
 				Order(map[string]string{"_count": string(esquery.OrderDesc)}).
 				Size(10),
 		).
@@ -170,9 +171,9 @@ func (c *client) GetQuerySuggestions(ctx context.Context, query string) ([]strin
 		return nil, fmt.Errorf("c.search: %w", err)
 	}
 
-	bucketKeyItems, ok := searchResult.Aggregations.Terms("queries")
+	bucketKeyItems, ok := searchResult.Aggregations.Terms(aggregationTerm)
 	if !ok {
-		return nil, fmt.Errorf("", err)
+		return nil, fmt.Errorf("aggregation term '%s' not found in the search result, aggs: %+v", aggregationTerm, searchResult.Aggregations)
 	}
 
 	suggestedQueries := make([]string, 0, len(bucketKeyItems.Buckets))
