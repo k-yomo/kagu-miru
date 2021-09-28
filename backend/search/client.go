@@ -94,6 +94,7 @@ func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 		c.esClient.Search.WithContext(ctx),
 		c.esClient.Search.WithIndex(c.itemsIndexName),
 		c.esClient.Search.WithBody(esQuery),
+		c.esClient.Search.WithRequestCache(true),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)
@@ -182,6 +183,7 @@ func (c *client) GetQuerySuggestions(ctx context.Context, query string) ([]strin
 		c.esClient.Search.WithContext(ctx),
 		c.esClient.Search.WithIndex(c.itemsQuerySuggestionsIndexName),
 		c.esClient.Search.WithBody(bytes.NewReader(esQuery)),
+		c.esClient.Search.WithRequestCache(true),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)
