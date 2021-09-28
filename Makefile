@@ -22,7 +22,6 @@ fmt:
 	go fmt ./... & \
 	goimports -w . & \
 	cd frontend && npm run fmt & \
-	cd terraform && terraform fmt -recursive & \
 	wait
 
 gen-graphql:
@@ -30,9 +29,3 @@ gen-graphql:
 	cd frontend && npm run codegen & \
 	gqldoc -s defs/graphql/schema.graphql -o ./docs/graphql & \
 	wait
-
-.PHONY: tf-symlink
-tf-symlink:
-	#cd ./terraform/dev && ln -sf ../shared/* .
-	cd ./terraform/prod && ln -sf ../shared/* .
-
