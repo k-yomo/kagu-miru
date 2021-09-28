@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/k-yomo/kagu-miru/pkg/esutil"
+	"github.com/k-yomo/kagu-miru/pkg/xesquery"
 
 	"github.com/aquasecurity/esquery"
 
@@ -133,7 +133,7 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (i
 		Query(
 			esquery.MultiMatch(query).
 				Type(esquery.MatchTypeMostFields).
-				Fields(esutil.BoostFieldForMultiMatch(es.ItemFieldName, 100), es.ItemFieldDescription)).
+				Fields(xesquery.BoostFieldForMultiMatch(es.ItemFieldName, 100), es.ItemFieldDescription)).
 		SourceIncludes(es.AllItemFields...).
 		From(page * pageSize).
 		Size(pageSize)

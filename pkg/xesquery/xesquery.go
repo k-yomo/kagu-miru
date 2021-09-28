@@ -1,4 +1,4 @@
-package esutil
+package xesquery
 
 import "fmt"
 
