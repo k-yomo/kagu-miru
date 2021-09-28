@@ -1,0 +1,38 @@
+name: Frontend Deploy Workflow
+on:
+  workflow_dispatch:
+
+env:
+  GO111MODULE: "on"
+  TZ: "Asia/Tokyo"
+
+jobs:
+  deploy:
+    name: Deploy
+    environment:
+      name: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: '348.0.0'
+          service_account_key: ${{ secrets.PROD_GCP_CI_USER_KEY_BASE64 }}
+
+      - name: Push Docker Image to Prod GCR
+        if: github.ref == 'refs/heads/main'
+        run: |
+          gcloud --quiet auth configure-docker
+          docker build -t kagu-miru-frontend -f frontend.Dockerfile .
+          docker tag kagu-miru-frontend asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-frontend:latest
+          docker push asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-frontend
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main'
+        run: |
+          gcloud run deploy kagu-miru-frontend-prod --image=asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-frontend:latest --project=${{ secrets.PROD_GCP_PROJECT }} --region=asia-northeast1 --platform=managed
