@@ -1,0 +1,54 @@
+name: Backend Workflow
+on:
+  push:
+    paths:
+      - ".github/workflows/backend.yml"
+      - "backend/**"
+      - "go.mod"
+
+env:
+  GO111MODULE: "on"
+  TZ: "Asia/Tokyo"
+
+jobs:
+  test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+#    services:
+#      mysql:
+#        image: mysql:8.0
+#        ports:
+#          - 13306:3306
+#        env:
+#          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+        id: go
+
+      - name: Cache modules
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Download Modules
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: go mod download
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v2.5.2
+        with:
+          version: v1.33
+          working-directory: backend
+
+      - name: Test
+        run: go test ./... -v -race -coverprofile=coverage.out
