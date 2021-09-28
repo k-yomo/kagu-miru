@@ -73,12 +73,7 @@ func mapSearchItemsToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
 }
 
 func mapSearchResponseToGraphqlItemConnection(res *search.Response) (*gqlmodel.ItemConnection, error) {
-	items := make([]*es.Item, 0, len(res.Result.Hits.Hits))
-	for _, hit := range res.Result.Hits.Hits {
-		items = append(items, hit.Source)
-	}
-
-	graphqlItems, err := mapSearchItemsToGraphqlItems(items)
+	graphqlItems, err := mapSearchItemsToGraphqlItems(res.Items)
 	if err != nil {
 		return nil, err
 	}

@@ -9,12 +9,13 @@ import (
 	"io/ioutil"
 	"time"
 
+	"github.com/olivere/elastic/v7"
+
 	"github.com/k-yomo/kagu-miru/pkg/xesquery"
 
 	"github.com/aquasecurity/esquery"
 
 	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/k-yomo/kagu-miru/internal/es"
 	"github.com/k-yomo/kagu-miru/pkg/logging"
 	"github.com/pkg/errors"
@@ -62,7 +63,7 @@ type Request struct {
 }
 
 type Response struct {
-	Result    *Result
+	Items     []*es.Item
 	Page      uint64
 	TotalPage uint64
 }
@@ -90,43 +91,27 @@ func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 	if err != nil {
 		return nil, fmt.Errorf("buildSearchQuery: %w", err)
 	}
-	response, err := c.esClient.Search(
-		c.esClient.Search.WithContext(ctx),
-		c.esClient.Search.WithIndex(c.itemsIndexName),
-		c.esClient.Search.WithBody(esQuery),
-		c.esClient.Search.WithRequestCache(true),
-	)
+	searchResult, err := c.search(ctx, c.itemsIndexName, esQuery)
 	if err != nil {
-		return nil, fmt.Errorf("esClient.Search: %w", err)
+		return nil, fmt.Errorf("client.search: %w", err)
 	}
-	defer response.Body.Close()
 
-	searchResult, err := mapResponseToSearchResult(response)
-	if err != nil {
-		return nil, err
+	var items []*es.Item
+	for _, hit := range searchResult.Hits.Hits {
+		var item es.Item
+		if err := json.Unmarshal(hit.Source, &item); err != nil {
+			logging.Logger(ctx).Error("Failed to unmarshal hit.Source into es.Item", zap.String("source", string(hit.Source)))
+			continue
+		}
+
+		items = append(items, &item)
 	}
 
 	return &Response{
-		Result:    searchResult,
+		Items:     items,
 		Page:      req.Page,
-		TotalPage: calcTotalPage(uint64(searchResult.Hits.Total.Value), 100),
+		TotalPage: calcTotalPage(uint64(searchResult.Hits.TotalHits.Value), 100),
 	}, nil
-}
-
-func mapResponseToSearchResult(response *esapi.Response) (*Result, error) {
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, errors.Wrapf(err, "read response body failed, response: %s", response.String())
-	}
-	if response.StatusCode >= 400 {
-		return nil, errors.Errorf("search request to elasticsearch failed with status %s, body: %s", response.Status(), body)
-	}
-
-	sr := &Result{}
-	if err := json.Unmarshal(body, sr); err != nil {
-		return nil, errors.Wrapf(err, "unmarshal response body json failed, body: %s", body)
-	}
-	return sr, nil
 }
 
 func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (io.Reader, error) {
@@ -179,49 +164,53 @@ func (c *client) GetQuerySuggestions(ctx context.Context, query string) ([]strin
 	if err != nil {
 		return nil, fmt.Errorf("esquery.MarshalJSON(): %w", err)
 	}
-	esResponse, err := c.esClient.Search(
+
+	searchResult, err := c.search(ctx, c.itemsQuerySuggestionsIndexName, bytes.NewReader(esQuery))
+	if err != nil {
+		return nil, fmt.Errorf("c.search: %w", err)
+	}
+
+	bucketKeyItems, ok := searchResult.Aggregations.Terms("queries")
+	if !ok {
+		return nil, fmt.Errorf("", err)
+	}
+
+	suggestedQueries := make([]string, 0, len(bucketKeyItems.Buckets))
+	for _, bucket := range bucketKeyItems.Buckets {
+		if bucket.Key == query {
+			continue
+		}
+		suggestedQueries = append(suggestedQueries, bucket.Key.(string))
+	}
+
+	return suggestedQueries, nil
+}
+
+func (c *client) search(ctx context.Context, indexName string, esQuery io.Reader) (*elastic.SearchResult, error) {
+	response, err := c.esClient.Search(
 		c.esClient.Search.WithContext(ctx),
-		c.esClient.Search.WithIndex(c.itemsQuerySuggestionsIndexName),
-		c.esClient.Search.WithBody(bytes.NewReader(esQuery)),
+		c.esClient.Search.WithIndex(indexName),
+		c.esClient.Search.WithBody(esQuery),
 		c.esClient.Search.WithRequestCache(true),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)
 	}
-	defer esResponse.Body.Close()
+	defer response.Body.Close()
 
-	body, err := ioutil.ReadAll(esResponse.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, errors.Wrapf(err, "read response body failed, response: %s", esResponse.String())
+		return nil, errors.Wrapf(err, "read response body failed, response: %s", response.String())
 	}
-	if esResponse.StatusCode >= 400 {
-		return nil, fmt.Errorf("search request to elasticsearch failed with status %s, body: %s", esResponse.Status(), body)
-	}
-
-	var response struct {
-		Aggregations struct {
-			Queries struct {
-				Buckets []struct {
-					Key      string `json:"key"`
-					DocCount int    `json:"doc_count"`
-				} `json:"buckets"`
-			} `json:"queries"`
-		} `json:"aggregations"`
+	if response.StatusCode >= 400 {
+		return nil, errors.Errorf("search request to elasticsearch failed with status %s, body: %s", response.Status(), body)
 	}
 
-	if err := json.Unmarshal(body, &response); err != nil {
-		return nil, fmt.Errorf("search request to elasticsearch failed with body: %s: %w", body, err)
+	searchResult := elastic.SearchResult{}
+	if err := json.Unmarshal(body, &searchResult); err != nil {
+		return nil, errors.Wrapf(err, "unmarshal response body json failed, body: %s", body)
 	}
-
-	suggestedQueries := make([]string, 0, len(response.Aggregations.Queries.Buckets))
-	for _, bucket := range response.Aggregations.Queries.Buckets {
-		if bucket.Key == query {
-			continue
-		}
-		suggestedQueries = append(suggestedQueries, bucket.Key)
-	}
-
-	return suggestedQueries, nil
+	return &searchResult, nil
 }
 
 func (c *client) insertQuerySuggestion(ctx context.Context, query string) error {
