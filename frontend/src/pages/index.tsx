@@ -127,6 +127,9 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const { query } = searchInput;
+    if (!query) {
+      return;
+    }
     searchItems({
       variables: {
         input: {
