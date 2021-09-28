@@ -2,7 +2,9 @@ version: "3.8"
 
 services:
   elasticsearch:
-    build: ./elasticsearch
+    build:
+      context: .
+      dockerfile: elasticsearch.Dockerfile
     volumes:
       - es_data:/usr/share/elasticsearch/data
     environment:
