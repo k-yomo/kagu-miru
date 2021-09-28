@@ -176,6 +176,7 @@
     }
   },
   "mappings": {
+    "dynamic": "strict",
     "properties": {
       "query": {
         "type": "text",
