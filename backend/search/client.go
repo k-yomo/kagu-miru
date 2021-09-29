@@ -115,11 +115,26 @@ func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 }
 
 func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (io.Reader, error) {
+	// queryTokens := strings.Fields(query)
+	// if len(queryTokens) > 1 {
+	// 	queryTokens[0] = xesquery.Boost(queryTokens[0], 10)
+	// }
+	// query = strings.Join(queryTokens, " ")
 	esQuery := esquery.Search().
 		Query(
-			esquery.MultiMatch(query).
-				Type(esquery.MatchTypeMostFields).
-				Fields(xesquery.BoostFieldForMultiMatch(es.ItemFieldName, 100), es.ItemFieldDescription)).
+			esquery.Bool().
+				Must(
+					esquery.MultiMatch(query).
+						Type(esquery.MatchTypeMostFields).
+						Fields(xesquery.Boost(es.ItemFieldName, 10), es.ItemFieldDescription),
+				).
+				Should(
+					esquery.MultiMatch(query).
+						Type(esquery.MatchTypePhrase).
+						Fields(xesquery.Boost(es.ItemFieldName, 10), es.ItemFieldDescription).
+						Boost(10),
+				),
+		).
 		SourceIncludes(es.AllItemFields...).
 		From(page * pageSize).
 		Size(pageSize)
@@ -141,6 +156,8 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (i
 	if err != nil {
 		return nil, fmt.Errorf("esQuery.MarshalJSON(): %w", err)
 	}
+
+	fmt.Println(string(esQueryJSON))
 
 	return bytes.NewReader(esQueryJSON), nil
 }
