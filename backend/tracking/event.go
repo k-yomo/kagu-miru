@@ -19,7 +19,7 @@ type Event struct {
 	Params    map[string]interface{} `json:"params"`
 
 	// fill on backend
-	UserID    string `json:"user_id"`
+	UserID    string `json:"user_id,omitempty"`
 	UserAgent string `json:"user_agent"`
 	Device    string `json:"devise"`
 	IPAddress string `json:"ip"`
