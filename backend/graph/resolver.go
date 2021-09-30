@@ -1,15 +1,22 @@
 package graph
 
-import "github.com/k-yomo/kagu-miru/backend/search"
+import (
+	"github.com/k-yomo/kagu-miru/backend/search"
+	"github.com/k-yomo/kagu-miru/backend/tracking"
+)
 
 //go:generate go run github.com/99designs/gqlgen
 
 type Resolver struct {
-	SearchClient search.Client
+	SearchClient    search.Client
+	SearchIDManager *tracking.SearchIDManager
+	EventLoader     tracking.EventLoader
 }
 
-func NewResolver(searchClient search.Client) *Resolver {
+func NewResolver(searchClient search.Client, searchIDManager *tracking.SearchIDManager, eventLoader tracking.EventLoader) *Resolver {
 	return &Resolver{
-		SearchClient: searchClient,
+		SearchClient:    searchClient,
+		SearchIDManager: searchIDManager,
+		EventLoader:     eventLoader,
 	}
 }

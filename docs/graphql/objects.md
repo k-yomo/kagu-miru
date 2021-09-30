@@ -109,6 +109,29 @@
 
 ---
 
+### QuerySuggestionsResponse
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>query</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>suggestedQueries</strong> (<a href="scalars.md#string">[String!]!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### SearchResponse
 
   
@@ -122,6 +145,10 @@
   </tr>
   <tr>
     <td><strong>itemConnection</strong> (<a href="objects.md#itemconnection">ItemConnection!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>searchId</strong> (<a href="scalars.md#string">String!</a>)</td> 
     <td></td>
   </tr>
 </table>

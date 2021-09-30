@@ -18,8 +18,10 @@ func (e Env) IsDeployed() bool {
 type Config struct {
 	Env            Env      `default:"local" envconfig:"APP_ENV"`
 	Port           int      `default:"8000" envconfig:"PORT"`
-	GCPProjectID   string   `default:"local" envconfig:"GCP_PROJECT_ID"`
 	AllowedOrigins []string `default:"http://localhost:3000" envconfig:"ALLOWED_ORIGINS"`
+
+	GCPProjectID       string `default:"local" envconfig:"GCP_PROJECT_ID"`
+	PubSubEventTopicID string `envconfig:"PUBSUB_EVENT_TOPIC_ID"`
 
 	ElasticSearchUsername          string `envconfig:"ELASTICSEARCH_USERNAME"`
 	ElasticSearchPassword          string `envconfig:"ELASTICSEARCH_PASSWORD"`

@@ -72,12 +72,13 @@ func mapSearchToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
 	return gqlItems, nil
 }
 
-func mapSearchResponseToGraphqlSearchResponse(res *search.Response) (*gqlmodel.SearchResponse, error) {
+func mapSearchResponseToGraphqlSearchResponse(res *search.Response, searchID string) (*gqlmodel.SearchResponse, error) {
 	graphqlItems, err := mapSearchToGraphqlItems(res.Items)
 	if err != nil {
 		return nil, err
 	}
 	return &gqlmodel.SearchResponse{
+		SearchID: searchID,
 		ItemConnection: &gqlmodel.ItemConnection{
 			PageInfo: &gqlmodel.PageInfo{
 				Page:      int(res.Page),

@@ -30,8 +30,20 @@ When calling the GraphQL API, you must specify nested subfields until you return
 
 ---
 
+### Map
+
+
+
+---
+
 ### String
 
 <p>The <code>String</code> scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.</p>
+
+---
+
+### Time
+
+
 
 ---

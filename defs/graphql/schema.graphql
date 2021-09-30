@@ -1,7 +1,13 @@
+scalar Map
+scalar Time
 
 type Query {
     search(input: SearchInput): SearchResponse!
-    getQuerySuggestions(query: String!): [String!]!
+    getQuerySuggestions(query: String!): QuerySuggestionsResponse!
+}
+
+type Mutation {
+    trackEvent(event: Event!): Boolean!
 }
 
 type PageInfo {
@@ -38,7 +44,13 @@ type ItemConnection {
 }
 
 type SearchResponse {
+    searchId: String!
     itemConnection: ItemConnection!
+}
+
+type QuerySuggestionsResponse {
+    query: String!
+    suggestedQueries: [String!]!
 }
 
 enum SearchSortType {
@@ -54,4 +66,46 @@ input SearchInput {
     sortType: SearchSortType!
     page: Int
     pageSize: Int
+}
+
+enum EventID {
+    SEARCH
+    QUERY_SUGGESTIONS
+}
+
+enum Action {
+    DISPLAY
+    CLICK_ITEM
+}
+
+input Event {
+    id: EventID!
+    action: Action!
+    createdAt: Time!
+
+    # one of the action must be set depending on the event id and action
+    params: Map!
+}
+
+enum SearchFrom {
+    URL
+    SEARCH
+    QUERY_SUGGESTION
+}
+
+input SearchDisplayItemsActionParams {
+    searchId: String!
+    searchFrom: SearchFrom!
+    searchInput: SearchInput!
+    itemIds: [ID!]! # Must be ranking's descending order
+}
+
+input SearchClickItemActionParams {
+    searchId: String!
+    itemId: String!
+}
+
+input QuerySuggestionsDisplayActionParams {
+    query: String!
+    suggestedQueries: [String!]! # Must be ranking's descending order
 }

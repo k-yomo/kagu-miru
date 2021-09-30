@@ -4,6 +4,48 @@
 
 [Enums](https://graphql.github.io/graphql-spec/June2018/#sec-Enums) represent possible sets of values for a field.
 
+### Action
+
+
+
+<table>
+  <tr>
+    <th>Value</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>CLICK_ITEM</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>DISPLAY</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### EventID
+
+
+
+<table>
+  <tr>
+    <th>Value</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>QUERY_SUGGESTIONS</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>SEARCH</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### ItemSellingPlatform
 
 
@@ -36,6 +78,31 @@
   </tr>
   <tr>
     <td><strong>INACTIVE</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### SearchFrom
+
+
+
+<table>
+  <tr>
+    <th>Value</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>QUERY_SUGGESTION</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>SEARCH</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>URL</strong></td>
     <td></td>
   </tr>
 </table>
