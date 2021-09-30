@@ -20,7 +20,7 @@ const (
 )
 
 type Client struct {
-	sync.Mutex
+	mu sync.Mutex
 
 	applicationIDs []string
 	appIDIndex     int
@@ -66,7 +66,7 @@ func (c *Client) SearchGenre(ctx context.Context, genreID string) (*SearchGenreR
 	u := urlutil.CopyWithQueries(c.genreSearchAPIURL, c.buildParams(map[string]string{"genreId": genreID}))
 	var resp SearchGenreResponse
 	if err := httputil.GetAndUnmarshal(ctx, c.httpClient, u, &resp); err != nil {
-		return nil, fmt.Errorf("getAndUnmarshal: %w", err)
+		return nil, fmt.Errorf("httputil.GetAndUnmarshal: %w", err)
 	}
 	return &resp, nil
 }
@@ -160,7 +160,7 @@ func (c *Client) SearchItem(ctx context.Context, params *SearchItemParams) (*Sea
 	u := urlutil.CopyWithQueries(c.itemSearchAPIURL, c.buildParams(reqParams))
 	var resp SearchItemResponse
 	if err := httputil.GetAndUnmarshal(ctx, c.httpClient, u, &resp); err != nil {
-		return nil, fmt.Errorf("getAndUnmarshal: %w", err)
+		return nil, fmt.Errorf("httputil.GetAndUnmarshal: %w", err)
 	}
 	return &resp, nil
 }
@@ -178,8 +178,8 @@ func (c *Client) buildParams(params map[string]string) map[string]string {
 }
 
 func (c *Client) getApplicationID() string {
-	c.Lock()
-	defer c.Unlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	idx := c.appIDIndex
 	if idx == len(c.applicationIDs)-1 {

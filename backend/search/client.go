@@ -157,8 +157,6 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (i
 		return nil, fmt.Errorf("esQuery.MarshalJSON(): %w", err)
 	}
 
-	fmt.Println(string(esQueryJSON))
-
 	return bytes.NewReader(esQueryJSON), nil
 }
 
