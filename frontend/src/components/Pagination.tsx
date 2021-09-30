@@ -53,7 +53,11 @@ export default function Pagination({ page, totalPage, onClickPage }: Props) {
                 ? 'border-black dark:border-white text-black dark:text-text-primary-dark font-bold'
                 : 'border-transparent text-gray-400 hover:text-gray-700 dark:hover:text-gray-100 hover:border-gray-300'
             } cursor-pointer border-t-2 pt-4 px-4 inline-flex items-center text-sm`}
-            onClick={() => onClickPage(p)}
+            onClick={() => {
+              if (p !== page) {
+                onClickPage(p);
+              }
+            }}
           >
             {p}
           </span>
