@@ -2,6 +2,7 @@ package tracking
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/avct/uasurfer"
@@ -13,10 +14,10 @@ import (
 
 type Event struct {
 	// passed from client
-	ID        string                 `json:"id"`
-	Action    string                 `json:"action"`
-	CreatedAt time.Time              `json:"created_at"`
-	Params    map[string]interface{} `json:"params"`
+	ID        string    `json:"id"`
+	Action    string    `json:"action"`
+	CreatedAt time.Time `json:"created_at"`
+	Params    string    `json:"params"`
 
 	// fill on backend
 	UserID    string `json:"user_id,omitempty"`
@@ -26,11 +27,12 @@ type Event struct {
 }
 
 func NewEvent(ctx context.Context, gqlEvent gqlmodel.Event) *Event {
+	params, _ := json.Marshal(gqlEvent.Params)
 	event := newDefaultEvent(ctx)
 	event.ID = gqlEvent.ID.String()
 	event.Action = gqlEvent.Action.String()
 	event.CreatedAt = gqlEvent.CreatedAt
-	event.Params = gqlEvent.Params
+	event.Params = string(params)
 	return event
 }
 
