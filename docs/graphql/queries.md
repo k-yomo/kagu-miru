@@ -6,7 +6,7 @@
 
 ### getQuerySuggestions
 
-#### Type: [[String!]!](scalars.md#string)
+#### Type: [QuerySuggestionsResponse!](objects.md#querysuggestionsresponse)
 
  
 

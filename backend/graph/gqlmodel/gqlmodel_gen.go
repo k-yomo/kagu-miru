@@ -6,7 +6,15 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 )
+
+type Event struct {
+	ID        EventID                `json:"id"`
+	Action    Action                 `json:"action"`
+	CreatedAt time.Time              `json:"createdAt"`
+	Params    map[string]interface{} `json:"params"`
+}
 
 type Item struct {
 	ID            string              `json:"id"`
@@ -32,6 +40,28 @@ type PageInfo struct {
 	TotalPage int `json:"totalPage"`
 }
 
+type QuerySuggestionsDisplayActionParams struct {
+	Query            string   `json:"query"`
+	SuggestedQueries []string `json:"suggestedQueries"`
+}
+
+type QuerySuggestionsResponse struct {
+	Query            string   `json:"query"`
+	SuggestedQueries []string `json:"suggestedQueries"`
+}
+
+type SearchClickItemActionParams struct {
+	SearchID string `json:"searchId"`
+	ItemID   string `json:"itemId"`
+}
+
+type SearchDisplayItemsActionParams struct {
+	SearchID    string       `json:"searchId"`
+	SearchFrom  SearchFrom   `json:"searchFrom"`
+	SearchInput *SearchInput `json:"searchInput"`
+	ItemIds     []string     `json:"itemIds"`
+}
+
 type SearchInput struct {
 	Query    string         `json:"query"`
 	SortType SearchSortType `json:"sortType"`
@@ -40,7 +70,90 @@ type SearchInput struct {
 }
 
 type SearchResponse struct {
+	SearchID       string          `json:"searchId"`
 	ItemConnection *ItemConnection `json:"itemConnection"`
+}
+
+type Action string
+
+const (
+	ActionDisplay   Action = "DISPLAY"
+	ActionClickItem Action = "CLICK_ITEM"
+)
+
+var AllAction = []Action{
+	ActionDisplay,
+	ActionClickItem,
+}
+
+func (e Action) IsValid() bool {
+	switch e {
+	case ActionDisplay, ActionClickItem:
+		return true
+	}
+	return false
+}
+
+func (e Action) String() string {
+	return string(e)
+}
+
+func (e *Action) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Action(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Action", str)
+	}
+	return nil
+}
+
+func (e Action) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type EventID string
+
+const (
+	EventIDSearch           EventID = "SEARCH"
+	EventIDQuerySuggestions EventID = "QUERY_SUGGESTIONS"
+)
+
+var AllEventID = []EventID{
+	EventIDSearch,
+	EventIDQuerySuggestions,
+}
+
+func (e EventID) IsValid() bool {
+	switch e {
+	case EventIDSearch, EventIDQuerySuggestions:
+		return true
+	}
+	return false
+}
+
+func (e EventID) String() string {
+	return string(e)
+}
+
+func (e *EventID) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventID(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventID", str)
+	}
+	return nil
+}
+
+func (e EventID) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type ItemSellingPlatform string
@@ -120,6 +233,49 @@ func (e *ItemStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ItemStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SearchFrom string
+
+const (
+	SearchFromURL             SearchFrom = "URL"
+	SearchFromSearch          SearchFrom = "SEARCH"
+	SearchFromQuerySuggestion SearchFrom = "QUERY_SUGGESTION"
+)
+
+var AllSearchFrom = []SearchFrom{
+	SearchFromURL,
+	SearchFromSearch,
+	SearchFromQuerySuggestion,
+}
+
+func (e SearchFrom) IsValid() bool {
+	switch e {
+	case SearchFromURL, SearchFromSearch, SearchFromQuerySuggestion:
+		return true
+	}
+	return false
+}
+
+func (e SearchFrom) String() string {
+	return string(e)
+}
+
+func (e *SearchFrom) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SearchFrom(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SearchFrom", str)
+	}
+	return nil
+}
+
+func (e SearchFrom) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

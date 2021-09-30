@@ -9,6 +9,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/request"
+
+	"cloud.google.com/go/pubsub"
+
+	"github.com/k-yomo/kagu-miru/backend/tracking"
+
+	"github.com/k-yomo/kagu-miru/backend/search"
+
 	"cloud.google.com/go/profiler"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -21,7 +29,6 @@ import (
 	"github.com/k-yomo/kagu-miru/backend/config"
 	"github.com/k-yomo/kagu-miru/backend/graph"
 	"github.com/k-yomo/kagu-miru/backend/graph/gqlgen"
-	"github.com/k-yomo/kagu-miru/backend/search"
 	"github.com/k-yomo/kagu-miru/pkg/csrf"
 	"github.com/k-yomo/kagu-miru/pkg/logging"
 	"github.com/k-yomo/kagu-miru/pkg/tracing"
@@ -68,15 +75,29 @@ func main() {
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}
+	searchClient := search.NewSearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient)
+
+	var eventLoader tracking.EventLoader
+	if cfg.Env.IsDeployed() {
+		pubsubClient, err := pubsub.NewClient(ctx, cfg.GCPProjectID)
+		if err != nil {
+			logger.Fatal("failed to initialize pubsub client", zap.Error(err))
+		}
+		eventLoader = tracking.NewEventLoader(pubsubClient.Topic(cfg.PubSubEventTopicID))
+	} else {
+		eventLoader = &tracking.NoopEventLoader{}
+	}
+
+	searchIDManager := tracking.NewSearchIDManager(cfg.Env.IsDeployed())
 
 	gqlConfig := gqlgen.Config{
-		Resolvers: graph.NewResolver(search.NewSearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient)),
+		Resolvers: graph.NewResolver(searchClient, searchIDManager, eventLoader),
 	}
 	gqlServer := handler.NewDefaultServer(gqlgen.NewExecutableSchema(gqlConfig))
 	gqlServer.Use(tracing.GraphqlExtension{})
 	gqlServer.Use(logging.GraphQLResponseInterceptor{})
 
-	r := newBaseRouter(cfg, logger)
+	r := newBaseRouter(cfg, logger, searchIDManager)
 	r.Route("/api", func(r chi.Router) {
 		r.Handle("/graphql/playground", playground.Handler("GraphQL playground", "/api/graphql"))
 		r.Handle("/graphql", gqlServer)
@@ -101,7 +122,7 @@ func main() {
 	}
 }
 
-func newBaseRouter(cfg *config.Config, logger *zap.Logger) *chi.Mux {
+func newBaseRouter(cfg *config.Config, logger *zap.Logger, searchIDManager *tracking.SearchIDManager) *chi.Mux {
 	r := chi.NewRouter()
 	c := cors.New(cors.Options{
 		AllowedOrigins:   cfg.AllowedOrigins,
@@ -113,10 +134,11 @@ func newBaseRouter(cfg *config.Config, logger *zap.Logger) *chi.Mux {
 	r.Use(c.Handler)
 	r.Use(
 		middleware.RequestID,
-		middleware.RealIP,
 		middleware.Recoverer,
 		logging.NewMiddleware(cfg.GCPProjectID, logger),
 		csrf.NewCSRFValidationMiddleware(cfg.Env.IsDeployed()),
+		request.NewMiddleware(),
+		searchIDManager.Middleware(),
 	)
 	return r
 }

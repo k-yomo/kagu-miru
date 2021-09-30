@@ -4,6 +4,7 @@ View reference documentation to learn about the data types available in your Gra
 
 
 - [Query](queries.md)
+- [Mutations](mutations.md)
 - [Objects](objects.md)
 - [Enums](enums.md)
 - [Input objects](input_objects.md)

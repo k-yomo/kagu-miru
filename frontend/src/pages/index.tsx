@@ -2,6 +2,7 @@ import {
   ChangeEvent,
   KeyboardEvent,
   memo,
+  MouseEvent,
   useCallback,
   useEffect,
   useState,
@@ -11,11 +12,18 @@ import Image from 'next/image';
 import gql from 'graphql-tag';
 import { SearchIcon } from '@heroicons/react/solid';
 import {
+  Action,
+  EventId,
   HomePageSearchQuery,
+  QuerySuggestionsDisplayActionParams,
+  SearchClickItemActionParams,
+  SearchDisplayItemsActionParams,
+  SearchFrom,
   SearchInput,
   SearchSortType,
   useHomePageGetQuerySuggestionsLazyQuery,
   useHomePageSearchLazyQuery,
+  useHomePageTrackEventMutation,
 } from '@src/generated/graphql';
 import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
@@ -28,61 +36,118 @@ import Rating from '@src/components/Rating';
 gql`
   query homePageSearch($input: SearchInput!) {
     search(input: $input) {
-        itemConnection {
-            pageInfo {
-                page
-                totalPage
-            }
-            nodes {
-                id
-                name
-                description
-                status
-                url
-                affiliateUrl
-                price
-                imageUrls
-                averageRating
-                reviewCount
-                platform
-            }
+      searchId
+      itemConnection {
+        pageInfo {
+          page
+          totalPage
         }
+        nodes {
+          id
+          name
+          description
+          status
+          url
+          affiliateUrl
+          price
+          imageUrls
+          averageRating
+          reviewCount
+          platform
+        }
+      }
     }
   }
 
   query homePageGetQuerySuggestions($query: String!) {
-    getQuerySuggestions(query: $query)
+    getQuerySuggestions(query: $query) {
+      query
+      suggestedQueries
+    }
+  }
+
+  mutation homePageTrackEvent($event: Event!) {
+    trackEvent(event: $event)
   }
 `;
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const [searchInput, setSearchInput] = useState<SearchInput>({
-    query: '',
-    sortType: SearchSortType.BestMatch,
-    page: 1,
+  const [searchInput, setSearchInput] = useState<{
+    input: SearchInput;
+    searchFrom: SearchFrom;
+  }>({
+    input: {
+      query: '',
+      sortType: SearchSortType.BestMatch,
+      page: 1,
+    },
+    searchFrom: SearchFrom.Url,
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestedQueries, setSuggestedQueries] = useState<string[]>([]);
   const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
-  const [searchItems, { data, loading, error }] =
-    useHomePageSearchLazyQuery({
-      fetchPolicy: 'no-cache',
-      nextFetchPolicy: 'no-cache',
-    });
-  const items = data?.search?.itemConnection?.nodes
-  const pageInfo = data?.search?.itemConnection?.pageInfo
+  const [search, { data, loading, error }] = useHomePageSearchLazyQuery({
+    fetchPolicy: 'no-cache',
+    nextFetchPolicy: 'no-cache',
+    onCompleted: (data) => {
+      const params: SearchDisplayItemsActionParams = {
+        searchId: data.search.searchId,
+        searchInput: searchInput.input,
+        searchFrom: searchInput.searchFrom,
+        itemIds: data.search.itemConnection.nodes.map((item) => item.id),
+      };
+      trackEvent({
+        variables: {
+          event: {
+            id: EventId.Search,
+            action: Action.Display,
+            createdAt: new Date(),
+            params,
+          },
+        },
+      })
+        .then(() => {
+          console.log('track event published!');
+        })
+        .catch(() => {
+          // do nothing
+        });
+    },
+  });
+  const [trackEvent] = useHomePageTrackEventMutation();
+  const items = data?.search?.itemConnection?.nodes;
+  const pageInfo = data?.search?.itemConnection?.pageInfo;
   const [getQuerySuggestions, { data: getQuerySuggestionsData }] =
     useHomePageGetQuerySuggestionsLazyQuery({
       fetchPolicy: 'no-cache',
       nextFetchPolicy: 'no-cache',
+      onCompleted: (data) => {
+        const params: QuerySuggestionsDisplayActionParams = {
+          query: data.getQuerySuggestions.query,
+          suggestedQueries: data.getQuerySuggestions.suggestedQueries,
+        };
+        trackEvent({
+          variables: {
+            event: {
+              id: EventId.QuerySuggestions,
+              action: Action.Display,
+              createdAt: new Date(),
+              params,
+            },
+          },
+        }).catch(() => {
+          // do nothing
+        });
+      },
     });
 
   const updateSearchInput = useCallback(
-    ({ query, sortType, page }: SearchInput) => {
+    ({ input, searchFrom }: typeof searchInput) => {
+      const { query, sortType, page } = input;
       router.push(
+        `${router.pathname}?q=${query}&sort=${sortType}&page=${page}&searchFrom=${searchFrom}`,
         `${router.pathname}?q=${query}&sort=${sortType}&page=${page}`,
-        undefined,
         {
           shallow: true,
         }
@@ -94,8 +159,11 @@ const Home: NextPage = () => {
   const onChangeSortBy = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
       updateSearchInput({
-        ...searchInput,
-        sortType: e.target.value as SearchSortType,
+        input: {
+          ...searchInput.input,
+          sortType: e.target.value as SearchSortType,
+        },
+        searchFrom: SearchFrom.Search,
       });
     },
     [searchInput, updateSearchInput]
@@ -111,11 +179,17 @@ const Home: NextPage = () => {
   );
 
   const onClickSuggestedQuery = (query: string) => {
-    updateSearchInput({ ...searchInput, query, page: 1 });
+    updateSearchInput({
+      input: { ...searchInput.input, query, page: 1 },
+      searchFrom: SearchFrom.QuerySuggestion,
+    });
   };
 
   const onClickPage = (page: number) => {
-    updateSearchInput({ ...searchInput, page });
+    updateSearchInput({
+      input: { ...searchInput.input, page },
+      searchFrom: SearchFrom.Search,
+    });
   };
 
   const onSearchKeyPress = useCallback(
@@ -123,46 +197,74 @@ const Home: NextPage = () => {
       if (e.key == 'Enter') {
         e.preventDefault();
         setShowQuerySuggestions(false);
-        updateSearchInput({ ...searchInput, query: searchQuery, page: 1 });
+        updateSearchInput({
+          input: { ...searchInput.input, query: searchQuery, page: 1 },
+          searchFrom: SearchFrom.Search,
+        });
       }
     },
     [searchInput, searchQuery, updateSearchInput]
   );
 
+  const onClickItem = (itemId: string) => {
+    const params: SearchClickItemActionParams = {
+      searchId: data!.search.searchId,
+      itemId,
+    };
+    trackEvent({
+      variables: {
+        event: {
+          id: EventId.Search,
+          action: Action.ClickItem,
+          createdAt: new Date(),
+          params,
+        },
+      },
+    }).catch(() => {
+      // do nothing
+    });
+  };
+
   useEffect(() => {
-    const { query } = searchInput;
+    const { query } = searchInput.input;
     if (!query) {
       return;
     }
-    searchItems({
+    search({
       variables: {
         input: {
-          ...searchInput,
+          ...searchInput.input,
           query: query.trim(),
         },
       },
     });
-  }, [searchInput, searchItems]);
+  }, [searchInput, search]);
 
   useEffect(() => {
     const page = parseInt(router.query.page as string) || 1;
     const sortType =
-      (router.query.sort as SearchSortType) ||
-      SearchSortType.BestMatch;
+      (router.query.sort as SearchSortType) || SearchSortType.BestMatch;
+    const searchFrom =
+      (router.query.searchFrom as SearchFrom) || SearchFrom.Url;
     if (router.query.q) {
       const query = router.query.q as string;
       setSearchQuery(query);
       setSearchInput({
-        query,
-        sortType,
-        page,
+        input: {
+          query,
+          sortType,
+          page,
+        },
+        searchFrom,
       });
     }
   }, [router.query]);
 
   useEffect(() => {
     if (getQuerySuggestionsData?.getQuerySuggestions) {
-      setSuggestedQueries(getQuerySuggestionsData.getQuerySuggestions);
+      setSuggestedQueries(
+        getQuerySuggestionsData.getQuerySuggestions.suggestedQueries
+      );
     }
   }, [getQuerySuggestionsData?.getQuerySuggestions]);
 
@@ -197,6 +299,7 @@ const Home: NextPage = () => {
                     setShowQuerySuggestions(false);
                   }, 100);
                 }}
+                disabled={loading}
               />
               <QuerySuggestionsDropdown
                 show={showQuerySuggestions && suggestedQueries.length > 0}
@@ -216,20 +319,17 @@ const Home: NextPage = () => {
               id="location"
               name="location"
               className="appearance-none mt-1 block w-full pl-3 pr-10 py-2 rounded-md text-base border border-gray-700 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
-              value={searchInput.sortType}
+              value={searchInput.input.sortType}
               onChange={onChangeSortBy}
+              disabled={loading}
             >
               <option value={SearchSortType.BestMatch}>関連度順</option>
               <option value={SearchSortType.PriceAsc}>価格の安い順</option>
-              <option value={SearchSortType.PriceDesc}>
-                価格の高い順
-              </option>
+              <option value={SearchSortType.PriceDesc}>価格の高い順</option>
               <option value={SearchSortType.ReviewCount}>
                 レビューの件数順
               </option>
-              <option value={SearchSortType.Rating}>
-                レビューの評価順
-              </option>
+              <option value={SearchSortType.Rating}>レビューの評価順</option>
             </select>
           </div>
         </div>
@@ -237,7 +337,11 @@ const Home: NextPage = () => {
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
             {items && (
-              <ItemList items={items} loading={loading} />
+              <ItemList
+                items={items}
+                loading={loading}
+                onClickItem={onClickItem}
+              />
             )}
           </div>
           {pageInfo && (
@@ -257,10 +361,15 @@ const Home: NextPage = () => {
 
 interface ItemListProps {
   items: HomePageSearchQuery['search']['itemConnection']['nodes'];
+  onClickItem: (itemId: string) => void;
   loading: boolean;
 }
 
-const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
+const ItemList = memo(function ItemList({
+  items,
+  loading,
+  onClickItem,
+}: ItemListProps) {
   if (loading) {
     return <Loading />;
   }
@@ -271,6 +380,7 @@ const ItemList = memo(function ItemList({ items, loading }: ItemListProps) {
         <a
           key={item.id}
           href={!!item.affiliateUrl ? item.affiliateUrl : item.url}
+          onClick={() => onClickItem(item.id)}
         >
           <div className="rounded-md sm:shadow">
             <Image

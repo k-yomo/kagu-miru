@@ -10,7 +10,13 @@ import (
 	gqlgend "github.com/k-yomo/kagu-miru/backend/graph/gqlgen"
 	gqlmodell "github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/search"
+	"github.com/k-yomo/kagu-miru/backend/tracking"
 )
+
+func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodell.Event) (bool, error) {
+	r.EventLoader.Load(ctx, tracking.NewEvent(ctx, event))
+	return true, nil
+}
 
 func (r *queryResolver) Search(ctx context.Context, input *gqlmodell.SearchInput) (*gqlmodell.SearchResponse, error) {
 	sortType, err := mapGraphqlSortTypeToSearchSortType(input.SortType)
@@ -31,19 +37,26 @@ func (r *queryResolver) Search(ctx context.Context, input *gqlmodell.SearchInput
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
 	}
 
-	return mapSearchResponseToGraphqlSearchResponse(searchResponse)
+	return mapSearchResponseToGraphqlSearchResponse(searchResponse, r.SearchIDManager.GetSearchID(ctx))
 }
 
-func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
+func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (*gqlmodell.QuerySuggestionsResponse, error) {
 	suggestedQueries, err := r.SearchClient.GetQuerySuggestions(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.GetQuerySuggestions: %w", err)
 	}
 
-	return suggestedQueries, nil
+	return &gqlmodell.QuerySuggestionsResponse{
+		Query:            query,
+		SuggestedQueries: suggestedQueries,
+	}, nil
 }
+
+// Mutation returns gqlgend.MutationResolver implementation.
+func (r *Resolver) Mutation() gqlgend.MutationResolver { return &mutationResolver{r} }
 
 // Query returns gqlgend.QueryResolver implementation.
 func (r *Resolver) Query() gqlgend.QueryResolver { return &queryResolver{r} }
 
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
