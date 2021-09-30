@@ -422,7 +422,7 @@
             "deprecationReason": null
           },
           {
-            "name": "searchItems",
+            "name": "search",
             "description": null,
             "args": [
               {
@@ -430,7 +430,7 @@
                 "description": null,
                 "type": {
                   "kind": "INPUT_OBJECT",
-                  "name": "SearchItemsInput",
+                  "name": "SearchInput",
                   "ofType": null
                 },
                 "defaultValue": null,
@@ -443,7 +443,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "ItemConnection",
+                "name": "SearchResponse",
                 "ofType": null
               }
             },
@@ -458,7 +458,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "SearchItemsInput",
+        "name": "SearchInput",
         "description": null,
         "fields": null,
         "inputFields": [
@@ -510,7 +510,7 @@
               "name": null,
               "ofType": {
                 "kind": "ENUM",
-                "name": "SearchItemsSortType",
+                "name": "SearchSortType",
                 "ofType": null
               }
             },
@@ -524,8 +524,35 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "SearchResponse",
+        "description": null,
+        "fields": [
+          {
+            "name": "itemConnection",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ItemConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "ENUM",
-        "name": "SearchItemsSortType",
+        "name": "SearchSortType",
         "description": null,
         "fields": null,
         "inputFields": null,

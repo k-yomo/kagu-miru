@@ -9,17 +9,17 @@ import (
 	"github.com/k-yomo/kagu-miru/internal/es"
 )
 
-func mapGraphqlSortTypeToSearchSortType(st gqlmodel.SearchItemsSortType) (search.SortType, error) {
+func mapGraphqlSortTypeToSearchSortType(st gqlmodel.SearchSortType) (search.SortType, error) {
 	switch st {
-	case gqlmodel.SearchItemsSortTypeBestMatch:
+	case gqlmodel.SearchSortTypeBestMatch:
 		return search.SortTypeBestMatch, nil
-	case gqlmodel.SearchItemsSortTypePriceAsc:
+	case gqlmodel.SearchSortTypePriceAsc:
 		return search.SortTypePriceAsc, nil
-	case gqlmodel.SearchItemsSortTypePriceDesc:
+	case gqlmodel.SearchSortTypePriceDesc:
 		return search.SortTypePriceDesc, nil
-	case gqlmodel.SearchItemsSortTypeReviewCount:
+	case gqlmodel.SearchSortTypeReviewCount:
 		return search.SortTypeReviewCount, nil
-	case gqlmodel.SearchItemsSortTypeRating:
+	case gqlmodel.SearchSortTypeRating:
 		return search.SortTypeRating, nil
 	default:
 		return 0, fmt.Errorf("unknown sort type '%s' is given", st)
@@ -60,7 +60,7 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 	}, nil
 }
 
-func mapSearchItemsToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
+func mapSearchToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
 	gqlItems := make([]*gqlmodel.Item, 0, len(items))
 	for _, item := range items {
 		gqlItem, err := mapSearchItemToGraphqlItem(item)
@@ -72,16 +72,18 @@ func mapSearchItemsToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
 	return gqlItems, nil
 }
 
-func mapSearchResponseToGraphqlItemConnection(res *search.Response) (*gqlmodel.ItemConnection, error) {
-	graphqlItems, err := mapSearchItemsToGraphqlItems(res.Items)
+func mapSearchResponseToGraphqlSearchResponse(res *search.Response) (*gqlmodel.SearchResponse, error) {
+	graphqlItems, err := mapSearchToGraphqlItems(res.Items)
 	if err != nil {
 		return nil, err
 	}
-	return &gqlmodel.ItemConnection{
-		PageInfo: &gqlmodel.PageInfo{
-			Page:      int(res.Page),
-			TotalPage: int(res.TotalPage),
+	return &gqlmodel.SearchResponse{
+		ItemConnection: &gqlmodel.ItemConnection{
+			PageInfo: &gqlmodel.PageInfo{
+				Page:      int(res.Page),
+				TotalPage: int(res.TotalPage),
+			},
+			Nodes: graphqlItems,
 		},
-		Nodes: graphqlItems,
 	}, nil
 }

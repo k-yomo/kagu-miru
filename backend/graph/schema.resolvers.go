@@ -12,7 +12,7 @@ import (
 	"github.com/k-yomo/kagu-miru/backend/search"
 )
 
-func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.SearchItemsInput) (*gqlmodell.ItemConnection, error) {
+func (r *queryResolver) Search(ctx context.Context, input *gqlmodell.SearchInput) (*gqlmodell.SearchResponse, error) {
 	sortType, err := mapGraphqlSortTypeToSearchSortType(input.SortType)
 	if err != nil {
 		return nil, fmt.Errorf("mapGraphqlSortTypeToSearchSortType: %w", err)
@@ -31,7 +31,7 @@ func (r *queryResolver) SearchItems(ctx context.Context, input *gqlmodell.Search
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
 	}
 
-	return mapSearchResponseToGraphqlItemConnection(searchResponse)
+	return mapSearchResponseToGraphqlSearchResponse(searchResponse)
 }
 
 func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {

@@ -1,5 +1,6 @@
+
 type Query {
-    searchItems(input: SearchItemsInput): ItemConnection!
+    search(input: SearchInput): SearchResponse!
     getQuerySuggestions(query: String!): [String!]!
 }
 
@@ -36,7 +37,11 @@ type ItemConnection {
     nodes: [Item!]!
 }
 
-enum SearchItemsSortType {
+type SearchResponse {
+    itemConnection: ItemConnection!
+}
+
+enum SearchSortType {
     BEST_MATCH
     PRICE_ASC
     PRICE_DESC
@@ -44,9 +49,9 @@ enum SearchItemsSortType {
     RATING
 }
 
-input SearchItemsInput {
+input SearchInput {
     query: String!
-    sortType: SearchItemsSortType!
+    sortType: SearchSortType!
     page: Int
     pageSize: Int
 }

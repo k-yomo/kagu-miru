@@ -11,11 +11,11 @@ import Image from 'next/image';
 import gql from 'graphql-tag';
 import { SearchIcon } from '@heroicons/react/solid';
 import {
-  HomePageSearchItemsQuery,
-  SearchItemsInput,
-  SearchItemsSortType,
+  HomePageSearchQuery,
+  SearchInput,
+  SearchSortType,
   useHomePageGetQuerySuggestionsLazyQuery,
-  useHomePageSearchItemsLazyQuery,
+  useHomePageSearchLazyQuery,
 } from '@src/generated/graphql';
 import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
@@ -26,25 +26,27 @@ import QuerySuggestionsDropdown from '@src/components/QuerySuggestionsDropdown';
 import Rating from '@src/components/Rating';
 
 gql`
-  query homePageSearchItems($input: SearchItemsInput!) {
-    searchItems(input: $input) {
-      pageInfo {
-        page
-        totalPage
-      }
-      nodes {
-        id
-        name
-        description
-        status
-        url
-        affiliateUrl
-        price
-        imageUrls
-        averageRating
-        reviewCount
-        platform
-      }
+  query homePageSearch($input: SearchInput!) {
+    search(input: $input) {
+        itemConnection {
+            pageInfo {
+                page
+                totalPage
+            }
+            nodes {
+                id
+                name
+                description
+                status
+                url
+                affiliateUrl
+                price
+                imageUrls
+                averageRating
+                reviewCount
+                platform
+            }
+        }
     }
   }
 
@@ -55,19 +57,21 @@ gql`
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const [searchInput, setSearchInput] = useState<SearchItemsInput>({
+  const [searchInput, setSearchInput] = useState<SearchInput>({
     query: '',
-    sortType: SearchItemsSortType.BestMatch,
+    sortType: SearchSortType.BestMatch,
     page: 1,
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestedQueries, setSuggestedQueries] = useState<string[]>([]);
   const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
   const [searchItems, { data, loading, error }] =
-    useHomePageSearchItemsLazyQuery({
+    useHomePageSearchLazyQuery({
       fetchPolicy: 'no-cache',
       nextFetchPolicy: 'no-cache',
     });
+  const items = data?.search?.itemConnection?.nodes
+  const pageInfo = data?.search?.itemConnection?.pageInfo
   const [getQuerySuggestions, { data: getQuerySuggestionsData }] =
     useHomePageGetQuerySuggestionsLazyQuery({
       fetchPolicy: 'no-cache',
@@ -75,7 +79,7 @@ const Home: NextPage = () => {
     });
 
   const updateSearchInput = useCallback(
-    ({ query, sortType, page }: SearchItemsInput) => {
+    ({ query, sortType, page }: SearchInput) => {
       router.push(
         `${router.pathname}?q=${query}&sort=${sortType}&page=${page}`,
         undefined,
@@ -91,7 +95,7 @@ const Home: NextPage = () => {
     (e: ChangeEvent<HTMLSelectElement>) => {
       updateSearchInput({
         ...searchInput,
-        sortType: e.target.value as SearchItemsSortType,
+        sortType: e.target.value as SearchSortType,
       });
     },
     [searchInput, updateSearchInput]
@@ -143,8 +147,8 @@ const Home: NextPage = () => {
   useEffect(() => {
     const page = parseInt(router.query.page as string) || 1;
     const sortType =
-      (router.query.sort as SearchItemsSortType) ||
-      SearchItemsSortType.BestMatch;
+      (router.query.sort as SearchSortType) ||
+      SearchSortType.BestMatch;
     if (router.query.q) {
       const query = router.query.q as string;
       setSearchQuery(query);
@@ -215,15 +219,15 @@ const Home: NextPage = () => {
               value={searchInput.sortType}
               onChange={onChangeSortBy}
             >
-              <option value={SearchItemsSortType.BestMatch}>関連度順</option>
-              <option value={SearchItemsSortType.PriceAsc}>価格の安い順</option>
-              <option value={SearchItemsSortType.PriceDesc}>
+              <option value={SearchSortType.BestMatch}>関連度順</option>
+              <option value={SearchSortType.PriceAsc}>価格の安い順</option>
+              <option value={SearchSortType.PriceDesc}>
                 価格の高い順
               </option>
-              <option value={SearchItemsSortType.ReviewCount}>
+              <option value={SearchSortType.ReviewCount}>
                 レビューの件数順
               </option>
-              <option value={SearchItemsSortType.Rating}>
+              <option value={SearchSortType.Rating}>
                 レビューの評価順
               </option>
             </select>
@@ -232,15 +236,15 @@ const Home: NextPage = () => {
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
-            {data && (
-              <ItemList items={data.searchItems.nodes} loading={loading} />
+            {items && (
+              <ItemList items={items} loading={loading} />
             )}
           </div>
-          {data && (
+          {pageInfo && (
             <div className="my-4 w-full">
               <Pagination
-                page={data.searchItems.pageInfo.page}
-                totalPage={data.searchItems.pageInfo.totalPage}
+                page={pageInfo.page}
+                totalPage={pageInfo.totalPage}
                 onClickPage={onClickPage}
               />
             </div>
@@ -252,7 +256,7 @@ const Home: NextPage = () => {
 };
 
 interface ItemListProps {
-  items: HomePageSearchItemsQuery['searchItems']['nodes'];
+  items: HomePageSearchQuery['search']['itemConnection']['nodes'];
   loading: boolean;
 }
 

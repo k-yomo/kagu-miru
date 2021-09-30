@@ -108,3 +108,22 @@
 </table>
 
 ---
+
+### SearchResponse
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>itemConnection</strong> (<a href="objects.md#itemconnection">ItemConnection!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---

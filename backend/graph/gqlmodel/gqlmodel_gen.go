@@ -32,11 +32,15 @@ type PageInfo struct {
 	TotalPage int `json:"totalPage"`
 }
 
-type SearchItemsInput struct {
-	Query    string              `json:"query"`
-	SortType SearchItemsSortType `json:"sortType"`
-	Page     *int                `json:"page"`
-	PageSize *int                `json:"pageSize"`
+type SearchInput struct {
+	Query    string         `json:"query"`
+	SortType SearchSortType `json:"sortType"`
+	Page     *int           `json:"page"`
+	PageSize *int           `json:"pageSize"`
+}
+
+type SearchResponse struct {
+	ItemConnection *ItemConnection `json:"itemConnection"`
 }
 
 type ItemSellingPlatform string
@@ -119,49 +123,49 @@ func (e ItemStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type SearchItemsSortType string
+type SearchSortType string
 
 const (
-	SearchItemsSortTypeBestMatch   SearchItemsSortType = "BEST_MATCH"
-	SearchItemsSortTypePriceAsc    SearchItemsSortType = "PRICE_ASC"
-	SearchItemsSortTypePriceDesc   SearchItemsSortType = "PRICE_DESC"
-	SearchItemsSortTypeReviewCount SearchItemsSortType = "REVIEW_COUNT"
-	SearchItemsSortTypeRating      SearchItemsSortType = "RATING"
+	SearchSortTypeBestMatch   SearchSortType = "BEST_MATCH"
+	SearchSortTypePriceAsc    SearchSortType = "PRICE_ASC"
+	SearchSortTypePriceDesc   SearchSortType = "PRICE_DESC"
+	SearchSortTypeReviewCount SearchSortType = "REVIEW_COUNT"
+	SearchSortTypeRating      SearchSortType = "RATING"
 )
 
-var AllSearchItemsSortType = []SearchItemsSortType{
-	SearchItemsSortTypeBestMatch,
-	SearchItemsSortTypePriceAsc,
-	SearchItemsSortTypePriceDesc,
-	SearchItemsSortTypeReviewCount,
-	SearchItemsSortTypeRating,
+var AllSearchSortType = []SearchSortType{
+	SearchSortTypeBestMatch,
+	SearchSortTypePriceAsc,
+	SearchSortTypePriceDesc,
+	SearchSortTypeReviewCount,
+	SearchSortTypeRating,
 }
 
-func (e SearchItemsSortType) IsValid() bool {
+func (e SearchSortType) IsValid() bool {
 	switch e {
-	case SearchItemsSortTypeBestMatch, SearchItemsSortTypePriceAsc, SearchItemsSortTypePriceDesc, SearchItemsSortTypeReviewCount, SearchItemsSortTypeRating:
+	case SearchSortTypeBestMatch, SearchSortTypePriceAsc, SearchSortTypePriceDesc, SearchSortTypeReviewCount, SearchSortTypeRating:
 		return true
 	}
 	return false
 }
 
-func (e SearchItemsSortType) String() string {
+func (e SearchSortType) String() string {
 	return string(e)
 }
 
-func (e *SearchItemsSortType) UnmarshalGQL(v interface{}) error {
+func (e *SearchSortType) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = SearchItemsSortType(str)
+	*e = SearchSortType(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid SearchItemsSortType", str)
+		return fmt.Errorf("%s is not a valid SearchSortType", str)
 	}
 	return nil
 }
 
-func (e SearchItemsSortType) MarshalGQL(w io.Writer) {
+func (e SearchSortType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

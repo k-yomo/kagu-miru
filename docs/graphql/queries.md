@@ -18,9 +18,9 @@
 
 ---
 
-### searchItems
+### search
 
-#### Type: [ItemConnection!](objects.md#itemconnection)
+#### Type: [SearchResponse!](objects.md#searchresponse)
 
  
 
@@ -28,6 +28,6 @@
 
 | Name | Description |
 |------|-------------|
-| input ([SearchItemsInput](input_objects.md#searchitemsinput)) |  |
+| input ([SearchInput](input_objects.md#searchinput)) |  |
 
 ---

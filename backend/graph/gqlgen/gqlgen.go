@@ -68,12 +68,16 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetQuerySuggestions func(childComplexity int, query string) int
-		SearchItems         func(childComplexity int, input *gqlmodel.SearchItemsInput) int
+		Search              func(childComplexity int, input *gqlmodel.SearchInput) int
+	}
+
+	SearchResponse struct {
+		ItemConnection func(childComplexity int) int
 	}
 }
 
 type QueryResolver interface {
-	SearchItems(ctx context.Context, input *gqlmodel.SearchItemsInput) (*gqlmodel.ItemConnection, error)
+	Search(ctx context.Context, input *gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error)
 	GetQuerySuggestions(ctx context.Context, query string) ([]string, error)
 }
 
@@ -209,17 +213,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetQuerySuggestions(childComplexity, args["query"].(string)), true
 
-	case "Query.searchItems":
-		if e.complexity.Query.SearchItems == nil {
+	case "Query.search":
+		if e.complexity.Query.Search == nil {
 			break
 		}
 
-		args, err := ec.field_Query_searchItems_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_search_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.SearchItems(childComplexity, args["input"].(*gqlmodel.SearchItemsInput)), true
+		return e.complexity.Query.Search(childComplexity, args["input"].(*gqlmodel.SearchInput)), true
+
+	case "SearchResponse.itemConnection":
+		if e.complexity.SearchResponse.ItemConnection == nil {
+			break
+		}
+
+		return e.complexity.SearchResponse.ItemConnection(childComplexity), true
 
 	}
 	return 0, false
@@ -271,8 +282,9 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../defs/graphql/schema.graphql", Input: `type Query {
-    searchItems(input: SearchItemsInput): ItemConnection!
+	{Name: "../defs/graphql/schema.graphql", Input: `
+type Query {
+    search(input: SearchInput): SearchResponse!
     getQuerySuggestions(query: String!): [String!]!
 }
 
@@ -309,7 +321,11 @@ type ItemConnection {
     nodes: [Item!]!
 }
 
-enum SearchItemsSortType {
+type SearchResponse {
+    itemConnection: ItemConnection!
+}
+
+enum SearchSortType {
     BEST_MATCH
     PRICE_ASC
     PRICE_DESC
@@ -317,9 +333,9 @@ enum SearchItemsSortType {
     RATING
 }
 
-input SearchItemsInput {
+input SearchInput {
     query: String!
-    sortType: SearchItemsSortType!
+    sortType: SearchSortType!
     page: Int
     pageSize: Int
 }
@@ -361,13 +377,13 @@ func (ec *executionContext) field_Query_getQuerySuggestions_args(ctx context.Con
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_searchItems_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_search_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *gqlmodel.SearchItemsInput
+	var arg0 *gqlmodel.SearchInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOSearchItemsInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchItemsInput(ctx, tmp)
+		arg0, err = ec.unmarshalOSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -939,7 +955,7 @@ func (ec *executionContext) _PageInfo_totalPage(ctx context.Context, field graph
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_searchItems(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_search(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -956,7 +972,7 @@ func (ec *executionContext) _Query_searchItems(ctx context.Context, field graphq
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_searchItems_args(ctx, rawArgs)
+	args, err := ec.field_Query_search_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -964,7 +980,7 @@ func (ec *executionContext) _Query_searchItems(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().SearchItems(rctx, args["input"].(*gqlmodel.SearchItemsInput))
+		return ec.resolvers.Query().Search(rctx, args["input"].(*gqlmodel.SearchInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -976,9 +992,9 @@ func (ec *executionContext) _Query_searchItems(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*gqlmodel.ItemConnection)
+	res := resTmp.(*gqlmodel.SearchResponse)
 	fc.Result = res
-	return ec.marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemConnection(ctx, field.Selections, res)
+	return ec.marshalNSearchResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getQuerySuggestions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1092,6 +1108,41 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SearchResponse_itemConnection(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.SearchResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SearchResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ItemConnection, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*gqlmodel.ItemConnection)
+	fc.Result = res
+	return ec.marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2216,8 +2267,8 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputSearchItemsInput(ctx context.Context, obj interface{}) (gqlmodel.SearchItemsInput, error) {
-	var it gqlmodel.SearchItemsInput
+func (ec *executionContext) unmarshalInputSearchInput(ctx context.Context, obj interface{}) (gqlmodel.SearchInput, error) {
+	var it gqlmodel.SearchInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
@@ -2237,7 +2288,7 @@ func (ec *executionContext) unmarshalInputSearchItemsInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortType"))
-			it.SortType, err = ec.unmarshalNSearchItemsSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchItemsSortType(ctx, v)
+			it.SortType, err = ec.unmarshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchSortType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2427,7 +2478,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "searchItems":
+		case "search":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -2435,7 +2486,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_searchItems(ctx, field)
+				res = ec._Query_search(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -2459,6 +2510,33 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var searchResponseImplementors = []string{"SearchResponse"}
+
+func (ec *executionContext) _SearchResponse(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.SearchResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, searchResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SearchResponse")
+		case "itemConnection":
+			out.Values[i] = ec._SearchResponse_itemConnection(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2834,10 +2912,6 @@ func (ec *executionContext) marshalNItem2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmir
 	return ec._Item(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNItemConnection2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemConnection(ctx context.Context, sel ast.SelectionSet, v gqlmodel.ItemConnection) graphql.Marshaler {
-	return ec._ItemConnection(ctx, sel, &v)
-}
-
 func (ec *executionContext) marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemConnection(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.ItemConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -2878,13 +2952,27 @@ func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋkᚑyomoᚋkagu�
 	return ec._PageInfo(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSearchItemsSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchItemsSortType(ctx context.Context, v interface{}) (gqlmodel.SearchItemsSortType, error) {
-	var res gqlmodel.SearchItemsSortType
+func (ec *executionContext) marshalNSearchResponse2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchResponse(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchResponse) graphql.Marshaler {
+	return ec._SearchResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSearchResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchResponse(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.SearchResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SearchResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchSortType(ctx context.Context, v interface{}) (gqlmodel.SearchSortType, error) {
+	var res gqlmodel.SearchSortType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSearchItemsSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchItemsSortType(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchItemsSortType) graphql.Marshaler {
+func (ec *executionContext) marshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchSortType(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchSortType) graphql.Marshaler {
 	return v
 }
 
@@ -3235,11 +3323,11 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return graphql.MarshalInt(*v)
 }
 
-func (ec *executionContext) unmarshalOSearchItemsInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchItemsInput(ctx context.Context, v interface{}) (*gqlmodel.SearchItemsInput, error) {
+func (ec *executionContext) unmarshalOSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchInput(ctx context.Context, v interface{}) (*gqlmodel.SearchInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalInputSearchItemsInput(ctx, v)
+	res, err := ec.unmarshalInputSearchInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

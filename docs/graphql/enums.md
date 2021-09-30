@@ -42,7 +42,7 @@
 
 ---
 
-### SearchItemsSortType
+### SearchSortType
 
 
 

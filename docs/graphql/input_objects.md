@@ -4,7 +4,7 @@
 
 [Input objects](https://graphql.github.io/graphql-spec/June2018/#sec-Input-Objects) can be described as "composable objects" because they include a set of input fields that define the object.
 
-### SearchItemsInput
+### SearchInput
 
 
 
@@ -29,7 +29,7 @@
     <td></td>
   </tr>
   <tr>
-    <td><strong>sortType</strong> (<a href="enums.md#searchitemssorttype">SearchItemsSortType!</a>)</td>
+    <td><strong>sortType</strong> (<a href="enums.md#searchsorttype">SearchSortType!</a>)</td>
     <td></td>
   </tr>
 </table>
