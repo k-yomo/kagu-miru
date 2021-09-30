@@ -39,8 +39,8 @@ func (l *eventLoader) Load(ctx context.Context, event *Event) {
 		msg := pubsub.Message{
 			Data: eventData,
 			Attributes: map[string]string{
-				"eventId": event.ID.String(),
-				"action":  event.Action.String(),
+				"event_id": event.ID,
+				"action":   event.Action,
 			},
 		}
 
