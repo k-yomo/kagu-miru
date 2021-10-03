@@ -55,7 +55,7 @@ func (l *eventLoader) Load(ctx context.Context, event *Event) {
 	}()
 }
 
-// NoopEventLoader ca be used for local env / test
+// NoopEventLoader can be used for local env / test
 type NoopEventLoader struct {
 }
 
