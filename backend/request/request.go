@@ -29,10 +29,10 @@ func GetRequestFromCtx(ctx context.Context) (*http.Request, bool) {
 func RealClientIP(req *http.Request) string {
 	if xff := req.Header.Get("X-Forwarded-For"); xff != "" {
 		ips := strings.Split(xff, ",")
-		if len(ips) >= 2 {
+		if len(ips) >= 3 {
 			// Since we have a GCLB in front, and it sets client-ip and lb-ip the second last IP is the client IP.
-			// X-Forwarded-For: <supplied-value>,<client-ip>,<load-balancer-ip>
-			return ips[len(ips)-2]
+			// X-Forwarded-For: <supplied-value>,<client-ip>,<load-balancer-ip>,<backend-ip>
+			return ips[len(ips)-3]
 		}
 		return ips[len(ips)-1]
 	}
