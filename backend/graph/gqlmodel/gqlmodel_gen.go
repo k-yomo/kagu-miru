@@ -30,6 +30,12 @@ type Item struct {
 	Platform      ItemSellingPlatform `json:"platform"`
 }
 
+type ItemCategory struct {
+	ID       string          `json:"id"`
+	Name     string          `json:"name"`
+	Children []*ItemCategory `json:"children"`
+}
+
 type ItemConnection struct {
 	PageInfo *PageInfo `json:"pageInfo"`
 	Nodes    []*Item   `json:"nodes"`
@@ -63,10 +69,11 @@ type SearchDisplayItemsActionParams struct {
 }
 
 type SearchInput struct {
-	Query    string         `json:"query"`
-	SortType SearchSortType `json:"sortType"`
-	Page     *int           `json:"page"`
-	PageSize *int           `json:"pageSize"`
+	Query       string         `json:"query"`
+	CategoryIds []string       `json:"categoryIds"`
+	SortType    SearchSortType `json:"sortType"`
+	Page        *int           `json:"page"`
+	PageSize    *int           `json:"pageSize"`
 }
 
 type SearchResponse struct {

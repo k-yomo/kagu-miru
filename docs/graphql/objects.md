@@ -63,6 +63,33 @@
 
 ---
 
+### ItemCategory
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>children</strong> (<a href="objects.md#itemcategory">[ItemCategory!]!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>id</strong> (<a href="scalars.md#id">ID!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>name</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### ItemConnection
 
   

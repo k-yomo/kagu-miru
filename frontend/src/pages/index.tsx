@@ -2,7 +2,6 @@ import {
   ChangeEvent,
   KeyboardEvent,
   memo,
-  MouseEvent,
   useCallback,
   useEffect,
   useState,
@@ -32,6 +31,7 @@ import PlatformBadge from '@src/components/PlatformBadge';
 import Pagination from '@src/components/Pagination';
 import QuerySuggestionsDropdown from '@src/components/QuerySuggestionsDropdown';
 import Rating from '@src/components/Rating';
+import CategoryList from '@src/components/CategoryList';
 
 gql`
   query homePageSearch($input: SearchInput!) {
@@ -66,6 +66,30 @@ gql`
     }
   }
 
+  #  query homePageGetAllCategories {
+  #      getAllCategories {
+  #          id
+  #          name
+  #          children {
+  #              id
+  #              name
+  #              children {
+  #                  id
+  #                  name
+  #                  children {
+  #                      id
+  #                      name
+  #                      # deepest categories are 4 levels
+  #                      children {
+  #                          id
+  #                          name
+  #                      }
+  #                  }
+  #              }
+  #          }
+  #      }
+  #  }
+
   mutation homePageTrackEvent($event: Event!) {
     trackEvent(event: $event)
   }
@@ -79,6 +103,7 @@ const Home: NextPage = () => {
   }>({
     input: {
       query: '',
+      categoryIds: [],
       sortType: SearchSortType.BestMatch,
       page: 1,
     },
@@ -106,13 +131,9 @@ const Home: NextPage = () => {
             params,
           },
         },
-      })
-        .then(() => {
-          console.log('track event published!');
-        })
-        .catch(() => {
-          // do nothing
-        });
+      }).catch(() => {
+        // do nothing
+      });
     },
   });
   const [trackEvent] = useHomePageTrackEventMutation();
@@ -144,10 +165,22 @@ const Home: NextPage = () => {
 
   const updateSearchInput = useCallback(
     ({ input, searchFrom }: typeof searchInput) => {
-      const { query, sortType, page } = input;
+      const { query, categoryIds, sortType, page } = input;
+      const urlQuery = {
+        q: query,
+        categoryIds: categoryIds.join(','),
+        sort: sortType,
+        page: page ? page.toString() : '',
+      };
       router.push(
-        `${router.pathname}?q=${query}&sort=${sortType}&page=${page}&searchFrom=${searchFrom}`,
-        `${router.pathname}?q=${query}&sort=${sortType}&page=${page}`,
+        {
+          pathname: router.pathname,
+          query: {
+            ...urlQuery,
+            searchFrom,
+          },
+        },
+        `${router.pathname}?${new URLSearchParams(urlQuery).toString()}`,
         {
           shallow: true,
         }
@@ -188,6 +221,20 @@ const Home: NextPage = () => {
   const onClickPage = (page: number) => {
     updateSearchInput({
       input: { ...searchInput.input, page },
+      searchFrom: SearchFrom.Search,
+    });
+  };
+
+  const onClickCategory = (categoryId: string) => {
+    updateSearchInput({
+      input: { ...searchInput.input, categoryIds: [categoryId] },
+      searchFrom: SearchFrom.Search,
+    });
+  };
+
+  const onClearCategory = () => {
+    updateSearchInput({
+      input: { ...searchInput.input, categoryIds: [] },
       searchFrom: SearchFrom.Search,
     });
   };
@@ -241,6 +288,9 @@ const Home: NextPage = () => {
   }, [searchInput, search]);
 
   useEffect(() => {
+    const categoryIds = ((router.query.categoryIds as string) || '')
+      .split(',')
+      .filter((s) => s); // remove empty values
     const page = parseInt(router.query.page as string) || 1;
     const sortType =
       (router.query.sort as SearchSortType) || SearchSortType.BestMatch;
@@ -252,6 +302,7 @@ const Home: NextPage = () => {
       setSearchInput({
         input: {
           query,
+          categoryIds,
           sortType,
           page,
         },
@@ -269,16 +320,27 @@ const Home: NextPage = () => {
   }, [getQuerySuggestionsData?.getQuerySuggestions]);
 
   return (
-    <div className="max-w-[1200px] mx-auto">
+    <div className="flex max-w-[1200px] mx-auto my-3">
       <SEOMeta
         title="カグミル - 家具検索サービス"
         excludeSiteTitle
         description="カグミルはオンラインで買える家具を横断で検索出来るサービスです。"
         // img={{ srcPath: TopImg.src }}
       />
-      <div className="m-3">
-        <h1 className="text-2xl text-black dark:text-white">商品検索</h1>
-        <div className="flex flex-col sm:flex-row items-end justify-between gap-2 my-4 w-full">
+      <div className="my-8 lg:min-w-[300px] hidden md:block">
+        <h2 className="my-2 text-md font-bold">カテゴリー</h2>
+        <CategoryList
+          selectedCategoryId={
+            searchInput.input.categoryIds.length > 0
+              ? searchInput.input.categoryIds[0]
+              : undefined
+          }
+          onClickCategory={onClickCategory}
+          onClearCategory={onClearCategory}
+        />
+      </div>
+      <div className="flex-1">
+        <div className="flex flex-col sm:flex-row items-end justify-between my-4 w-full">
           <div className="z-10 relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400  focus-within:text-gray-600">
             <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
               <SearchIcon className="h-5 w-5" aria-hidden="true" />

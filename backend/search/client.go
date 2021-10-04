@@ -56,10 +56,11 @@ const (
 )
 
 type Request struct {
-	Query    string
-	SortType SortType
-	Page     uint64
-	PageSize *int
+	Query       string
+	SortType    SortType
+	CategoryIDs []string
+	Page        uint64
+	PageSize    *int
 }
 
 type Response struct {
@@ -78,16 +79,7 @@ func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 		}
 	}()
 
-	var page uint64
-	if req.Page > 1 {
-		page = req.Page - 1 // page starts from 0 in elasticsearch
-	}
-	pageSize := defaultPageSize
-	if req.PageSize != nil {
-		pageSize = uint64(*req.PageSize)
-	}
-
-	esQuery, err := buildSearchQuery(req.Query, req.SortType, page, pageSize)
+	esQuery, err := buildSearchQuery(req)
 	if err != nil {
 		return nil, fmt.Errorf("buildSearchQuery: %w", err)
 	}
@@ -114,30 +106,28 @@ func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 	}, nil
 }
 
-func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (io.Reader, error) {
-	// queryTokens := strings.Fields(query)
-	// if len(queryTokens) > 1 {
-	// 	queryTokens[0] = xesquery.Boost(queryTokens[0], 10)
-	// }
-	// query = strings.Join(queryTokens, " ")
-	esQuery := esquery.Search().
-		Query(
-			esquery.Bool().
-				Must(
-					esquery.MultiMatch(query).
-						Type(esquery.MatchTypeMostFields).
-						Fields(
-							xesquery.Boost(es.ItemFieldName, 5),
-							es.ItemFieldDescription,
-							xesquery.Boost(es.ItemFieldCategoryNames, 10),
-						),
-				),
-		).
-		SourceIncludes(es.AllItemFields...).
-		From(page * pageSize).
-		Size(pageSize)
+func buildSearchQuery(req *Request) (io.Reader, error) {
+	boolQuery := esquery.Bool().Must(
+		esquery.MultiMatch(req.Query).
+			Type(esquery.MatchTypeMostFields).
+			Fields(
+				xesquery.Boost(es.ItemFieldName, 5),
+				es.ItemFieldDescription,
+				xesquery.Boost(es.ItemFieldCategoryNames, 10),
+			),
+	)
 
-	switch sortType {
+	if len(req.CategoryIDs) > 0 {
+		var categoryIDs []interface{}
+		for _, id := range req.CategoryIDs {
+			categoryIDs = append(categoryIDs, id)
+		}
+		boolQuery.Filter(esquery.Terms(es.ItemFieldCategoryIDs, categoryIDs...))
+	}
+
+	esQuery := esquery.Search().Query(boolQuery)
+
+	switch req.SortType {
 	case SortTypePriceAsc:
 		esQuery.Sort(es.ItemFieldPrice, esquery.OrderAsc)
 	case SortTypePriceDesc:
@@ -150,10 +140,25 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (i
 		esQuery.Sort("_score", esquery.OrderDesc)
 	}
 
+	var page uint64
+	if req.Page > 1 {
+		page = req.Page - 1 // page starts from 0 in elasticsearch
+	}
+	pageSize := defaultPageSize
+	if req.PageSize != nil {
+		pageSize = uint64(*req.PageSize)
+	}
+	esQuery.
+		SourceIncludes(es.AllItemFields...).
+		From(page * pageSize).
+		Size(pageSize)
+
 	esQueryJSON, err := esQuery.MarshalJSON()
 	if err != nil {
 		return nil, fmt.Errorf("esQuery.MarshalJSON(): %w", err)
 	}
+
+	fmt.Println(string(esQueryJSON))
 
 	return bytes.NewReader(esQueryJSON), nil
 }

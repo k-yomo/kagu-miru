@@ -4,6 +4,7 @@ scalar Time
 type Query {
     search(input: SearchInput): SearchResponse!
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
+    getAllCategories: [ItemCategory]!
 }
 
 type Mutation {
@@ -13,6 +14,12 @@ type Mutation {
 type PageInfo {
     page: Int!
     totalPage: Int!
+}
+
+type ItemCategory {
+    id: ID!
+    name: String!
+    children: [ItemCategory!]!
 }
 
 enum ItemStatus {
@@ -63,6 +70,7 @@ enum SearchSortType {
 
 input SearchInput {
     query: String!
+    categoryIds: [ID!]!
     sortType: SearchSortType!
     page: Int
     pageSize: Int
