@@ -93,7 +93,7 @@ function Category({
     if (!showChildren) {
       setShowChildren(selectedCategoryIdPath.includes(category.id));
     }
-  }, [selectedCategoryIdPath]);
+  }, [showChildren, selectedCategoryIdPath, category.id]);
 
   return (
     <div className="ml-6">

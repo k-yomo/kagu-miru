@@ -122,9 +122,7 @@ func buildGenreMapFromGenres(genres []*rakutenichiba.Genre) map[string]*rakuteni
 
 		genreMap[strconv.Itoa(g.ID)] = g
 
-		for _, child := range g.Children {
-			queue = append(queue, child)
-		}
+		queue = append(queue, g.Children...)
 	}
 	return genreMap
 }
