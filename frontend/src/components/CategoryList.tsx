@@ -53,12 +53,12 @@ export default memo(function CategoryList({
   return (
     <>
       <span
-        className="my-1 cursor-pointer border-text-primary hover:border-b-[1px] text-sm "
+        className="my-1 cursor-pointer border-text-primary hover:border-b-[1px] text-sm"
         onClick={onClearCategory}
       >
         ALL
       </span>
-      <div className="space-y-1.5">
+      <div>
         {displayedCategories.map((category) => (
           <Category
             key={category.id}
@@ -83,6 +83,7 @@ function Category({
   selectedCategoryIdPath,
   onClick,
 }: CategoryProps) {
+  const hasChildren = category.children.length > 0;
   const isSelected =
     selectedCategoryIdPath.length > 0 &&
     selectedCategoryIdPath[selectedCategoryIdPath.length - 1] === category.id;
@@ -93,31 +94,34 @@ function Category({
     if (!showChildren) {
       setShowChildren(selectedCategoryIdPath.includes(category.id));
     }
-  }, [showChildren, selectedCategoryIdPath, category.id]);
+  }, [selectedCategoryIdPath, category.id]);
 
   return (
     <div className="ml-6">
-      <div className="flex items-center cursor-pointer ">
+      <div
+        className={`flex items-center justify-between p-2 cursor-pointer ${
+          hasChildren ? 'hover:bg-gray-50 dark:hover:bg-gray-800' : ''
+        }`}
+      >
         <span
           className={`hover:underline text-sm ${isSelected ? 'font-bold' : ''}`}
           onClick={() => onClick(category.id)}
         >
           {category.name}
         </span>
-        {category.children.length > 0 &&
-          (showChildren ? (
-            <ChevronUpIcon
-              className="h-5 w-5"
-              onClick={() => setShowChildren(false)}
-            />
-          ) : (
-            <ChevronDownIcon
-              className="h-5 w-5"
-              onClick={() => setShowChildren(true)}
-            />
-          ))}
+        <div
+          className="flex-1 flex justify-end"
+          onClick={() => setShowChildren(!showChildren)}
+        >
+          {hasChildren &&
+            (showChildren ? (
+              <ChevronUpIcon className="h-5 w-5" />
+            ) : (
+              <ChevronDownIcon className="h-5 w-5" />
+            ))}
+        </div>
       </div>
-      <div className="mt-1.5 space-y-1.5">
+      <div>
         {showChildren &&
           category.children.map((category) => (
             <Category
