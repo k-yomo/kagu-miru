@@ -1,13 +1,11 @@
-package indexworker
+package rakutenichiba
 
-import (
-	"strconv"
-
-	"github.com/k-yomo/kagu-miru/pkg/rakutenichiba"
-)
+import "strconv"
 
 type Genre struct {
-	*rakutenichiba.Genre
+	ID       int    `json:"genreId"`
+	Name     string `json:"genreName"`
+	Level    int    `json:"genreLevel"`
 	Parent   *Genre
 	Children []*Genre
 }

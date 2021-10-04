@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/k-yomo/kagu-miru/pkg/httputil"
 
@@ -46,17 +47,15 @@ func NewClient(appIDs []string, affiliateID string) *Client {
 
 const GenreFurnitureID = "100804"
 
-type Genre struct {
-	ID    int    `json:"genreId"`
-	Name  string `json:"genreName"`
-	Level int    `json:"genreLevel"`
-}
-
 type SearchGenreResponse struct {
 	Parents  []*Genre `json:"parents"`
 	Current  *Genre   `json:"current"`
 	Children []struct {
-		Child *Genre `json:"child"`
+		Child *struct {
+			ID    int    `json:"genreId"`
+			Name  string `json:"genreName"`
+			Level int    `json:"genreLevel"`
+		} `json:"child"`
 	} `json:"children"`
 }
 
@@ -69,6 +68,50 @@ func (c *Client) SearchGenre(ctx context.Context, genreID string) (*SearchGenreR
 		return nil, fmt.Errorf("httputil.GetAndUnmarshal: %w", err)
 	}
 	return &resp, nil
+}
+
+// GetGenreWithAllChildren gets genre with all lower hierarchy genre
+func (c *Client) GetGenreWithAllChildren(ctx context.Context, genreID string) (*Genre, error) {
+	u := urlutil.CopyWithQueries(c.genreSearchAPIURL, c.buildParams(map[string]string{"genreId": genreID}))
+	var resp SearchGenreResponse
+	if err := httputil.GetAndUnmarshal(ctx, c.httpClient, u, &resp); err != nil {
+		return nil, fmt.Errorf("httputil.GetAndUnmarshal: %w", err)
+	}
+
+	genre := &Genre{
+		ID:    resp.Current.ID,
+		Name:  resp.Current.Name,
+		Level: resp.Current.Level,
+	}
+	if err := c.setChildGenres(ctx, genre); err != nil {
+		return nil, fmt.Errorf("c.setChildGenres: %w", err)
+	}
+	return genre, nil
+}
+
+func (c *Client) setChildGenres(ctx context.Context, genre *Genre) error {
+	time.Sleep((time.Duration(1000.0 / float64(c.ApplicationIDNum()))) * time.Millisecond)
+
+	rakutenGenre, err := c.SearchGenre(ctx, strconv.Itoa(genre.ID))
+	if err != nil {
+		return fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
+	}
+	genres := make([]*Genre, 0, len(genre.Children))
+	for _, child := range rakutenGenre.Children {
+		childGenre := child.Child
+		g := &Genre{
+			ID:     childGenre.ID,
+			Name:   childGenre.Name,
+			Level:  childGenre.Level,
+			Parent: genre,
+		}
+		if err := c.setChildGenres(ctx, g); err != nil {
+			return err
+		}
+		genres = append(genres, g)
+	}
+	genre.Children = genres
+	return nil
 }
 
 // ApplicationIDNum returns number of application ids available

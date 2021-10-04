@@ -27,7 +27,7 @@ type genreIndexWorker struct {
 	pool    chan<- *genreIndexWorker
 	genreID chan int
 
-	genreMap map[string]*Genre
+	genreMap map[string]*rakutenichiba.Genre
 
 	logger *zap.Logger
 }
@@ -113,9 +113,9 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 }
 
 // buildGenreMapFromGenre builds genreID => *Genre map by tracking
-func buildGenreMapFromGenres(genres []*Genre) map[string]*Genre {
+func buildGenreMapFromGenres(genres []*rakutenichiba.Genre) map[string]*rakutenichiba.Genre {
 	queue := genres
-	genreMap := map[string]*Genre{}
+	genreMap := map[string]*rakutenichiba.Genre{}
 	for len(queue) != 0 {
 		g := queue[0]
 		queue = queue[1:]
@@ -129,42 +129,12 @@ func buildGenreMapFromGenres(genres []*Genre) map[string]*Genre {
 	return genreMap
 }
 
-func (r *RakutenWorker) getFurnitureGenres(ctx context.Context) ([]*Genre, error) {
-	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakutenichiba.GenreFurnitureID)
+func (r *RakutenWorker) getFurnitureGenres(ctx context.Context) ([]*rakutenichiba.Genre, error) {
+	furnitureGenre, err := r.rakutenIchibaAPIClient.GetGenreWithAllChildren(ctx, rakutenichiba.GenreFurnitureID)
 	if err != nil {
-		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
+		return nil, fmt.Errorf("rakutenIchibaAPIClient.GetGenreWithAllChildren: %w", err)
 	}
-	genres := make([]*Genre, 0, len(furnitureGenre.Children))
-	for _, genre := range furnitureGenre.Children {
-		genre := &Genre{Genre: genre.Child}
-		if err := r.setChildGenres(ctx, genre); err != nil {
-			return nil, err
-		}
-		genres = append(genres, genre)
-	}
-	return genres, nil
-}
-
-func (r *RakutenWorker) setChildGenres(ctx context.Context, genre *Genre) error {
-	time.Sleep((time.Duration(1000.0 / float64(r.rakutenIchibaAPIClient.ApplicationIDNum()))) * time.Millisecond)
-
-	rakutenGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, strconv.Itoa(genre.ID))
-	if err != nil {
-		return fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
-	}
-	genres := make([]*Genre, 0, len(genre.Children))
-	for _, childGenre := range rakutenGenre.Children {
-		cd := &Genre{
-			Parent: genre,
-			Genre:  childGenre.Child,
-		}
-		if err := r.setChildGenres(ctx, cd); err != nil {
-			return err
-		}
-		genres = append(genres, cd)
-	}
-	genre.Children = genres
-	return nil
+	return furnitureGenre.Children, nil
 }
 
 // We traverse all items in the given genre with following way
@@ -247,7 +217,7 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 	}()
 }
 
-func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap map[string]*Genre) ([]*es.Item, error) {
+func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap map[string]*rakutenichiba.Genre) ([]*es.Item, error) {
 	items := make([]*es.Item, 0, len(rakutenItems))
 	var errors []error
 	for _, rakutenItem := range rakutenItems {
@@ -266,7 +236,7 @@ func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap ma
 	return items, multierr.Combine(errors...)
 }
 
-func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *Genre) (*es.Item, error) {
+func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenichiba.Genre) (*es.Item, error) {
 	var status es.Status
 	switch rakutenItem.Availability {
 	case 0:
