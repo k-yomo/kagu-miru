@@ -44,8 +44,15 @@
       "review_count": {
         "type": "long"
       },
-      "genre_id": {
-        "type": "long"
+      "category_id": {
+        "type": "keyword"
+      },
+      "category_ids": {
+        "type": "keyword"
+      },
+      "category_names": {
+        "type": "text",
+        "analyzer": "kuromoji_analyzer"
       },
       "tag_ids": {
         "type": "long"
