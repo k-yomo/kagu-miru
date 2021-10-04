@@ -19,10 +19,6 @@ func (g *Genre) GenreIDs() []string {
 		genreIDs = append([]string{strconv.Itoa(parentGenre.ID)}, genreIDs...)
 		parentGenre = parentGenre.Parent
 	}
-	if len(genreIDs) > 1 {
-		// remove root genre id since it's same for all items
-		genreIDs = genreIDs[1:]
-	}
 	return genreIDs
 }
 
@@ -32,10 +28,6 @@ func (g *Genre) GenreNames() []string {
 	for parentGenre != nil {
 		genreNames = append([]string{parentGenre.Name}, genreNames...)
 		parentGenre = parentGenre.Parent
-	}
-	if len(genreNames) > 1 {
-		// remove root genre name since it's same for all items
-		genreNames = genreNames[1:]
 	}
 	return genreNames
 }

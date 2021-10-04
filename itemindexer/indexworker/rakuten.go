@@ -71,19 +71,19 @@ type RakutenWorkerOption struct {
 
 // Run starts rakuten item indexing genreIndexWorker
 func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) error {
-	furnitureGenre, err := r.getFurnitureGenre(ctx)
+	furnitureGenres, err := r.getFurnitureGenres(ctx)
 	if err != nil {
 		return fmt.Errorf("getFurnitureGenre: %w", err)
 	}
 
-	genreMap := buildGenreMapFromGenre(furnitureGenre)
+	genreMap := buildGenreMapFromGenres(furnitureGenres)
 	for _, w := range r.workers {
 		w.genreMap = genreMap
 		w.start(ctx)
 	}
 
-	indexGenreIDs := make([]int, 0, len(furnitureGenre.Children))
-	for _, genre := range furnitureGenre.Children {
+	indexGenreIDs := make([]int, 0, len(furnitureGenres))
+	for _, genre := range furnitureGenres {
 		indexGenreIDs = append(indexGenreIDs, genre.ID)
 	}
 	sort.Slice(indexGenreIDs, func(i, j int) bool {
@@ -113,8 +113,8 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 }
 
 // buildGenreMapFromGenre builds genreID => *Genre map by tracking
-func buildGenreMapFromGenre(genre *Genre) map[string]*Genre {
-	queue := []*Genre{genre}
+func buildGenreMapFromGenres(genres []*Genre) map[string]*Genre {
+	queue := genres
 	genreMap := map[string]*Genre{}
 	for len(queue) != 0 {
 		g := queue[0]
@@ -129,16 +129,20 @@ func buildGenreMapFromGenre(genre *Genre) map[string]*Genre {
 	return genreMap
 }
 
-func (r *RakutenWorker) getFurnitureGenre(ctx context.Context) (*Genre, error) {
+func (r *RakutenWorker) getFurnitureGenres(ctx context.Context) ([]*Genre, error) {
 	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakutenichiba.GenreFurnitureID)
 	if err != nil {
 		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
 	}
-	genre := &Genre{Genre: furnitureGenre.Current}
-	if err := r.setChildGenres(ctx, genre); err != nil {
-		return nil, err
+	genres := make([]*Genre, 0, len(furnitureGenre.Children))
+	for _, genre := range furnitureGenre.Children {
+		genre := &Genre{Genre: genre.Child}
+		if err := r.setChildGenres(ctx, genre); err != nil {
+			return nil, err
+		}
+		genres = append(genres, genre)
 	}
-	return genre, nil
+	return genres, nil
 }
 
 func (r *RakutenWorker) setChildGenres(ctx context.Context, genre *Genre) error {
