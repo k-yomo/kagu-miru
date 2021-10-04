@@ -126,13 +126,11 @@ func buildSearchQuery(query string, sortType SortType, page, pageSize uint64) (i
 				Must(
 					esquery.MultiMatch(query).
 						Type(esquery.MatchTypeMostFields).
-						Fields(xesquery.Boost(es.ItemFieldName, 10), es.ItemFieldDescription),
-				).
-				Should(
-					esquery.MultiMatch(query).
-						Type(esquery.MatchTypePhrase).
-						Fields(xesquery.Boost(es.ItemFieldName, 10), es.ItemFieldDescription).
-						Boost(10),
+						Fields(
+							xesquery.Boost(es.ItemFieldName, 5),
+							es.ItemFieldDescription,
+							xesquery.Boost(es.ItemFieldCategoryNames, 10),
+						),
 				),
 		).
 		SourceIncludes(es.AllItemFields...).
