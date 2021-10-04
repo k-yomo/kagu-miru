@@ -99,8 +99,8 @@ function Category({
   return (
     <div className="ml-4">
       <div
-        className={`flex items-center justify-between p-2 cursor-pointer ${
-          hasChildren ? 'hover:bg-gray-50 dark:hover:bg-gray-800' : ''
+        className={`flex items-center justify-between px-2 cursor-pointer ${
+          hasChildren ? 'hover:bg-gray-50 dark:hover:bg-gray-800' : 'py-2'
         }`}
       >
         <span
@@ -110,7 +110,7 @@ function Category({
           {category.name}
         </span>
         <div
-          className="flex-1 flex justify-end"
+          className="flex-1 flex justify-end py-2"
           onClick={() => setShowChildren(!showChildren)}
         >
           {hasChildren &&
