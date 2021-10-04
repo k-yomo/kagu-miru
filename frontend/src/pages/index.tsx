@@ -293,7 +293,7 @@ const Home: NextPage = () => {
       (router.query.sort as SearchSortType) || SearchSortType.BestMatch;
     const searchFrom =
       (router.query.searchFrom as SearchFrom) || SearchFrom.Url;
-    const query = router.query.q as string || '';
+    const query = (router.query.q as string) || '';
     setSearchQuery(query);
     setSearchInput({
       input: {
