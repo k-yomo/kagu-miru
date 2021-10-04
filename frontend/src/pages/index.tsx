@@ -451,17 +451,19 @@ const ItemList = memo(function ItemList({
               unoptimized
             />
             <div className="py-0.5 sm:p-2">
-              <PlatformBadge platform={item.platform} />
+              <div className="flex justify-between">
+                <PlatformBadge platform={item.platform} />
+                <div className="flex items-center">
+                  <Rating rating={item.averageRating} maxRating={5} />
+                  <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
+                    {item.reviewCount}
+                  </div>
+                </div>
+              </div>
               <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
               </h4>
               <div className=" my-1 text-lg font-bold">￥{item.price}</div>
-              <div className="flex items-center">
-                <Rating rating={item.averageRating} maxRating={5} />
-                <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
-                  {item.reviewCount}
-                </div>
-              </div>
             </div>
           </div>
         </a>
