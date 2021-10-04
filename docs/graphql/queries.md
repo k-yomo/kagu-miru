@@ -4,6 +4,14 @@
 
 
 
+### getAllCategories
+
+#### Type: [[ItemCategory]!](objects.md#itemcategory)
+
+ 
+
+---
+
 ### getQuerySuggestions
 
 #### Type: [QuerySuggestionsResponse!](objects.md#querysuggestionsresponse)

@@ -25,6 +25,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.22.0
 	go.opentelemetry.io/otel v1.0.0-RC3
 	go.opentelemetry.io/otel/sdk v1.0.0-RC3
+	go.uber.org/multierr v1.7.0
 	go.uber.org/zap v1.19.1
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
 )
@@ -60,7 +61,6 @@ require (
 	go.opentelemetry.io/otel/metric v0.22.0 // indirect
 	go.opentelemetry.io/otel/trace v1.0.0-RC3 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985 // indirect
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect

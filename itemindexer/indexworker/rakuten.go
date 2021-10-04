@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"go.uber.org/multierr"
+
 	"github.com/k-yomo/kagu-miru/pkg/jancode"
 
 	"github.com/k-yomo/kagu-miru/internal/es"
@@ -24,6 +26,8 @@ type genreIndexWorker struct {
 	wg      *sync.WaitGroup
 	pool    chan<- *genreIndexWorker
 	genreID chan int
+
+	genreMap map[string]*rakutenichiba.Genre
 
 	logger *zap.Logger
 }
@@ -67,21 +71,28 @@ type RakutenWorkerOption struct {
 
 // Run starts rakuten item indexing genreIndexWorker
 func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) error {
+	furnitureGenres, err := r.getFurnitureGenres(ctx)
+	if err != nil {
+		return fmt.Errorf("getFurnitureGenre: %w", err)
+	}
+
+	genreMap := buildGenreMapFromGenres(furnitureGenres)
 	for _, w := range r.workers {
+		w.genreMap = genreMap
 		w.start(ctx)
 	}
 
-	furnitureGenreIDs, err := r.getFurnitureGenreIDs(ctx)
-	if err != nil {
-		return fmt.Errorf("getFurnitureGenreIDs: %w", err)
+	indexGenreIDs := make([]int, 0, len(furnitureGenres))
+	for _, genre := range furnitureGenres {
+		indexGenreIDs = append(indexGenreIDs, genre.ID)
 	}
-	sort.Slice(furnitureGenreIDs, func(i, j int) bool {
-		return furnitureGenreIDs[i] < furnitureGenreIDs[j]
+	sort.Slice(indexGenreIDs, func(i, j int) bool {
+		return indexGenreIDs[i] < indexGenreIDs[j]
 	})
 
 	startGenreIdx := 0
 	if option.StartGenreID != 0 {
-		for i, genreID := range furnitureGenreIDs {
+		for i, genreID := range indexGenreIDs {
 			if genreID == option.StartGenreID {
 				startGenreIdx = i
 				break
@@ -89,28 +100,47 @@ func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) er
 		}
 	}
 
-	r.logger.Info(fmt.Sprintf("[start] indexing %d genre", len(furnitureGenreIDs[startGenreIdx:])))
+	r.logger.Info(fmt.Sprintf("[start] indexing %d genre", len(indexGenreIDs[startGenreIdx:])))
 
-	for _, genreID := range furnitureGenreIDs[startGenreIdx:] {
+	for _, genreID := range indexGenreIDs[startGenreIdx:] {
 		r.wg.Add(1)
 		(<-r.pool).genreID <- genreID
 	}
 	r.wg.Wait()
 
-	r.logger.Info(fmt.Sprintf("[end] indexing %d genre", len(furnitureGenreIDs[startGenreIdx:])))
+	r.logger.Info(fmt.Sprintf("[end] indexing %d genre", len(indexGenreIDs[startGenreIdx:])))
 	return nil
 }
 
-func (r *RakutenWorker) getFurnitureGenreIDs(ctx context.Context) ([]int, error) {
+// buildGenreMapFromGenre builds genreID => *Genre map by tracking
+func buildGenreMapFromGenres(genres []*rakutenichiba.Genre) map[string]*rakutenichiba.Genre {
+	queue := genres
+	genreMap := map[string]*rakutenichiba.Genre{}
+	for len(queue) != 0 {
+		g := queue[0]
+		queue = queue[1:]
+
+		genreMap[strconv.Itoa(g.ID)] = g
+
+		queue = append(queue, g.Children...)
+	}
+	return genreMap
+}
+
+func (r *RakutenWorker) getFurnitureGenres(ctx context.Context) ([]*rakutenichiba.Genre, error) {
 	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakutenichiba.GenreFurnitureID)
 	if err != nil {
 		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
 	}
-	genreIDs := make([]int, 0, len(furnitureGenre.Children))
-	for _, genre := range furnitureGenre.Children {
-		genreIDs = append(genreIDs, genre.Child.ID)
+	var genres []*rakutenichiba.Genre
+	for _, child := range furnitureGenre.Children {
+		genre, err := r.rakutenIchibaAPIClient.GetGenreWithAllChildren(ctx, strconv.Itoa(child.Child.ID))
+		if err != nil {
+			return nil, fmt.Errorf("rakutenIchibaAPIClient.GetGenreWithAllChildren: %w", err)
+		}
+		genres = append(genres, genre)
 	}
-	return genreIDs, nil
+	return genres, nil
 }
 
 // We traverse all items in the given genre with following way
@@ -161,9 +191,14 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 					for _, item := range res.Items {
 						rakutenItems = append(rakutenItems, item.Item)
 					}
-					items, err := mapRakutenItemsToIndexItems(rakutenItems)
+					items, err := mapRakutenItemsToIndexItems(rakutenItems, w.genreMap)
 					if err != nil {
-						w.logger.Error("mapRakutenItemsToIndexItems failed", zap.Error(err))
+						w.logger.Error(
+							"mapRakutenItemsToIndexItems failed for some items",
+							zap.Error(err),
+							zap.Int("totalCount", len(rakutenItems)),
+							zap.Int("failedCount", len(rakutenItems)-len(items)),
+						)
 					}
 
 					if err := w.itemIndexer.BulkIndex(ctx, items); err != nil {
@@ -188,19 +223,26 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 	}()
 }
 
-func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item) ([]*es.Item, error) {
+func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap map[string]*rakutenichiba.Genre) ([]*es.Item, error) {
 	items := make([]*es.Item, 0, len(rakutenItems))
+	var errors []error
 	for _, rakutenItem := range rakutenItems {
-		item, err := mapRakutenItemToIndexItem(rakutenItem)
+		genre, ok := genreMap[rakutenItem.GenreID]
+		if !ok {
+			errors = append(errors, fmt.Errorf("failed to get genre, item id: %s", rakutenItem.ID()))
+			continue
+		}
+		item, err := mapRakutenItemToIndexItem(rakutenItem, genre)
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
+			continue
 		}
 		items = append(items, item)
 	}
-	return items, nil
+	return items, multierr.Combine(errors...)
 }
 
-func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item) (*es.Item, error) {
+func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenichiba.Genre) (*es.Item, error) {
 	var status es.Status
 	switch rakutenItem.Availability {
 	case 0:
@@ -208,17 +250,12 @@ func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item) (*es.Item, error
 	case 1:
 		status = es.StatusActive
 	default:
-		return nil, fmt.Errorf("unknown status %d, item: %v", rakutenItem.Availability, rakutenItem)
+		return nil, fmt.Errorf("unknown status %d, item id: %v", rakutenItem.Availability, rakutenItem.ID())
 	}
 
 	imageURLs := make([]string, 0, len(rakutenItem.MediumImageURLs))
 	for _, mediumImage := range rakutenItem.MediumImageURLs {
 		imageURLs = append(imageURLs, mediumImage.ImageURL)
-	}
-
-	genreID, err := strconv.Atoi(rakutenItem.GenreID)
-	if err != nil {
-		return nil, fmt.Errorf("invalid genreId '%d': %w", genreID, err)
 	}
 
 	janCode := jancode.ExtractJANCode(rakutenItem.ItemCaption)
@@ -234,7 +271,9 @@ func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item) (*es.Item, error
 		ImageURLs:     imageURLs,
 		AverageRating: rakutenItem.ReviewAverage,
 		ReviewCount:   rakutenItem.ReviewCount,
-		GenreID:       genreID,
+		CategoryID:    rakutenItem.GenreID,
+		CategoryIDs:   genre.GenreIDs(),
+		CategoryNames: genre.GenreNames(),
 		TagIDs:        rakutenItem.TagIDs,
 		JANCode:       janCode,
 		Platform:      es.PlatformRakuten,

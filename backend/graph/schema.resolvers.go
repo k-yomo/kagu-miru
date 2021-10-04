@@ -28,10 +28,11 @@ func (r *queryResolver) Search(ctx context.Context, input *gqlmodell.SearchInput
 		page = uint64(*input.Page)
 	}
 	searchResponse, err := r.SearchClient.SearchItems(ctx, &search.Request{
-		Query:    input.Query,
-		SortType: sortType,
-		Page:     page,
-		PageSize: input.PageSize,
+		Query:       input.Query,
+		SortType:    sortType,
+		CategoryIDs: input.CategoryIds,
+		Page:        page,
+		PageSize:    input.PageSize,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
@@ -50,6 +51,10 @@ func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (
 		Query:            query,
 		SuggestedQueries: suggestedQueries,
 	}, nil
+}
+
+func (r *queryResolver) GetAllCategories(ctx context.Context) ([]*gqlmodell.ItemCategory, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns gqlgend.MutationResolver implementation.

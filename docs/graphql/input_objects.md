@@ -129,6 +129,10 @@
     <th>Description</th>
   </tr>
   <tr>
+    <td><strong>categoryIds</strong> (<a href="scalars.md#id">[ID!]!</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>page</strong> (<a href="scalars.md#int">Int</a>)</td>
     <td></td>
   </tr>

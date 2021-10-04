@@ -194,6 +194,9 @@
             "search_analyzer": "readingform_search_analyzer"
           }
         }
+      },
+      "createdAt": {
+        "type": "date"
       }
     }
   }
