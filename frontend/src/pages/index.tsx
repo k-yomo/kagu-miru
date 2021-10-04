@@ -327,7 +327,7 @@ const Home: NextPage = () => {
         description="カグミルはオンラインで買える家具を横断で検索出来るサービスです。"
         // img={{ srcPath: TopImg.src }}
       />
-      <div className="my-8 px-2 lg:min-w-[300px] hidden md:block">
+      <div className="my-8 mx-2 lg:mx-4 lg:min-w-[300px] hidden md:block">
         <h2 className="my-2 text-md font-bold">カテゴリー</h2>
         <CategoryList
           selectedCategoryId={
@@ -339,8 +339,8 @@ const Home: NextPage = () => {
           onClearCategory={onClearCategory}
         />
       </div>
-      <div className="flex-1">
-        <div className="flex flex-col sm:flex-row items-end justify-between my-4 w-full">
+      <div className="flex-1 mx-2">
+        <div className="flex flex-col sm:flex-row items-end justify-between my-4 gap-2 w-full">
           <div className="z-10 relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400  focus-within:text-gray-600">
             <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
               <SearchIcon className="h-5 w-5" aria-hidden="true" />
