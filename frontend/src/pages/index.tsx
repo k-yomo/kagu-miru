@@ -274,9 +274,6 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const { query } = searchInput.input;
-    if (!query) {
-      return;
-    }
     search({
       variables: {
         input: {
@@ -296,19 +293,17 @@ const Home: NextPage = () => {
       (router.query.sort as SearchSortType) || SearchSortType.BestMatch;
     const searchFrom =
       (router.query.searchFrom as SearchFrom) || SearchFrom.Url;
-    if (router.query.q) {
-      const query = router.query.q as string;
-      setSearchQuery(query);
-      setSearchInput({
-        input: {
-          query,
-          categoryIds,
-          sortType,
-          page,
-        },
-        searchFrom,
-      });
-    }
+    const query = router.query.q as string || '';
+    setSearchQuery(query);
+    setSearchInput({
+      input: {
+        query,
+        categoryIds,
+        sortType,
+        page,
+      },
+      searchFrom,
+    });
   }, [router.query]);
 
   useEffect(() => {
@@ -452,7 +447,7 @@ const ItemList = memo(function ItemList({
               height={300}
               layout="responsive"
               objectFit="cover"
-              className="w-20 h-20"
+              className="w-20 h-20 rounded-md"
               unoptimized
             />
             <div className="py-0.5 sm:p-2">

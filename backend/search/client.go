@@ -9,15 +9,12 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/olivere/elastic/v7"
-
-	"github.com/k-yomo/kagu-miru/pkg/xesquery"
-
 	"github.com/aquasecurity/esquery"
-
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/internal/es"
 	"github.com/k-yomo/kagu-miru/pkg/logging"
+	"github.com/k-yomo/kagu-miru/pkg/xesquery"
+	"github.com/olivere/elastic/v7"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
@@ -107,15 +104,20 @@ func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 }
 
 func buildSearchQuery(req *Request) (io.Reader, error) {
-	boolQuery := esquery.Bool().Must(
-		esquery.MultiMatch(req.Query).
+	var mustQueries []esquery.Mappable
+	if req.Query != "" {
+		mustQueries = append(mustQueries, esquery.MultiMatch(req.Query).
 			Type(esquery.MatchTypeMostFields).
 			Fields(
 				xesquery.Boost(es.ItemFieldName, 5),
 				es.ItemFieldDescription,
 				xesquery.Boost(es.ItemFieldCategoryNames, 10),
-			),
-	)
+			))
+	} else {
+		mustQueries = append(mustQueries, esquery.MatchAll())
+	}
+
+	boolQuery := esquery.Bool().Must(mustQueries...)
 
 	if len(req.CategoryIDs) > 0 {
 		var categoryIDs []interface{}
@@ -125,7 +127,29 @@ func buildSearchQuery(req *Request) (io.Reader, error) {
 		boolQuery.Filter(esquery.Terms(es.ItemFieldCategoryIDs, categoryIDs...))
 	}
 
-	esQuery := esquery.Search().Query(boolQuery)
+	esQuery := esquery.Search().Query(esquery.CustomQuery(map[string]interface{}{
+		"function_score": map[string]interface{}{
+			"query": boolQuery.Map(),
+			"functions": []map[string]interface{}{
+				{
+					"gauss": map[string]interface{}{
+						es.ItemFieldAverageRating: map[string]interface{}{
+							"origin": 5,
+							"offset": 1,
+							"scale":  1,
+							"decay":  0.4,
+						},
+					},
+				},
+				{
+					"field_value_factor": map[string]string{
+						"field": es.ItemFieldReviewCount,
+					},
+				},
+			},
+			"max_boost": 3,
+		},
+	}))
 
 	switch req.SortType {
 	case SortTypePriceAsc:
