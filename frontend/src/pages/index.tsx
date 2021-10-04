@@ -327,7 +327,7 @@ const Home: NextPage = () => {
         description="カグミルはオンラインで買える家具を横断で検索出来るサービスです。"
         // img={{ srcPath: TopImg.src }}
       />
-      <div className="my-8 lg:min-w-[300px] hidden md:block">
+      <div className="my-8 px-2 lg:min-w-[300px] hidden md:block">
         <h2 className="my-2 text-md font-bold">カテゴリー</h2>
         <CategoryList
           selectedCategoryId={

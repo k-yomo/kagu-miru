@@ -97,7 +97,7 @@ function Category({
   }, [selectedCategoryIdPath, category.id]);
 
   return (
-    <div className="ml-6">
+    <div className="ml-4">
       <div
         className={`flex items-center justify-between p-2 cursor-pointer ${
           hasChildren ? 'hover:bg-gray-50 dark:hover:bg-gray-800' : ''
