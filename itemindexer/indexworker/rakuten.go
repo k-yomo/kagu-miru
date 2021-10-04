@@ -130,11 +130,19 @@ func buildGenreMapFromGenres(genres []*rakutenichiba.Genre) map[string]*rakuteni
 }
 
 func (r *RakutenWorker) getFurnitureGenres(ctx context.Context) ([]*rakutenichiba.Genre, error) {
-	furnitureGenre, err := r.rakutenIchibaAPIClient.GetGenreWithAllChildren(ctx, rakutenichiba.GenreFurnitureID)
+	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakutenichiba.GenreFurnitureID)
 	if err != nil {
-		return nil, fmt.Errorf("rakutenIchibaAPIClient.GetGenreWithAllChildren: %w", err)
+		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
 	}
-	return furnitureGenre.Children, nil
+	var genres []*rakutenichiba.Genre
+	for _, child := range furnitureGenre.Children {
+		genre, err := r.rakutenIchibaAPIClient.GetGenreWithAllChildren(ctx, strconv.Itoa(child.Child.ID))
+		if err != nil {
+			return nil, fmt.Errorf("rakutenIchibaAPIClient.GetGenreWithAllChildren: %w", err)
+		}
+		genres = append(genres, genre)
+	}
+	return genres, nil
 }
 
 // We traverse all items in the given genre with following way
