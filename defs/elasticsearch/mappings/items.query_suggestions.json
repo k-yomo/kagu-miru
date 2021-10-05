@@ -153,7 +153,7 @@
           "use_romaji": true
         },
         "engram": {
-          "type": "edgeNGram",
+          "type": "edge_ngram",
           "min_gram": 1,
           "max_gram": 36
         },
@@ -168,7 +168,7 @@
           "type": "kuromoji_tokenizer"
         },
         "engram": {
-          "type": "edgeNGram",
+          "type": "edge_ngram",
           "min_gram": 1,
           "max_gram": 36
         }
