@@ -1,8 +1,11 @@
 import React, { memo, useEffect, useState } from 'react';
 import itemCategories from '@src/static/itemCategories.json';
-import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/solid';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
 
 interface Props {
+  // used to sort categories
+  displayedItemTopLevelCategoryIds: string[];
+  // used to highlight selected category
   selectedCategoryId?: string;
   onClickCategory: (categoryId: string) => void;
   onClearCategory: () => void;
@@ -33,22 +36,46 @@ function findSelectedCategoryIdPath(
   return children.find((categories) => categories.length > 0) || [];
 }
 
+function buildCategoryIdCountMap(displayedCategoryIds: string[]): {
+  [key: string]: number;
+} {
+  const categoryIdDisplayCountMap: { [key: string]: number } = {};
+  displayedCategoryIds.forEach((id) => {
+    if (categoryIdDisplayCountMap[id]) {
+      categoryIdDisplayCountMap[id] += 1;
+    } else {
+      categoryIdDisplayCountMap[id] = 1;
+    }
+  });
+  return categoryIdDisplayCountMap;
+}
+
 export default memo(function CategoryList({
+  displayedItemTopLevelCategoryIds,
   selectedCategoryId,
   onClickCategory,
   onClearCategory,
 }: Props) {
+  const [categories, setCategories] = useState(itemCategories);
   const selectedCategoryIdPath = findSelectedCategoryIdPath(
     itemCategories,
     selectedCategoryId
   );
-  const [displayedCategories, setDisplayedCategories] =
-    useState(itemCategories);
-  // const [showMore, setShowMore] = useState(false)
+  const [showMore, setShowMore] = useState(false);
 
-  // useEffect(() => {
-  //   setDisplayedCategories(showMore ? itemCategories : itemCategories.slice(0, 10))
-  // }, [showMore])
+  useEffect(() => {
+    const categoryIdCountMap = buildCategoryIdCountMap(
+      displayedItemTopLevelCategoryIds
+    );
+    const sortedCategories = itemCategories.sort(function (a, b) {
+      const aCount = categoryIdCountMap[a.id] ? categoryIdCountMap[a.id] : 0;
+      const bCount = categoryIdCountMap[b.id] ? categoryIdCountMap[b.id] : 0;
+      if (aCount > bCount) return -1;
+      if (aCount < bCount) return 1;
+      return 0;
+    });
+    setCategories([...sortedCategories]);
+  }, [displayedItemTopLevelCategoryIds]);
 
   return (
     <>
@@ -59,7 +86,7 @@ export default memo(function CategoryList({
         ALL
       </span>
       <div>
-        {displayedCategories.map((category) => (
+        {(showMore ? categories : categories.slice(0, 10)).map((category) => (
           <Category
             key={category.id}
             category={category}
@@ -67,6 +94,22 @@ export default memo(function CategoryList({
             onClick={onClickCategory}
           />
         ))}
+        <div
+          className="cursor-pointer hover:underline text-sm"
+          onClick={() => setShowMore(!showMore)}
+        >
+          {showMore ? (
+            <div className="flex items-center">
+              表示を少なく
+              <ChevronUpIcon className="h-5 w-5" />
+            </div>
+          ) : (
+            <div className="flex items-center">
+              続きを見る
+              <ChevronDownIcon className="h-5 w-5" />
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

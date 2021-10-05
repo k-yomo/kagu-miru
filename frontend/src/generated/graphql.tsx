@@ -42,6 +42,7 @@ export enum EventId {
 export type Item = {
   affiliateUrl: Scalars['String'];
   averageRating: Scalars['Float'];
+  categoryIds: Array<Scalars['ID']>;
   description: Scalars['String'];
   id: Scalars['ID'];
   imageUrls: Array<Scalars['String']>;
@@ -169,6 +170,7 @@ export type HomePageSearchQuery = {
         imageUrls: Array<string>;
         averageRating: number;
         reviewCount: number;
+        categoryIds: Array<string>;
         platform: ItemSellingPlatform;
       }>;
     };
@@ -181,32 +183,6 @@ export type HomePageGetQuerySuggestionsQueryVariables = Exact<{
 
 export type HomePageGetQuerySuggestionsQuery = {
   getQuerySuggestions: { query: string; suggestedQueries: Array<string> };
-};
-
-export type HomePageGetAllCategoriesQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type HomePageGetAllCategoriesQuery = {
-  getAllCategories: Array<
-    Maybe<{
-      id: string;
-      name: string;
-      children: Array<{
-        id: string;
-        name: string;
-        children: Array<{
-          id: string;
-          name: string;
-          children: Array<{
-            id: string;
-            name: string;
-            children: Array<{ id: string; name: string }>;
-          }>;
-        }>;
-      }>;
-    }>
-  >;
 };
 
 export type HomePageTrackEventMutationVariables = Exact<{
@@ -235,6 +211,7 @@ export const HomePageSearchDocument = gql`
           imageUrls
           averageRating
           reviewCount
+          categoryIds
           platform
         }
       }
@@ -350,80 +327,6 @@ export type HomePageGetQuerySuggestionsLazyQueryHookResult = ReturnType<
 export type HomePageGetQuerySuggestionsQueryResult = Apollo.QueryResult<
   HomePageGetQuerySuggestionsQuery,
   HomePageGetQuerySuggestionsQueryVariables
->;
-export const HomePageGetAllCategoriesDocument = gql`
-  query homePageGetAllCategories {
-    getAllCategories {
-      id
-      name
-      children {
-        id
-        name
-        children {
-          id
-          name
-          children {
-            id
-            name
-            children {
-              id
-              name
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useHomePageGetAllCategoriesQuery__
- *
- * To run a query within a React component, call `useHomePageGetAllCategoriesQuery` and pass it any options that fit your needs.
- * When your component renders, `useHomePageGetAllCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHomePageGetAllCategoriesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useHomePageGetAllCategoriesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    HomePageGetAllCategoriesQuery,
-    HomePageGetAllCategoriesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    HomePageGetAllCategoriesQuery,
-    HomePageGetAllCategoriesQueryVariables
-  >(HomePageGetAllCategoriesDocument, options);
-}
-export function useHomePageGetAllCategoriesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    HomePageGetAllCategoriesQuery,
-    HomePageGetAllCategoriesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    HomePageGetAllCategoriesQuery,
-    HomePageGetAllCategoriesQueryVariables
-  >(HomePageGetAllCategoriesDocument, options);
-}
-export type HomePageGetAllCategoriesQueryHookResult = ReturnType<
-  typeof useHomePageGetAllCategoriesQuery
->;
-export type HomePageGetAllCategoriesLazyQueryHookResult = ReturnType<
-  typeof useHomePageGetAllCategoriesLazyQuery
->;
-export type HomePageGetAllCategoriesQueryResult = Apollo.QueryResult<
-  HomePageGetAllCategoriesQuery,
-  HomePageGetAllCategoriesQueryVariables
 >;
 export const HomePageTrackEventDocument = gql`
   mutation homePageTrackEvent($event: Event!) {

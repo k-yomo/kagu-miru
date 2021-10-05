@@ -1,26 +1,19 @@
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
-import type { NextPage } from 'next';
+import { ChangeEvent, memo, useCallback, useState } from 'react';
+import type { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import gql from 'graphql-tag';
-import { SearchIcon } from '@heroicons/react/solid';
 import {
   Action,
   EventId,
+  HomePageSearchDocument,
   HomePageSearchQuery,
-  QuerySuggestionsDisplayActionParams,
+  HomePageTrackEventDocument,
+  HomePageTrackEventMutation,
   SearchClickItemActionParams,
   SearchDisplayItemsActionParams,
   SearchFrom,
   SearchInput,
   SearchSortType,
-  useHomePageGetQuerySuggestionsLazyQuery,
   useHomePageSearchLazyQuery,
   useHomePageTrackEventMutation,
 } from '@src/generated/graphql';
@@ -29,9 +22,12 @@ import Loading from '@src/components/Loading';
 import { useRouter } from 'next/router';
 import PlatformBadge from '@src/components/PlatformBadge';
 import Pagination from '@src/components/Pagination';
-import QuerySuggestionsDropdown from '@src/components/QuerySuggestionsDropdown';
 import Rating from '@src/components/Rating';
 import CategoryList from '@src/components/CategoryList';
+import SearchBar from '@src/components/SearchBar';
+import { useNextQueryParams } from '@src/lib/nextqueryparams';
+import { ParsedUrlQuery } from 'querystring';
+import apolloClient from '@src/lib/apolloClient';
 
 gql`
   query homePageSearch($input: SearchInput!) {
@@ -53,6 +49,7 @@ gql`
           imageUrls
           averageRating
           reviewCount
+          categoryIds
           platform
         }
       }
@@ -95,31 +92,95 @@ gql`
   }
 `;
 
-const Home: NextPage = () => {
-  const router = useRouter();
-  const [searchInput, setSearchInput] = useState<{
-    input: SearchInput;
-    searchFrom: SearchFrom;
-  }>({
-    input: {
-      query: '',
-      categoryIds: [],
-      sortType: SearchSortType.BestMatch,
-      page: 1,
+type SearchParams = {
+  searchInput: SearchInput;
+  searchFrom: SearchFrom;
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const searchParams = queryParamsToSearchParams(ctx.query);
+  const { data, errors } = await apolloClient.query<HomePageSearchQuery>({
+    query: HomePageSearchDocument,
+    variables: {
+      input: searchParams.searchInput,
     },
-    searchFrom: SearchFrom.Url,
   });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [suggestedQueries, setSuggestedQueries] = useState<string[]>([]);
-  const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
+
+  if (errors) {
+    throw errors;
+  }
+
+  const params: SearchDisplayItemsActionParams = {
+    searchId: data.search.searchId,
+    searchInput: searchParams.searchInput,
+    searchFrom: searchParams.searchFrom,
+    itemIds: data.search.itemConnection.nodes.map((item) => item.id),
+  };
+
+  apolloClient
+    .mutate<HomePageTrackEventMutation>({
+      mutation: HomePageTrackEventDocument,
+      variables: {
+        event: {
+          id: EventId.Search,
+          action: Action.Display,
+          createdAt: new Date(),
+          params,
+        },
+      },
+    })
+    .catch(() => {
+      // do nothing
+    });
+
+  return {
+    props: {
+      itemConnection: data.search.itemConnection,
+    },
+  };
+};
+
+interface Props {
+  itemConnection: NonNullable<HomePageSearchQuery['search']['itemConnection']>;
+}
+
+function queryParamsToSearchParams(queryParams: ParsedUrlQuery): SearchParams {
+  return {
+    searchInput: {
+      query: (queryParams.q as string) || '',
+      categoryIds: ((queryParams.categoryIds as string) || '')
+        .split(',')
+        .filter((s) => s),
+      sortType:
+        (queryParams.sort as SearchSortType) || SearchSortType.BestMatch,
+      page: parseInt(queryParams.page as string) || 1,
+    },
+    searchFrom: (queryParams.searchFrom as SearchFrom) || SearchFrom.Url,
+  };
+}
+
+const Home = memo<Props>(({ itemConnection }: Props) => {
+  const router = useRouter();
+  const queryParams = useNextQueryParams();
+  const [items, setItems] = useState(itemConnection.nodes);
+  const [pageInfo, setPageInfo] = useState<
+    typeof itemConnection.pageInfo | undefined
+  >(itemConnection.pageInfo);
+  const [searchParams, setSearchParams] = useState<{
+    searchInput: SearchInput;
+    searchFrom: SearchFrom;
+  }>(queryParamsToSearchParams(queryParams));
+  const [trackEvent] = useHomePageTrackEventMutation();
   const [search, { data, loading, error }] = useHomePageSearchLazyQuery({
     fetchPolicy: 'no-cache',
     nextFetchPolicy: 'no-cache',
     onCompleted: (data) => {
+      setItems(data.search.itemConnection.nodes);
+      setPageInfo(data.search.itemConnection.pageInfo);
       const params: SearchDisplayItemsActionParams = {
         searchId: data.search.searchId,
-        searchInput: searchInput.input,
-        searchFrom: searchInput.searchFrom,
+        searchInput: searchParams.searchInput,
+        searchFrom: searchParams.searchFrom,
         itemIds: data.search.itemConnection.nodes.map((item) => item.id),
       };
       trackEvent({
@@ -136,36 +197,23 @@ const Home: NextPage = () => {
       });
     },
   });
-  const [trackEvent] = useHomePageTrackEventMutation();
-  const items = data?.search?.itemConnection?.nodes;
-  const pageInfo = data?.search?.itemConnection?.pageInfo;
-  const [getQuerySuggestions, { data: getQuerySuggestionsData }] =
-    useHomePageGetQuerySuggestionsLazyQuery({
-      fetchPolicy: 'no-cache',
-      nextFetchPolicy: 'no-cache',
-      onCompleted: (data) => {
-        const params: QuerySuggestionsDisplayActionParams = {
-          query: data.getQuerySuggestions.query,
-          suggestedQueries: data.getQuerySuggestions.suggestedQueries,
-        };
-        trackEvent({
-          variables: {
-            event: {
-              id: EventId.QuerySuggestions,
-              action: Action.Display,
-              createdAt: new Date(),
-              params,
-            },
-          },
-        }).catch(() => {
-          // do nothing
-        });
-      },
-    });
 
-  const updateSearchInput = useCallback(
-    ({ input, searchFrom }: typeof searchInput) => {
-      const { query, categoryIds, sortType, page } = input;
+  const updateSearchParams = useCallback(
+    ({ searchInput, searchFrom }: typeof searchParams) => {
+      setSearchParams({ searchInput, searchFrom });
+      setItems([]);
+      setPageInfo(undefined);
+
+      const { query, categoryIds, sortType, page } = searchInput;
+      search({
+        variables: {
+          input: {
+            ...searchInput,
+            query: query.trim(),
+          },
+        },
+      });
+
       const urlQuery = {
         q: query,
         categoryIds: categoryIds.join(','),
@@ -180,78 +228,62 @@ const Home: NextPage = () => {
             searchFrom,
           },
         },
+        // Exclude searchFrom to track actual searched from, since url can be shared.
         `${router.pathname}?${new URLSearchParams(urlQuery).toString()}`,
         {
           shallow: true,
         }
       );
     },
-    [router]
+    []
   );
 
-  const onChangeSortBy = useCallback(
-    (e: ChangeEvent<HTMLSelectElement>) => {
-      updateSearchInput({
-        input: {
-          ...searchInput.input,
-          sortType: e.target.value as SearchSortType,
-        },
+  const onChangeSortBy = (e: ChangeEvent<HTMLSelectElement>) => {
+    updateSearchParams({
+      searchInput: {
+        ...searchParams.searchInput,
+        sortType: e.target.value as SearchSortType,
+      },
+      searchFrom: SearchFrom.Search,
+    });
+  };
+
+  const onClickPage = useCallback(
+    (page: number) => {
+      updateSearchParams({
+        searchInput: { ...searchParams.searchInput, page },
         searchFrom: SearchFrom.Search,
       });
     },
-    [searchInput, updateSearchInput]
+    [updateSearchParams, searchParams]
   );
 
-  const onChangeSearchQuery = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const query = e.target.value as string;
-      setSearchQuery(query);
-      getQuerySuggestions({ variables: { query: query.trim() } });
+  const onSubmitQuery = useCallback(
+    (query: string, searchFrom: SearchFrom) => {
+      updateSearchParams({
+        searchInput: { ...searchParams.searchInput, query, page: 1 },
+        searchFrom,
+      });
     },
-    [setSearchQuery, getQuerySuggestions]
+    [updateSearchParams]
   );
 
-  const onClickSuggestedQuery = (query: string) => {
-    updateSearchInput({
-      input: { ...searchInput.input, query, page: 1 },
-      searchFrom: SearchFrom.QuerySuggestion,
-    });
-  };
-
-  const onClickPage = (page: number) => {
-    updateSearchInput({
-      input: { ...searchInput.input, page },
-      searchFrom: SearchFrom.Search,
-    });
-  };
-
-  const onClickCategory = (categoryId: string) => {
-    updateSearchInput({
-      input: { ...searchInput.input, categoryIds: [categoryId] },
-      searchFrom: SearchFrom.Search,
-    });
-  };
-
-  const onClearCategory = () => {
-    updateSearchInput({
-      input: { ...searchInput.input, categoryIds: [] },
-      searchFrom: SearchFrom.Search,
-    });
-  };
-
-  const onSearchKeyPress = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key == 'Enter') {
-        e.preventDefault();
-        setShowQuerySuggestions(false);
-        updateSearchInput({
-          input: { ...searchInput.input, query: searchQuery, page: 1 },
-          searchFrom: SearchFrom.Search,
-        });
-      }
+  const onClickCategory = useCallback(
+    (categoryId: string) => {
+      updateSearchParams({
+        searchInput: { ...searchParams.searchInput, categoryIds: [categoryId] },
+        searchFrom: SearchFrom.Search,
+      });
     },
-    [searchInput, searchQuery, updateSearchInput]
+    [updateSearchParams]
   );
+
+  const onClearCategory = useCallback(() => {
+    updateSearchParams({
+      searchInput: { ...searchParams.searchInput, categoryIds: [] },
+      searchFrom: SearchFrom.Search,
+    });
+  }, [updateSearchParams]);
 
   const onClickItem = (itemId: string) => {
     const params: SearchClickItemActionParams = {
@@ -272,48 +304,6 @@ const Home: NextPage = () => {
     });
   };
 
-  useEffect(() => {
-    const { query } = searchInput.input;
-    search({
-      variables: {
-        input: {
-          ...searchInput.input,
-          query: query.trim(),
-        },
-      },
-    });
-  }, [searchInput, search]);
-
-  useEffect(() => {
-    const categoryIds = ((router.query.categoryIds as string) || '')
-      .split(',')
-      .filter((s) => s); // remove empty values
-    const page = parseInt(router.query.page as string) || 1;
-    const sortType =
-      (router.query.sort as SearchSortType) || SearchSortType.BestMatch;
-    const searchFrom =
-      (router.query.searchFrom as SearchFrom) || SearchFrom.Url;
-    const query = (router.query.q as string) || '';
-    setSearchQuery(query);
-    setSearchInput({
-      input: {
-        query,
-        categoryIds,
-        sortType,
-        page,
-      },
-      searchFrom,
-    });
-  }, [router.query]);
-
-  useEffect(() => {
-    if (getQuerySuggestionsData?.getQuerySuggestions) {
-      setSuggestedQueries(
-        getQuerySuggestionsData.getQuerySuggestions.suggestedQueries
-      );
-    }
-  }, [getQuerySuggestionsData?.getQuerySuggestions]);
-
   return (
     <div className="flex max-w-[1200px] mx-auto my-3">
       <SEOMeta
@@ -325,9 +315,12 @@ const Home: NextPage = () => {
       <div className="my-8 mx-2 lg:mx-4 lg:min-w-[300px] hidden md:block">
         <h2 className="my-2 text-md font-bold">カテゴリー</h2>
         <CategoryList
+          displayedItemTopLevelCategoryIds={
+            items ? items.map((item) => item.categoryIds[0]) : []
+          }
           selectedCategoryId={
-            searchInput.input.categoryIds.length > 0
-              ? searchInput.input.categoryIds[0]
+            searchParams.searchInput.categoryIds.length > 0
+              ? searchParams.searchInput.categoryIds[0]
               : undefined
           }
           onClickCategory={onClickCategory}
@@ -336,35 +329,11 @@ const Home: NextPage = () => {
       </div>
       <div className="flex-1 mx-2">
         <div className="flex flex-col sm:flex-row items-end justify-between my-4 gap-2 w-full">
-          <div className="z-10 relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400  focus-within:text-gray-600">
-            <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-              <SearchIcon className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <form action=".">
-              <input
-                id="search"
-                className="appearance-none lock w-full bg-white py-3 pl-10 pr-3 dark:bg-gray-800 border border-gray-700 rounded-md leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
-                placeholder="Search"
-                type="search"
-                name="search"
-                value={searchQuery}
-                onChange={onChangeSearchQuery}
-                onKeyPress={onSearchKeyPress}
-                onFocus={() => setShowQuerySuggestions(true)}
-                onBlur={() => {
-                  setTimeout(() => {
-                    setShowQuerySuggestions(false);
-                  }, 100);
-                }}
-                disabled={loading}
-              />
-              <QuerySuggestionsDropdown
-                show={showQuerySuggestions && suggestedQueries.length > 0}
-                suggestedQueries={suggestedQueries}
-                onClickQuery={onClickSuggestedQuery}
-              />
-            </form>
-          </div>
+          <SearchBar
+            defaultQuery={searchParams.searchInput.query}
+            loading={loading}
+            onSubmit={onSubmitQuery}
+          />
           <div>
             <label
               htmlFor="location"
@@ -376,7 +345,7 @@ const Home: NextPage = () => {
               id="location"
               name="location"
               className="appearance-none mt-1 block w-full pl-3 pr-10 py-2 rounded-md text-base border border-gray-700 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
-              value={searchInput.input.sortType}
+              value={searchParams.searchInput.sortType}
               onChange={onChangeSortBy}
               disabled={loading}
             >
@@ -393,13 +362,7 @@ const Home: NextPage = () => {
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
-            {items && (
-              <ItemList
-                items={items}
-                loading={loading}
-                onClickItem={onClickItem}
-              />
-            )}
+            {items && <ItemList items={items} onClickItem={onClickItem} />}
           </div>
           {pageInfo && (
             <div className="my-4 w-full">
@@ -414,23 +377,14 @@ const Home: NextPage = () => {
       </div>
     </div>
   );
-};
+});
 
 interface ItemListProps {
   items: HomePageSearchQuery['search']['itemConnection']['nodes'];
   onClickItem: (itemId: string) => void;
-  loading: boolean;
 }
 
-const ItemList = memo(function ItemList({
-  items,
-  loading,
-  onClickItem,
-}: ItemListProps) {
-  if (loading) {
-    return <Loading />;
-  }
-
+const ItemList = memo(function ItemList({ items, onClickItem }: ItemListProps) {
   return (
     <>
       {items.map((item) => (

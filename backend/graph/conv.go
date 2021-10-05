@@ -56,6 +56,7 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 		ImageUrls:     item.ImageURLs,
 		AverageRating: item.AverageRating,
 		ReviewCount:   item.ReviewCount,
+		CategoryIds:   item.CategoryIDs,
 		Platform:      platform,
 	}, nil
 }

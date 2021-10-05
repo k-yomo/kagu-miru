@@ -107,11 +107,11 @@ func buildSearchQuery(req *Request) (io.Reader, error) {
 	var mustQueries []esquery.Mappable
 	if req.Query != "" {
 		mustQueries = append(mustQueries, esquery.MultiMatch(req.Query).
-			Type(esquery.MatchTypeMostFields).
+			Type(esquery.MatchTypeBestFields).
 			Fields(
-				xesquery.Boost(es.ItemFieldName, 5),
+				xesquery.Boost(es.ItemFieldName, 2),
 				es.ItemFieldDescription,
-				xesquery.Boost(es.ItemFieldCategoryNames, 10),
+				xesquery.Boost(es.ItemFieldCategoryNames, 3),
 			))
 	} else {
 		mustQueries = append(mustQueries, esquery.MatchAll())

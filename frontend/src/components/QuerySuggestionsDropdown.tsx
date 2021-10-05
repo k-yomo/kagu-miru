@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import React, { Fragment, memo } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 
 interface Props {
@@ -11,7 +11,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function QuerySuggestionsDropdown({
+export default memo(function QuerySuggestionsDropdown({
   show,
   suggestedQueries,
   onClickQuery,
@@ -50,4 +50,4 @@ export default function QuerySuggestionsDropdown({
       </Transition>
     </Menu>
   );
-}
+});

@@ -1,7 +1,9 @@
+import React, { memo } from 'react';
 import {
   ArrowNarrowLeftIcon,
   ArrowNarrowRightIcon,
 } from '@heroicons/react/solid';
+import { GetServerSideProps } from 'next';
 
 function range(start: number, end: number) {
   return Array(end - start + 1)
@@ -15,7 +17,11 @@ interface Props {
   onClickPage: (page: number) => void;
 }
 
-export default function Pagination({ page, totalPage, onClickPage }: Props) {
+export default memo(function Pagination({
+  page,
+  totalPage,
+  onClickPage,
+}: Props) {
   const minPage = Math.max(page - 5, 1);
   const maxPage = Math.min(page + 9 - (page - minPage), totalPage);
 
@@ -82,4 +88,4 @@ export default function Pagination({ page, totalPage, onClickPage }: Props) {
       </div>
     </nav>
   );
-}
+});

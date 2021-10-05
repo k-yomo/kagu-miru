@@ -27,6 +27,7 @@ type Item struct {
 	ImageUrls     []string            `json:"imageUrls"`
 	AverageRating float64             `json:"averageRating"`
 	ReviewCount   int                 `json:"reviewCount"`
+	CategoryIds   []string            `json:"categoryIds"`
 	Platform      ItemSellingPlatform `json:"platform"`
 }
 
