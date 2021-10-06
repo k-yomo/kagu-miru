@@ -7,4 +7,12 @@ module.exports = {
         'via.placeholder.com'
     ],
   },
+async headers() {
+    return [
+        {
+            source: '/(.*)',
+            headers: securityHeaders,
+        },
+    ]
+},
 }
