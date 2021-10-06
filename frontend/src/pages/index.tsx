@@ -126,7 +126,10 @@ function queryParamsToSearchParams(queryParams: ParsedUrlQuery): SearchParams {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  ctx.res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=60');
+  ctx.res.setHeader(
+    'Cache-Control',
+    'public, max-age=3600, stale-while-revalidate=60'
+  );
   const searchParams = queryParamsToSearchParams(ctx.query);
   const { data, errors } = await apolloClient.query<HomePageSearchQuery>({
     query: HomePageSearchDocument,
