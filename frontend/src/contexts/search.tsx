@@ -274,6 +274,7 @@ export const SearchProvider: FC = memo((props) => {
       `${router.pathname}?${new URLSearchParams(urlQuery).toString()}`,
       {
         shallow: true,
+        scroll: true,
       }
     );
   }, [searchState]);
