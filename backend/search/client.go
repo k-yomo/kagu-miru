@@ -7,7 +7,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"time"
+
+	"github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
 
 	"github.com/aquasecurity/esquery"
 	"github.com/elastic/go-elasticsearch/v7"
@@ -21,7 +24,7 @@ import (
 )
 
 type Client interface {
-	SearchItems(ctx context.Context, req *Request) (*Response, error)
+	SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error)
 	GetQuerySuggestions(ctx context.Context, query string) ([]string, error)
 }
 
@@ -39,26 +42,11 @@ func NewSearchClient(itemsIndexName string, itemsQuerySuggestionsIndexName strin
 	}
 }
 
-const DefaultPage uint64 = 1
-const defaultPageSize uint64 = 100
-
-type SortType int
-
 const (
-	SortTypeBestMatch SortType = iota
-	SortTypePriceAsc
-	SortTypePriceDesc
-	SortTypeReviewCount
-	SortTypeRating
+	defaultPage     uint64 = 0 // page starts from 0 in elasticsearch
+	defaultPageSize uint64 = 100
+	maxPageSize     uint64 = 1000
 )
-
-type Request struct {
-	Query       string
-	SortType    SortType
-	CategoryIDs []string
-	Page        uint64
-	PageSize    *int
-}
 
 type Response struct {
 	Items     []*es.Item
@@ -66,17 +54,17 @@ type Response struct {
 	TotalPage uint64
 }
 
-func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, error) {
+func (c *client) SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error) {
 	ctx, span := otel.Tracer("search").Start(ctx, "search.Client_SearchItems")
 	defer span.End()
 
 	go func() {
-		if err := c.insertQuerySuggestion(context.Background(), req.Query); err != nil {
+		if err := c.insertQuerySuggestion(context.Background(), input.Query); err != nil {
 			logging.Logger(ctx).Error("insertQuerySuggestion failed", zap.Error(err))
 		}
 	}()
 
-	esQuery, err := buildSearchQuery(req)
+	esQuery, err := buildSearchQuery(input)
 	if err != nil {
 		return nil, fmt.Errorf("buildSearchQuery: %w", err)
 	}
@@ -98,15 +86,15 @@ func (c *client) SearchItems(ctx context.Context, req *Request) (*Response, erro
 
 	return &Response{
 		Items:     items,
-		Page:      req.Page,
+		Page:      calcElasticSearchPage(input.Page) + 1,
 		TotalPage: calcTotalPage(uint64(searchResult.Hits.TotalHits.Value), 100),
 	}, nil
 }
 
-func buildSearchQuery(req *Request) (io.Reader, error) {
+func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 	var mustQueries []esquery.Mappable
-	if req.Query != "" {
-		mustQueries = append(mustQueries, esquery.MultiMatch(req.Query).
+	if input.Query != "" {
+		mustQueries = append(mustQueries, esquery.MultiMatch(input.Query).
 			Type(esquery.MatchTypeBestFields).
 			Fields(
 				xesquery.Boost(es.ItemFieldName, 2),
@@ -119,12 +107,28 @@ func buildSearchQuery(req *Request) (io.Reader, error) {
 
 	boolQuery := esquery.Bool().Must(mustQueries...)
 
-	if len(req.CategoryIDs) > 0 {
+	if len(input.Filter.CategoryIds) > 0 {
 		var categoryIDs []interface{}
-		for _, id := range req.CategoryIDs {
+		for _, id := range input.Filter.CategoryIds {
 			categoryIDs = append(categoryIDs, id)
 		}
 		boolQuery.Filter(esquery.Terms(es.ItemFieldCategoryIDs, categoryIDs...))
+	}
+
+	if input.Filter.MinPrice != nil && input.Filter.MaxPrice != nil {
+		boolQuery.Filter(
+			esquery.Range(es.ItemFieldPrice).
+				Gte(*input.Filter.MinPrice).
+				Lte(*input.Filter.MaxPrice),
+		)
+	} else if input.Filter.MinPrice != nil {
+		boolQuery.Filter(esquery.Range(es.ItemFieldPrice).Gte(*input.Filter.MinPrice))
+	} else if input.Filter.MaxPrice != nil {
+		boolQuery.Filter(esquery.Range(es.ItemFieldPrice).Lte(*input.Filter.MaxPrice))
+	}
+
+	if input.Filter.MinRating != nil {
+		boolQuery.Filter(esquery.Range(es.ItemFieldAverageRating).Gte(*input.Filter.MinRating))
 	}
 
 	esQuery := esquery.Search().Query(esquery.CustomQuery(map[string]interface{}{
@@ -151,30 +155,26 @@ func buildSearchQuery(req *Request) (io.Reader, error) {
 		},
 	}))
 
-	switch req.SortType {
-	case SortTypePriceAsc:
+	switch input.SortType {
+	case gqlmodel.SearchSortTypePriceAsc:
 		esQuery.Sort(es.ItemFieldPrice, esquery.OrderAsc)
-	case SortTypePriceDesc:
+	case gqlmodel.SearchSortTypePriceDesc:
 		esQuery.Sort(es.ItemFieldPrice, esquery.OrderDesc)
-	case SortTypeReviewCount:
+	case gqlmodel.SearchSortTypeReviewCount:
 		esQuery.Sort(es.ItemFieldReviewCount, esquery.OrderDesc).Sort(es.ItemFieldAverageRating, esquery.OrderDesc)
-	case SortTypeRating:
+	case gqlmodel.SearchSortTypeRating:
 		esQuery.Sort(es.ItemFieldAverageRating, esquery.OrderDesc).Sort(es.ItemFieldReviewCount, esquery.OrderDesc)
 	default:
 		esQuery.Sort("_score", esquery.OrderDesc)
 	}
 
-	var page uint64
-	if req.Page > 1 {
-		page = req.Page - 1 // page starts from 0 in elasticsearch
-	}
 	pageSize := defaultPageSize
-	if req.PageSize != nil {
-		pageSize = uint64(*req.PageSize)
+	if input.PageSize != nil {
+		pageSize = uint64(math.Min(float64(*input.PageSize), float64(maxPageSize)))
 	}
 	esQuery.
 		SourceIncludes(es.AllItemFields...).
-		From(page * pageSize).
+		From(calcElasticSearchPage(input.Page) * pageSize).
 		Size(pageSize)
 
 	esQueryJSON, err := esQuery.MarshalJSON()
@@ -288,4 +288,12 @@ func calcTotalPage(totalItems, pageSize uint64) uint64 {
 	}
 	total := totalItems + pageSize - 1
 	return total / pageSize
+}
+
+func calcElasticSearchPage(inputPage *int) uint64 {
+	page := defaultPage
+	if inputPage != nil && *inputPage > 1 {
+		page = uint64(*inputPage) - 1
+	}
+	return page
 }

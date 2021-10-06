@@ -461,10 +461,17 @@ enum SearchSortType {
 
 input SearchInput {
     query: String!
-    categoryIds: [ID!]!
+    filter: SearchFilter!
     sortType: SearchSortType!
     page: Int
     pageSize: Int
+}
+
+input SearchFilter {
+    categoryIds: [ID!]!
+    minPrice: Int
+    maxPrice: Int
+    minRating: Int
 }
 
 enum EventID {
@@ -2929,6 +2936,53 @@ func (ec *executionContext) unmarshalInputSearchDisplayItemsActionParams(ctx con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSearchFilter(ctx context.Context, obj interface{}) (gqlmodel.SearchFilter, error) {
+	var it gqlmodel.SearchFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "categoryIds":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryIds"))
+			it.CategoryIds, err = ec.unmarshalNID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "minPrice":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minPrice"))
+			it.MinPrice, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "maxPrice":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxPrice"))
+			it.MaxPrice, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "minRating":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minRating"))
+			it.MinRating, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputSearchInput(ctx context.Context, obj interface{}) (gqlmodel.SearchInput, error) {
 	var it gqlmodel.SearchInput
 	asMap := map[string]interface{}{}
@@ -2946,11 +3000,11 @@ func (ec *executionContext) unmarshalInputSearchInput(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
-		case "categoryIds":
+		case "filter":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryIds"))
-			it.CategoryIds, err = ec.unmarshalNID2ᚕstringᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+			it.Filter, err = ec.unmarshalNSearchFilter2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3932,6 +3986,11 @@ func (ec *executionContext) marshalNQuerySuggestionsResponse2ᚖgithubᚗcomᚋk
 		return graphql.Null
 	}
 	return ec._QuerySuggestionsResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSearchFilter2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchFilter(ctx context.Context, v interface{}) (*gqlmodel.SearchFilter, error) {
+	res, err := ec.unmarshalInputSearchFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchFrom(ctx context.Context, v interface{}) (gqlmodel.SearchFrom, error) {

@@ -9,7 +9,6 @@ import (
 
 	gqlgend "github.com/k-yomo/kagu-miru/backend/graph/gqlgen"
 	gqlmodell "github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
-	"github.com/k-yomo/kagu-miru/backend/search"
 	"github.com/k-yomo/kagu-miru/backend/tracking"
 )
 
@@ -19,21 +18,7 @@ func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodell.Event
 }
 
 func (r *queryResolver) Search(ctx context.Context, input *gqlmodell.SearchInput) (*gqlmodell.SearchResponse, error) {
-	sortType, err := mapGraphqlSortTypeToSearchSortType(input.SortType)
-	if err != nil {
-		return nil, fmt.Errorf("mapGraphqlSortTypeToSearchSortType: %w", err)
-	}
-	page := search.DefaultPage
-	if input.Page != nil {
-		page = uint64(*input.Page)
-	}
-	searchResponse, err := r.SearchClient.SearchItems(ctx, &search.Request{
-		Query:       input.Query,
-		SortType:    sortType,
-		CategoryIDs: input.CategoryIds,
-		Page:        page,
-		PageSize:    input.PageSize,
-	})
+	searchResponse, err := r.SearchClient.SearchItems(ctx, input)
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
 	}
