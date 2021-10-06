@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	cloud.google.com/go/profiler v0.1.0
-	cloud.google.com/go/pubsub v1.3.1
+	cloud.google.com/go/pubsub v1.17.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/Code-Hex/gqldoc v0.0.4
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2
