@@ -6,6 +6,7 @@ import { usePageView } from '@src/lib/googleAnalytics';
 import apolloClient from '@src/lib/apolloClient';
 import Header from '@src/components/Header';
 import Footer from '@src/components/Footer';
+import { SearchProvider } from '@src/contexts/search';
 
 function MyApp({ Component, pageProps }: AppProps) {
   usePageView();
@@ -16,7 +17,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="z-0 flex-grow relative bg-white dark:bg-black">
-            <Component {...pageProps} />
+            <SearchProvider>
+              <Component {...pageProps} />
+            </SearchProvider>
           </main>
           <Footer />
         </div>

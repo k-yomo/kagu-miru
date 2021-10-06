@@ -1,15 +1,7 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import itemCategories from '@src/static/itemCategories.json';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
-
-interface Props {
-  // used to sort categories
-  displayedItemTopLevelCategoryIds: string[];
-  // used to highlight selected category
-  selectedCategoryId?: string;
-  onClickCategory: (categoryId: string) => void;
-  onClearCategory: () => void;
-}
+import { SearchActionType, useSearch } from '@src/contexts/search';
 
 function findSelectedCategoryIdPath(
   categories: typeof itemCategories,
@@ -50,22 +42,34 @@ function buildCategoryIdCountMap(displayedCategoryIds: string[]): {
   return categoryIdDisplayCountMap;
 }
 
-export default memo(function CategoryList({
-  displayedItemTopLevelCategoryIds,
-  selectedCategoryId,
-  onClickCategory,
-  onClearCategory,
-}: Props) {
+export default memo(function CategoryList() {
+  const { searchState, items, dispatch } = useSearch();
   const [categories, setCategories] = useState(itemCategories);
+  const [showMore, setShowMore] = useState(false);
   const selectedCategoryIdPath = findSelectedCategoryIdPath(
     itemCategories,
-    selectedCategoryId
+    searchState.searchInput.filter.categoryIds.length > 0
+      ? searchState.searchInput.filter.categoryIds[0]
+      : undefined
   );
-  const [showMore, setShowMore] = useState(false);
+
+  const onClickCategory = useCallback(
+    (categoryId: string) => {
+      dispatch({
+        type: SearchActionType.SET_CATEGORY_FILTER,
+        payload: [categoryId],
+      });
+    },
+    [dispatch]
+  );
+
+  const onClearCategory = useCallback(() => {
+    dispatch({ type: SearchActionType.SET_CATEGORY_FILTER, payload: [] });
+  }, [dispatch]);
 
   useEffect(() => {
     const categoryIdCountMap = buildCategoryIdCountMap(
-      displayedItemTopLevelCategoryIds
+      items.map((item) => item.categoryIds[0])
     );
     const sortedCategories = itemCategories.sort(function (a, b) {
       const aCount = categoryIdCountMap[a.id] ? categoryIdCountMap[a.id] : 0;
@@ -75,12 +79,12 @@ export default memo(function CategoryList({
       return 0;
     });
     setCategories([...sortedCategories]);
-  }, [displayedItemTopLevelCategoryIds]);
+  }, [items]);
 
   return (
     <>
       <span
-        className="cursor-pointer border-text-primary hover:border-b-[1px] text-sm"
+        className="cursor-pointer hover:underline border-text-primary hover:border-b-[1px] text-sm"
         onClick={onClearCategory}
       >
         ALL
@@ -121,7 +125,7 @@ interface CategoryProps {
   onClick: (categoryId: string) => void;
 }
 
-function Category({
+const Category = memo(function Category({
   category,
   selectedCategoryIdPath,
   onClick,
@@ -133,11 +137,12 @@ function Category({
   const [showChildren, setShowChildren] = useState(false);
 
   useEffect(() => {
-    // don't close if already open
-    if (!showChildren) {
-      setShowChildren(selectedCategoryIdPath.includes(category.id));
-    }
-  }, [selectedCategoryIdPath, category.id]);
+    setShowChildren((prevState) => {
+      // don't close if already open
+      if (prevState) return prevState
+      return selectedCategoryIdPath.includes(category.id)
+    });
+  }, [setShowChildren, selectedCategoryIdPath, category.id]);
 
   return (
     <div className="ml-2">
@@ -177,4 +182,4 @@ function Category({
       </div>
     </div>
   );
-}
+});

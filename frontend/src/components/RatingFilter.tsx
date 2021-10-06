@@ -1,21 +1,22 @@
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import Rating from '@src/components/Rating';
+import { SearchActionType, useSearch } from '@src/contexts/search';
 
-interface Props {
-  minRating?: number;
-  defaultMaxPrice?: number;
-  onSubmit: (minRating?: number) => void;
-}
-
-export default memo(function RatingFilter({ minRating, onSubmit }: Props) {
-  const onClickClear = () => {
-    if (minRating) {
-      onSubmit(undefined);
-    }
-  };
+export default memo(function RatingFilter() {
+  const { searchState, dispatch } = useSearch();
+  const minRating = searchState.searchInput.filter.minRating;
 
   const onClickRating = (rating: number) => {
-    onSubmit(rating);
+    dispatch({ type: SearchActionType.SET_RATING_FILTER, payload: rating });
+  };
+
+  const onClickClear = () => {
+    if (minRating) {
+      dispatch({
+        type: SearchActionType.SET_RATING_FILTER,
+        payload: undefined,
+      });
+    }
   };
 
   return (

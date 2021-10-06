@@ -1,9 +1,10 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   ArrowNarrowLeftIcon,
   ArrowNarrowRightIcon,
 } from '@heroicons/react/solid';
 import { GetServerSideProps } from 'next';
+import { SearchActionType, useSearch } from '@src/contexts/search';
 
 function range(start: number, end: number) {
   return Array(end - start + 1)
@@ -11,17 +12,20 @@ function range(start: number, end: number) {
     .map((_, idx) => start + idx);
 }
 
-interface Props {
-  page: number;
-  totalPage: number;
-  onClickPage: (page: number) => void;
-}
+export default memo(function Pagination() {
+  const { pageInfo, dispatch } = useSearch();
 
-export default memo(function Pagination({
-  page,
-  totalPage,
-  onClickPage,
-}: Props) {
+  const onClickPage = useCallback(
+    (page: number) => {
+      dispatch({ type: SearchActionType.CHANGE_PAGE, payload: page });
+    },
+    [dispatch]
+  );
+  if (!pageInfo) {
+    return <></>;
+  }
+
+  const { page, totalPage } = pageInfo;
   const minPage = Math.max(page - 5, 1);
   const maxPage = Math.min(page + 9 - (page - minPage), totalPage);
 

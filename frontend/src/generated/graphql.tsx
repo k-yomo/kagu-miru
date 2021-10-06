@@ -157,11 +157,19 @@ export enum SearchSortType {
   ReviewCount = 'REVIEW_COUNT',
 }
 
-export type HomePageSearchQueryVariables = Exact<{
+export type GetQuerySuggestionsQueryVariables = Exact<{
+  query: Scalars['String'];
+}>;
+
+export type GetQuerySuggestionsQuery = {
+  getQuerySuggestions: { query: string; suggestedQueries: Array<string> };
+};
+
+export type SearchQueryVariables = Exact<{
   input: SearchInput;
 }>;
 
-export type HomePageSearchQuery = {
+export type SearchQuery = {
   search: {
     searchId: string;
     itemConnection: {
@@ -184,22 +192,73 @@ export type HomePageSearchQuery = {
   };
 };
 
-export type HomePageGetQuerySuggestionsQueryVariables = Exact<{
-  query: Scalars['String'];
-}>;
-
-export type HomePageGetQuerySuggestionsQuery = {
-  getQuerySuggestions: { query: string; suggestedQueries: Array<string> };
-};
-
-export type HomePageTrackEventMutationVariables = Exact<{
+export type TrackEventMutationVariables = Exact<{
   event: Event;
 }>;
 
-export type HomePageTrackEventMutation = { trackEvent: boolean };
+export type TrackEventMutation = { trackEvent: boolean };
 
-export const HomePageSearchDocument = gql`
-  query homePageSearch($input: SearchInput!) {
+export const GetQuerySuggestionsDocument = gql`
+  query getQuerySuggestions($query: String!) {
+    getQuerySuggestions(query: $query) {
+      query
+      suggestedQueries
+    }
+  }
+`;
+
+/**
+ * __useGetQuerySuggestionsQuery__
+ *
+ * To run a query within a React component, call `useGetQuerySuggestionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetQuerySuggestionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetQuerySuggestionsQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useGetQuerySuggestionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetQuerySuggestionsQuery,
+    GetQuerySuggestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetQuerySuggestionsQuery,
+    GetQuerySuggestionsQueryVariables
+  >(GetQuerySuggestionsDocument, options);
+}
+export function useGetQuerySuggestionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetQuerySuggestionsQuery,
+    GetQuerySuggestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetQuerySuggestionsQuery,
+    GetQuerySuggestionsQueryVariables
+  >(GetQuerySuggestionsDocument, options);
+}
+export type GetQuerySuggestionsQueryHookResult = ReturnType<
+  typeof useGetQuerySuggestionsQuery
+>;
+export type GetQuerySuggestionsLazyQueryHookResult = ReturnType<
+  typeof useGetQuerySuggestionsLazyQuery
+>;
+export type GetQuerySuggestionsQueryResult = Apollo.QueryResult<
+  GetQuerySuggestionsQuery,
+  GetQuerySuggestionsQueryVariables
+>;
+export const SearchDocument = gql`
+  query search($input: SearchInput!) {
     search(input: $input) {
       searchId
       itemConnection {
@@ -227,159 +286,90 @@ export const HomePageSearchDocument = gql`
 `;
 
 /**
- * __useHomePageSearchQuery__
+ * __useSearchQuery__
  *
- * To run a query within a React component, call `useHomePageSearchQuery` and pass it any options that fit your needs.
- * When your component renders, `useHomePageSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useSearchQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useHomePageSearchQuery({
+ * const { data, loading, error } = useSearchQuery({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useHomePageSearchQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    HomePageSearchQuery,
-    HomePageSearchQueryVariables
-  >
+export function useSearchQuery(
+  baseOptions: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<HomePageSearchQuery, HomePageSearchQueryVariables>(
-    HomePageSearchDocument,
+  return Apollo.useQuery<SearchQuery, SearchQueryVariables>(
+    SearchDocument,
     options
   );
 }
-export function useHomePageSearchLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    HomePageSearchQuery,
-    HomePageSearchQueryVariables
-  >
+export function useSearchLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<SearchQuery, SearchQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<HomePageSearchQuery, HomePageSearchQueryVariables>(
-    HomePageSearchDocument,
+  return Apollo.useLazyQuery<SearchQuery, SearchQueryVariables>(
+    SearchDocument,
     options
   );
 }
-export type HomePageSearchQueryHookResult = ReturnType<
-  typeof useHomePageSearchQuery
+export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
+export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
+export type SearchQueryResult = Apollo.QueryResult<
+  SearchQuery,
+  SearchQueryVariables
 >;
-export type HomePageSearchLazyQueryHookResult = ReturnType<
-  typeof useHomePageSearchLazyQuery
->;
-export type HomePageSearchQueryResult = Apollo.QueryResult<
-  HomePageSearchQuery,
-  HomePageSearchQueryVariables
->;
-export const HomePageGetQuerySuggestionsDocument = gql`
-  query homePageGetQuerySuggestions($query: String!) {
-    getQuerySuggestions(query: $query) {
-      query
-      suggestedQueries
-    }
-  }
-`;
-
-/**
- * __useHomePageGetQuerySuggestionsQuery__
- *
- * To run a query within a React component, call `useHomePageGetQuerySuggestionsQuery` and pass it any options that fit your needs.
- * When your component renders, `useHomePageGetQuerySuggestionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHomePageGetQuerySuggestionsQuery({
- *   variables: {
- *      query: // value for 'query'
- *   },
- * });
- */
-export function useHomePageGetQuerySuggestionsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    HomePageGetQuerySuggestionsQuery,
-    HomePageGetQuerySuggestionsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    HomePageGetQuerySuggestionsQuery,
-    HomePageGetQuerySuggestionsQueryVariables
-  >(HomePageGetQuerySuggestionsDocument, options);
-}
-export function useHomePageGetQuerySuggestionsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    HomePageGetQuerySuggestionsQuery,
-    HomePageGetQuerySuggestionsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    HomePageGetQuerySuggestionsQuery,
-    HomePageGetQuerySuggestionsQueryVariables
-  >(HomePageGetQuerySuggestionsDocument, options);
-}
-export type HomePageGetQuerySuggestionsQueryHookResult = ReturnType<
-  typeof useHomePageGetQuerySuggestionsQuery
->;
-export type HomePageGetQuerySuggestionsLazyQueryHookResult = ReturnType<
-  typeof useHomePageGetQuerySuggestionsLazyQuery
->;
-export type HomePageGetQuerySuggestionsQueryResult = Apollo.QueryResult<
-  HomePageGetQuerySuggestionsQuery,
-  HomePageGetQuerySuggestionsQueryVariables
->;
-export const HomePageTrackEventDocument = gql`
-  mutation homePageTrackEvent($event: Event!) {
+export const TrackEventDocument = gql`
+  mutation trackEvent($event: Event!) {
     trackEvent(event: $event)
   }
 `;
-export type HomePageTrackEventMutationFn = Apollo.MutationFunction<
-  HomePageTrackEventMutation,
-  HomePageTrackEventMutationVariables
+export type TrackEventMutationFn = Apollo.MutationFunction<
+  TrackEventMutation,
+  TrackEventMutationVariables
 >;
 
 /**
- * __useHomePageTrackEventMutation__
+ * __useTrackEventMutation__
  *
- * To run a mutation, you first call `useHomePageTrackEventMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useHomePageTrackEventMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useTrackEventMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTrackEventMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [homePageTrackEventMutation, { data, loading, error }] = useHomePageTrackEventMutation({
+ * const [trackEventMutation, { data, loading, error }] = useTrackEventMutation({
  *   variables: {
  *      event: // value for 'event'
  *   },
  * });
  */
-export function useHomePageTrackEventMutation(
+export function useTrackEventMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    HomePageTrackEventMutation,
-    HomePageTrackEventMutationVariables
+    TrackEventMutation,
+    TrackEventMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    HomePageTrackEventMutation,
-    HomePageTrackEventMutationVariables
-  >(HomePageTrackEventDocument, options);
+  return Apollo.useMutation<TrackEventMutation, TrackEventMutationVariables>(
+    TrackEventDocument,
+    options
+  );
 }
-export type HomePageTrackEventMutationHookResult = ReturnType<
-  typeof useHomePageTrackEventMutation
+export type TrackEventMutationHookResult = ReturnType<
+  typeof useTrackEventMutation
 >;
-export type HomePageTrackEventMutationResult =
-  Apollo.MutationResult<HomePageTrackEventMutation>;
-export type HomePageTrackEventMutationOptions = Apollo.BaseMutationOptions<
-  HomePageTrackEventMutation,
-  HomePageTrackEventMutationVariables
+export type TrackEventMutationResult =
+  Apollo.MutationResult<TrackEventMutation>;
+export type TrackEventMutationOptions = Apollo.BaseMutationOptions<
+  TrackEventMutation,
+  TrackEventMutationVariables
 >;

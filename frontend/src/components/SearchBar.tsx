@@ -13,27 +13,29 @@ import {
   EventId,
   QuerySuggestionsDisplayActionParams,
   SearchFrom,
-  useHomePageGetQuerySuggestionsLazyQuery,
-  useHomePageTrackEventMutation,
+  useGetQuerySuggestionsLazyQuery,
+  useTrackEventMutation,
 } from '@src/generated/graphql';
+import { SearchActionType, useSearch } from '@src/contexts/search';
+import gql from 'graphql-tag';
 
-interface Props {
-  defaultQuery: string;
-  loading: boolean;
-  onSubmit(query: string, searchFrom: SearchFrom): void;
-}
+gql`
+  query getQuerySuggestions($query: String!) {
+    getQuerySuggestions(query: $query) {
+      query
+      suggestedQueries
+    }
+  }
+`;
 
-export default memo(function SearchBar({
-  defaultQuery,
-  loading,
-  onSubmit,
-}: Props) {
-  const [searchQuery, setSearchQuery] = useState(defaultQuery);
+export default memo(function SearchBar() {
+  const { searchState, dispatch, loading } = useSearch();
+  const [searchQuery, setSearchQuery] = useState(searchState.searchInput.query);
   const [suggestedQueries, setSuggestedQueries] = useState<string[]>([]);
   const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
-  const [trackEvent] = useHomePageTrackEventMutation();
+  const [trackEvent] = useTrackEventMutation();
   const [getQuerySuggestions, { data: getQuerySuggestionsData }] =
-    useHomePageGetQuerySuggestionsLazyQuery({
+    useGetQuerySuggestionsLazyQuery({
       fetchPolicy: 'no-cache',
       nextFetchPolicy: 'no-cache',
       onCompleted: (data) => {
@@ -55,6 +57,16 @@ export default memo(function SearchBar({
         });
       },
     });
+
+  const onSubmit = useCallback(
+    (query: string, searchFrom: SearchFrom) => () => {
+      dispatch({
+        type: SearchActionType.CHANGE_QUERY,
+        payload: { query, searchFrom },
+      });
+    },
+    [dispatch]
+  );
 
   const onChangeSearchQuery = (e: ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value as string;

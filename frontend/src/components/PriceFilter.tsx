@@ -1,34 +1,31 @@
-import React, { useState, memo } from 'react';
+import React, { memo, useState } from 'react';
+import { SearchActionType, useSearch } from '@src/contexts/search';
 
-interface Props {
-  defaultMinPrice?: number;
-  defaultMaxPrice?: number;
-  onSubmit: (minPrice?: number, maxPrice?: number) => void;
-  onClear: () => void;
-}
-
-export default memo(function PriceFilter({
-  defaultMinPrice,
-  defaultMaxPrice,
-  onSubmit,
-  onClear,
-}: Props) {
-  const [minPrice, setMinPrice] = useState(defaultMinPrice);
-  const [maxPrice, setMaxPrice] = useState(defaultMaxPrice);
+export default memo(function PriceFilter() {
+  const { searchState, dispatch } = useSearch();
+  const [minPrice, setMinPrice] = useState(
+    searchState.searchInput.filter.minPrice
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    searchState.searchInput.filter.maxPrice
+  );
 
   const onClickClear = () => {
     if (minPrice || maxPrice) {
+      dispatch({ type: SearchActionType.SET_PRICE_FILTER, payload: {} });
       setMinPrice(undefined);
       setMaxPrice(undefined);
-      onClear();
     }
   };
 
   const onClickApply = () => {
-    onSubmit(
-      minPrice && !isNaN(minPrice) ? minPrice : undefined,
-      maxPrice && !isNaN(maxPrice) ? maxPrice : undefined
-    );
+    dispatch({
+      type: SearchActionType.SET_PRICE_FILTER,
+      payload: {
+        minPrice: minPrice && !isNaN(minPrice) ? minPrice : undefined,
+        maxPrice: maxPrice && !isNaN(maxPrice) ? maxPrice : undefined,
+      },
+    });
   };
 
   return (
