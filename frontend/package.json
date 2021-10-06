@@ -12,7 +12,7 @@
     "fmtcheck": "prettier --check *.{js,ts} **/*.{js,ts,tsx}"
   },
   "dependencies": {
-    "@apollo/client": "^3.4.11",
+    "@apollo/client": "^3.4.16",
     "@apollo/react-hooks": "^4.0.0",
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.4",
