@@ -139,8 +139,8 @@ const Category = memo(function Category({
   useEffect(() => {
     setShowChildren((prevState) => {
       // don't close if already open
-      if (prevState) return prevState
-      return selectedCategoryIdPath.includes(category.id)
+      if (prevState) return prevState;
+      return selectedCategoryIdPath.includes(category.id);
     });
   }, [setShowChildren, selectedCategoryIdPath, category.id]);
 
