@@ -9,23 +9,6 @@ import (
 	"github.com/k-yomo/kagu-miru/internal/es"
 )
 
-func mapGraphqlSortTypeToSearchSortType(st gqlmodel.SearchSortType) (search.SortType, error) {
-	switch st {
-	case gqlmodel.SearchSortTypeBestMatch:
-		return search.SortTypeBestMatch, nil
-	case gqlmodel.SearchSortTypePriceAsc:
-		return search.SortTypePriceAsc, nil
-	case gqlmodel.SearchSortTypePriceDesc:
-		return search.SortTypePriceDesc, nil
-	case gqlmodel.SearchSortTypeReviewCount:
-		return search.SortTypeReviewCount, nil
-	case gqlmodel.SearchSortTypeRating:
-		return search.SortTypeRating, nil
-	default:
-		return 0, fmt.Errorf("unknown sort type '%s' is given", st)
-	}
-}
-
 func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 	var status gqlmodel.ItemStatus
 	switch item.Status {

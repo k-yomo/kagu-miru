@@ -116,7 +116,7 @@
 
 ---
 
-### SearchInput
+### SearchFilter
 
 
 
@@ -130,6 +130,38 @@
   </tr>
   <tr>
     <td><strong>categoryIds</strong> (<a href="scalars.md#id">[ID!]!</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>maxPrice</strong> (<a href="scalars.md#int">Int</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>minPrice</strong> (<a href="scalars.md#int">Int</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>minRating</strong> (<a href="scalars.md#int">Int</a>)</td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### SearchInput
+
+
+
+
+#### Input fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>filter</strong> (<a href="input_objects.md#searchfilter">SearchFilter!</a>)</td>
     <td></td>
   </tr>
   <tr>

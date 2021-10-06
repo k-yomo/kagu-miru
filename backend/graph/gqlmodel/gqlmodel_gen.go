@@ -69,12 +69,19 @@ type SearchDisplayItemsActionParams struct {
 	ItemIds     []string     `json:"itemIds"`
 }
 
+type SearchFilter struct {
+	CategoryIds []string `json:"categoryIds"`
+	MinPrice    *int     `json:"minPrice"`
+	MaxPrice    *int     `json:"maxPrice"`
+	MinRating   *int     `json:"minRating"`
+}
+
 type SearchInput struct {
-	Query       string         `json:"query"`
-	CategoryIds []string       `json:"categoryIds"`
-	SortType    SearchSortType `json:"sortType"`
-	Page        *int           `json:"page"`
-	PageSize    *int           `json:"pageSize"`
+	Query    string         `json:"query"`
+	Filter   *SearchFilter  `json:"filter"`
+	SortType SearchSortType `json:"sortType"`
+	Page     *int           `json:"page"`
+	PageSize *int           `json:"pageSize"`
 }
 
 type SearchResponse struct {

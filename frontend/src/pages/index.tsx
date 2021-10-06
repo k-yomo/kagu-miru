@@ -1,4 +1,10 @@
-import { ChangeEvent, memo, useCallback, useState } from 'react';
+import React, {
+  ChangeEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import type { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import gql from 'graphql-tag';
@@ -28,6 +34,8 @@ import SearchBar from '@src/components/SearchBar';
 import { useNextQueryParams } from '@src/lib/nextqueryparams';
 import { ParsedUrlQuery } from 'querystring';
 import apolloClient from '@src/lib/apolloClient';
+import PriceFilter from '@src/components/PriceFilter';
+import RatingFilter from '@src/components/RatingFilter';
 
 gql`
   query homePageSearch($input: SearchInput!) {
@@ -97,7 +105,28 @@ type SearchParams = {
   searchFrom: SearchFrom;
 };
 
+function queryParamsToSearchParams(queryParams: ParsedUrlQuery): SearchParams {
+  return {
+    searchInput: {
+      query: (queryParams.q as string) || '',
+      filter: {
+        categoryIds: ((queryParams.categoryIds as string) || '')
+          .split(',')
+          .filter((s) => s),
+        minPrice: parseInt(queryParams.minPrice as string) || undefined,
+        maxPrice: parseInt(queryParams.maxPrice as string) || undefined,
+        minRating: parseInt(queryParams.minRating as string) || undefined,
+      },
+      sortType:
+        (queryParams.sort as SearchSortType) || SearchSortType.BestMatch,
+      page: parseInt(queryParams.page as string) || 1,
+    },
+    searchFrom: (queryParams.searchFrom as SearchFrom) || SearchFrom.Url,
+  };
+}
+
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  ctx.res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=60');
   const searchParams = queryParamsToSearchParams(ctx.query);
   const { data, errors } = await apolloClient.query<HomePageSearchQuery>({
     query: HomePageSearchDocument,
@@ -144,24 +173,10 @@ interface Props {
   itemConnection: NonNullable<HomePageSearchQuery['search']['itemConnection']>;
 }
 
-function queryParamsToSearchParams(queryParams: ParsedUrlQuery): SearchParams {
-  return {
-    searchInput: {
-      query: (queryParams.q as string) || '',
-      categoryIds: ((queryParams.categoryIds as string) || '')
-        .split(',')
-        .filter((s) => s),
-      sortType:
-        (queryParams.sort as SearchSortType) || SearchSortType.BestMatch,
-      page: parseInt(queryParams.page as string) || 1,
-    },
-    searchFrom: (queryParams.searchFrom as SearchFrom) || SearchFrom.Url,
-  };
-}
-
 const Home = memo<Props>(({ itemConnection }: Props) => {
   const router = useRouter();
   const queryParams = useNextQueryParams();
+  const [isMount, setIsMount] = useState(false);
   const [items, setItems] = useState(itemConnection.nodes);
   const [pageInfo, setPageInfo] = useState<
     typeof itemConnection.pageInfo | undefined
@@ -198,92 +213,106 @@ const Home = memo<Props>(({ itemConnection }: Props) => {
     },
   });
 
-  const updateSearchParams = useCallback(
-    ({ searchInput, searchFrom }: typeof searchParams) => {
-      setSearchParams({ searchInput, searchFrom });
-      setItems([]);
-      setPageInfo(undefined);
-
-      const { query, categoryIds, sortType, page } = searchInput;
-      search({
-        variables: {
-          input: {
-            ...searchInput,
-            query: query.trim(),
-          },
-        },
-      });
-
-      const urlQuery = {
-        q: query,
-        categoryIds: categoryIds.join(','),
-        sort: sortType,
-        page: page ? page.toString() : '',
-      };
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            ...urlQuery,
-            searchFrom,
-          },
-        },
-        // Exclude searchFrom to track actual searched from, since url can be shared.
-        `${router.pathname}?${new URLSearchParams(urlQuery).toString()}`,
-        {
-          shallow: true,
-        }
-      );
-    },
-    []
-  );
-
   const onChangeSortBy = (e: ChangeEvent<HTMLSelectElement>) => {
-    updateSearchParams({
+    setSearchParams(({ searchInput }) => ({
       searchInput: {
-        ...searchParams.searchInput,
+        ...searchInput,
         sortType: e.target.value as SearchSortType,
       },
       searchFrom: SearchFrom.Search,
-    });
+    }));
   };
 
   const onClickPage = useCallback(
     (page: number) => {
-      updateSearchParams({
-        searchInput: { ...searchParams.searchInput, page },
+      setSearchParams(({ searchInput }) => ({
+        searchInput: { ...searchInput, page },
         searchFrom: SearchFrom.Search,
-      });
+      }));
     },
-    [updateSearchParams, searchParams]
+    [setSearchParams]
   );
 
   const onSubmitQuery = useCallback(
     (query: string, searchFrom: SearchFrom) => {
-      updateSearchParams({
-        searchInput: { ...searchParams.searchInput, query, page: 1 },
+      setSearchParams(({ searchInput }) => ({
+        searchInput: { ...searchInput, query, page: 1 },
         searchFrom,
-      });
+      }));
     },
-    [updateSearchParams]
+    [setSearchParams]
   );
 
   const onClickCategory = useCallback(
     (categoryId: string) => {
-      updateSearchParams({
-        searchInput: { ...searchParams.searchInput, categoryIds: [categoryId] },
-        searchFrom: SearchFrom.Search,
+      setSearchParams(({ searchInput }) => {
+        const { filter, ...rest } = searchInput;
+        return {
+          searchInput: {
+            ...rest,
+            filter: { ...filter, categoryIds: [categoryId] },
+          },
+          searchFrom: SearchFrom.Search,
+        };
       });
     },
-    [updateSearchParams]
+    [setSearchParams]
   );
 
   const onClearCategory = useCallback(() => {
-    updateSearchParams({
-      searchInput: { ...searchParams.searchInput, categoryIds: [] },
-      searchFrom: SearchFrom.Search,
+    setSearchParams(({ searchInput }) => {
+      const { filter, ...rest } = searchInput;
+      return {
+        searchInput: { ...rest, filter: { ...filter, categoryIds: [] } },
+        searchFrom: SearchFrom.Search,
+      };
     });
-  }, [updateSearchParams]);
+  }, [setSearchParams]);
+
+  const onSubmitPriceFilter = useCallback(
+    (minPrice?: number, maxPrice?: number) => {
+      setSearchParams(({ searchInput }) => {
+        const { filter, ...rest } = searchInput;
+        return {
+          searchInput: {
+            ...rest,
+            filter: { ...filter, minPrice, maxPrice },
+          },
+          searchFrom: SearchFrom.Search,
+        };
+      });
+    },
+    [setSearchParams]
+  );
+
+  const onClearPriceFilter = useCallback(() => {
+    setSearchParams(({ searchInput }) => {
+      const { filter, ...rest } = searchInput;
+      return {
+        searchInput: {
+          ...rest,
+          filter: { ...filter, minPrice: undefined, maxPrice: undefined },
+        },
+        searchFrom: SearchFrom.Search,
+      };
+    });
+  }, [setSearchParams]);
+
+  const onSubmitRatingFilter = useCallback(
+    (minRating?: number) => {
+      setSearchParams(({ searchInput }) => {
+        const { filter, ...rest } = searchInput;
+        return {
+          searchInput: {
+            ...rest,
+            filter: { ...filter, minRating },
+          },
+          searchFrom: SearchFrom.Search,
+        };
+      });
+    },
+    [setSearchParams]
+  );
 
   const onClickItem = (itemId: string) => {
     const params: SearchClickItemActionParams = {
@@ -304,6 +333,53 @@ const Home = memo<Props>(({ itemConnection }: Props) => {
     });
   };
 
+  useEffect(() => {
+    if (!isMount) {
+      setIsMount(true);
+      return;
+    }
+    console.log('fired');
+    setItems([]);
+    setPageInfo(undefined);
+
+    const { searchInput, searchFrom } = searchParams;
+    const { query, filter, sortType, page } = searchInput;
+    search({
+      variables: {
+        input: {
+          ...searchInput,
+          query: query.trim(),
+        },
+      },
+    });
+
+    const urlQuery: { [key: string]: string } = {
+      q: query,
+    };
+    if (filter.categoryIds.length > 0)
+      urlQuery.categoryIds = filter.categoryIds.join(',');
+    if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
+    if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
+    if (filter.minRating) urlQuery.minRating = filter.minRating.toString();
+    if (sortType !== SearchSortType.BestMatch) urlQuery.sort = sortType;
+    if (page && page >= 2) urlQuery.page = page.toString();
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query: {
+          ...urlQuery,
+          searchFrom,
+        },
+      },
+      // Exclude searchFrom to track actual searched from, since url can be shared.
+      `${router.pathname}?${new URLSearchParams(urlQuery).toString()}`,
+      {
+        shallow: true,
+      }
+    );
+  }, [searchParams]);
+
   return (
     <div className="flex max-w-[1200px] mx-auto my-3">
       <SEOMeta
@@ -313,19 +389,60 @@ const Home = memo<Props>(({ itemConnection }: Props) => {
         // img={{ srcPath: TopImg.src }}
       />
       <div className="my-8 mx-2 lg:mx-4 lg:min-w-[300px] hidden md:block">
-        <h2 className="my-2 text-md font-bold">カテゴリー</h2>
-        <CategoryList
-          displayedItemTopLevelCategoryIds={
-            items ? items.map((item) => item.categoryIds[0]) : []
-          }
-          selectedCategoryId={
-            searchParams.searchInput.categoryIds.length > 0
-              ? searchParams.searchInput.categoryIds[0]
-              : undefined
-          }
-          onClickCategory={onClickCategory}
-          onClearCategory={onClearCategory}
-        />
+        <div
+          className={`mt-1 p-3 ${
+            searchParams.searchInput.filter.categoryIds.length > 0
+              ? 'bg-gray-100 dark:bg-gray-800'
+              : ''
+          }`}
+        >
+          <h3 className="my-2 text-md font-bold">カテゴリー</h3>
+          <CategoryList
+            displayedItemTopLevelCategoryIds={
+              items ? items.map((item) => item.categoryIds[0]) : []
+            }
+            selectedCategoryId={
+              searchParams.searchInput.filter.categoryIds.length > 0
+                ? searchParams.searchInput.filter.categoryIds[0]
+                : undefined
+            }
+            onClickCategory={onClickCategory}
+            onClearCategory={onClearCategory}
+          />
+        </div>
+        <div
+          className={`mt-6 p-3 ${
+            searchParams.searchInput.filter.minPrice ||
+            searchParams.searchInput.filter.maxPrice
+              ? 'bg-gray-100 dark:bg-gray-800'
+              : ''
+          }`}
+        >
+          <h3 className="mb-2 text-md font-bold">価格</h3>
+          <PriceFilter
+            defaultMinPrice={
+              searchParams.searchInput.filter.minPrice || undefined
+            }
+            defaultMaxPrice={
+              searchParams.searchInput.filter.maxPrice || undefined
+            }
+            onSubmit={onSubmitPriceFilter}
+            onClear={onClearPriceFilter}
+          />
+        </div>
+        <div
+          className={`mt-6 p-3 ${
+            searchParams.searchInput.filter.minRating
+              ? 'bg-gray-100 dark:bg-gray-800'
+              : ''
+          }`}
+        >
+          <h3 className="mb-2 text-md font-bold">レビュー評価</h3>
+          <RatingFilter
+            minRating={searchParams.searchInput.filter.minRating || undefined}
+            onSubmit={onSubmitRatingFilter}
+          />
+        </div>
       </div>
       <div className="flex-1 mx-2">
         <div className="flex flex-col sm:flex-row items-end justify-between my-4 gap-2 w-full">

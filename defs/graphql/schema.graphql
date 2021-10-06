@@ -71,10 +71,17 @@ enum SearchSortType {
 
 input SearchInput {
     query: String!
-    categoryIds: [ID!]!
+    filter: SearchFilter!
     sortType: SearchSortType!
     page: Int
     pageSize: Int
+}
+
+input SearchFilter {
+    categoryIds: [ID!]!
+    minPrice: Int
+    maxPrice: Int
+    minRating: Int
 }
 
 enum EventID {

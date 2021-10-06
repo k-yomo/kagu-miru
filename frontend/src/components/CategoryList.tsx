@@ -80,7 +80,7 @@ export default memo(function CategoryList({
   return (
     <>
       <span
-        className="my-1 cursor-pointer border-text-primary hover:border-b-[1px] text-sm"
+        className="cursor-pointer border-text-primary hover:border-b-[1px] text-sm"
         onClick={onClearCategory}
       >
         ALL
@@ -140,9 +140,9 @@ function Category({
   }, [selectedCategoryIdPath, category.id]);
 
   return (
-    <div className="ml-4">
+    <div className="ml-2">
       <div
-        className={`flex items-center justify-between px-2 cursor-pointer ${
+        className={`flex items-center justify-between cursor-pointer ${
           hasChildren ? 'hover:bg-gray-50 dark:hover:bg-gray-800' : 'py-2'
         }`}
       >

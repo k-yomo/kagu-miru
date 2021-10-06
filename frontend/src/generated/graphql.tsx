@@ -123,6 +123,13 @@ export type SearchDisplayItemsActionParams = {
   searchInput: SearchInput;
 };
 
+export type SearchFilter = {
+  categoryIds: Array<Scalars['ID']>;
+  maxPrice?: Maybe<Scalars['Int']>;
+  minPrice?: Maybe<Scalars['Int']>;
+  minRating?: Maybe<Scalars['Int']>;
+};
+
 export enum SearchFrom {
   QuerySuggestion = 'QUERY_SUGGESTION',
   Search = 'SEARCH',
@@ -130,7 +137,7 @@ export enum SearchFrom {
 }
 
 export type SearchInput = {
-  categoryIds: Array<Scalars['ID']>;
+  filter: SearchFilter;
   page?: Maybe<Scalars['Int']>;
   pageSize?: Maybe<Scalars['Int']>;
   query: Scalars['String'];
