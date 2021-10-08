@@ -47,7 +47,7 @@ export default function FilterIcons() {
   if (filter.minRating) {
     filterIcons.push(
       <FilterIcon
-        key="ratingFitler"
+        key="ratingFilter"
         name={`評価${filter.minRating}以上`}
         onClear={() => {
           dispatch({
@@ -72,7 +72,7 @@ const FilterIcon = memo(function FilterIcon({
   onClear,
 }: FilterIconProps) {
   return (
-    <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-indigo-100 dark:bg-indigo-600 text-indigo-800 dark:text-indigo-100 text-white text-xs focus:outline-none">
+    <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-indigo-100 dark:bg-indigo-600 text-indigo-800 dark:text-indigo-100 text-xs focus:outline-none">
       {name}
       <XIcon className="w-3 h-3 ml-2 cursor-pointer" onClick={onClear} />
     </span>

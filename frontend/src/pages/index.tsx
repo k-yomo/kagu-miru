@@ -85,11 +85,13 @@ export default memo(function HomePage() {
         </div>
       </div>
       <div className="flex-1 mx-2">
-        <div className="flex flex-col sm:flex-row items-end justify-between my-4 gap-2 w-full">
+        <div className="flex flex-col sm:flex-row items-end justify-between my-2 gap-2 w-full">
           <SearchBar />
           <SortTypeSelectBox />
         </div>
-        <FilterIcons />
+        <div className="mb-4">
+          <FilterIcons />
+        </div>
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
