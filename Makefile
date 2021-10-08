@@ -1,7 +1,7 @@
 
 .PHONY: setup
 setup:
-	brew list golangci-lint &>/dev/null || brew install golangci-lint
+	command -v golangci-lint &> /dev/null || brew install golangci-lint
 	command -v air &> /dev/null || curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 	go mod download
 	./scripts/install_go_tools.sh
