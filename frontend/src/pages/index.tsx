@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
-import gql from 'graphql-tag';
 import {
   Action,
   EventId,
@@ -19,6 +18,7 @@ import SearchBar from '@src/components/SearchBar';
 import PriceFilter from '@src/components/PriceFilter';
 import RatingFilter from '@src/components/RatingFilter';
 import SortTypeSelectBox from '@src/components/SortTypeSelectBox';
+import FilterIcons from '@src/components/FilterIcons';
 
 export default memo(function HomePage() {
   const { searchState, searchId, items, pageInfo, loading } = useSearch();
@@ -89,6 +89,7 @@ export default memo(function HomePage() {
           <SearchBar />
           <SortTypeSelectBox />
         </div>
+        <FilterIcons />
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
