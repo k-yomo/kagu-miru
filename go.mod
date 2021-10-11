@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/pubsub v1.17.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/Code-Hex/gqldoc v0.0.4
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
 	github.com/alexedwards/scs/v2 v2.4.0
 	github.com/aquasecurity/esquery v0.2.0
 	github.com/avct/uasurfer v0.0.0-20191028135549-26b5daa857f1
