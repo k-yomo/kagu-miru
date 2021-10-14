@@ -75,7 +75,7 @@ func main() {
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}
-	searchClient := search.NewSearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient)
+	searchClient := search.NewElasticsearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient)
 
 	var eventLoader tracking.EventLoader
 	if cfg.Env.IsDeployed() {
