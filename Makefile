@@ -13,17 +13,29 @@ run:
 	goreman -set-ports=false start & \
 	wait
 
+.PHONY: test
+test:
+	gotestsum -- -race -coverprofile=coverage.out $(TESTARGS) ./...
+
+.PHONY: test-cover
+test-cover: testacc
+	go tool cover -func=coverage.out
+	go tool cover -html=coverage.out
+
+.PHONY: lint
 lint:
 	@golangci-lint run & \
 	cd frontend && npm run lint & \
 	wait
 
+.PHONY: fmt
 fmt:
 	go fmt ./... & \
 	goimports -w . & \
 	cd frontend && npm run fmt & \
 	wait
 
+.PHONY: gen-graphql
 gen-graphql:
 	go generate ./... & \
 	cd frontend && npm run codegen & \
