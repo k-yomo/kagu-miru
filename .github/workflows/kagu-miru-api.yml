@@ -1,8 +1,8 @@
-name: Backend Workflow
+name: kagu-miru API Workflow
 on:
   push:
     paths:
-      - ".github/workflows/backend.yml"
+      - ".github/workflows/kagu-miru-api.yml"
       - "backend/**"
       - "go.mod"
 

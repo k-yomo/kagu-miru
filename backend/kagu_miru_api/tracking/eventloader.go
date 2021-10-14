@@ -8,7 +8,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/k-yomo/kagu-miru/pkg/logging"
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 
 	"cloud.google.com/go/pubsub"
 )

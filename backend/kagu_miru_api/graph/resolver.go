@@ -1,8 +1,8 @@
 package graph
 
 import (
-	"github.com/k-yomo/kagu-miru/backend/search"
-	"github.com/k-yomo/kagu-miru/backend/tracking"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/search"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
 )
 
 //go:generate go run github.com/99designs/gqlgen

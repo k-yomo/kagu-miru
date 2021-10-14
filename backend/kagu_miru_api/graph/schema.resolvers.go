@@ -7,9 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	gqlgend "github.com/k-yomo/kagu-miru/backend/graph/gqlgen"
-	gqlmodell "github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
-	"github.com/k-yomo/kagu-miru/backend/tracking"
+	gqlgend "github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
+	gqlmodell "github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
 )
 
 func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodell.Event) (bool, error) {

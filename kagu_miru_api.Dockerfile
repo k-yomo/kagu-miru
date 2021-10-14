@@ -9,11 +9,11 @@ RUN apk --no-cache add make ca-certificates tzdata
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY backend backend
-COPY internal internal
-COPY pkg pkg
+COPY backend/kagu_miru_api backend/kagu_miru_api
+COPY backend/internal backend/internal
+COPY backend/pkg backend/pkg
 
-RUN CGO_ENABLED=0 go build -o bin/server -ldflags "-w -s" ./backend
+RUN CGO_ENABLED=0 go build -o bin/server -ldflags "-w -s" ./backend/kagu_miru_api
 
 # exec
 FROM scratch

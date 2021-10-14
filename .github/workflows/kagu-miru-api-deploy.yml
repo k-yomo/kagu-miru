@@ -1,4 +1,4 @@
-name: Backend Deploy Workflow
+name: kagu-miru API Deploy Workflow
 on:
   workflow_dispatch:
 
@@ -26,13 +26,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           gcloud --quiet auth configure-docker
-          docker build -t kagu-miru-backend -f backend.Dockerfile .
-          docker tag kagu-miru-backend asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-backend:latest
-          docker push asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-backend
+          docker build -t kagu-miru-api -f kagu_miru_api.Dockerfile .
+          docker tag kagu-miru-api asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-api:latest
+          docker push asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-api
         env:
           DOCKER_BUILDKIT: 1
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
         run: |
-          gcloud run deploy kagu-miru-backend-prod --image=asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-backend:latest --project=${{ secrets.PROD_GCP_PROJECT }} --region=asia-northeast1 --platform=managed
+          gcloud run deploy kagu-miru-api-prod --image=asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/kagu-miru-api:latest --project=${{ secrets.PROD_GCP_PROJECT }} --region=asia-northeast1 --platform=managed

@@ -15,7 +15,7 @@ run:
 
 .PHONY: test
 test:
-	gotestsum -- -race -coverprofile=coverage.out $(TESTARGS) ./...
+	gotestsum -- -race -coverprofile=coverage.out $(TESTARGS) ./backend/...
 
 .PHONY: test-cover
 test-cover: testacc

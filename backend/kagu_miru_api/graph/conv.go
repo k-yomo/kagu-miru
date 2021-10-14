@@ -3,10 +3,9 @@ package graph
 import (
 	"fmt"
 
-	"github.com/k-yomo/kagu-miru/backend/search"
-
-	"github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
-	"github.com/k-yomo/kagu-miru/internal/es"
+	"github.com/k-yomo/kagu-miru/backend/internal/es"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/search"
 )
 
 func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {

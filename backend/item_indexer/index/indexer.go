@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 
 	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/k-yomo/kagu-miru/internal/es"
+	"github.com/k-yomo/kagu-miru/backend/internal/es"
 )
 
 type ItemIndexer struct {

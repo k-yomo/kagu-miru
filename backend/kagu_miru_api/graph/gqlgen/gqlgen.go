@@ -13,7 +13,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -388,7 +388,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../defs/graphql/schema.graphql", Input: `scalar Map
+	{Name: "../../defs/graphql/schema.graphql", Input: `scalar Map
 scalar Time
 
 type Query {
@@ -529,7 +529,7 @@ func (ec *executionContext) field_Mutation_trackEvent_args(ctx context.Context, 
 	var arg0 gqlmodel.Event
 	if tmp, ok := rawArgs["event"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("event"))
-		arg0, err = ec.unmarshalNEvent2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐEvent(ctx, tmp)
+		arg0, err = ec.unmarshalNEvent2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐEvent(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -574,7 +574,7 @@ func (ec *executionContext) field_Query_search_args(ctx context.Context, rawArgs
 	var arg0 *gqlmodel.SearchInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchInput(ctx, tmp)
+		arg0, err = ec.unmarshalOSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -758,7 +758,7 @@ func (ec *executionContext) _Item_status(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(gqlmodel.ItemStatus)
 	fc.Result = res
-	return ec.marshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemStatus(ctx, field.Selections, res)
+	return ec.marshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Item_url(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
@@ -1038,7 +1038,7 @@ func (ec *executionContext) _Item_platform(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(gqlmodel.ItemSellingPlatform)
 	fc.Result = res
-	return ec.marshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx, field.Selections, res)
+	return ec.marshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ItemCategory_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemCategory) (ret graphql.Marshaler) {
@@ -1143,7 +1143,7 @@ func (ec *executionContext) _ItemCategory_children(ctx context.Context, field gr
 	}
 	res := resTmp.([]*gqlmodel.ItemCategory)
 	fc.Result = res
-	return ec.marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemCategoryᚄ(ctx, field.Selections, res)
+	return ec.marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategoryᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ItemConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemConnection) (ret graphql.Marshaler) {
@@ -1178,7 +1178,7 @@ func (ec *executionContext) _ItemConnection_pageInfo(ctx context.Context, field 
 	}
 	res := resTmp.(*gqlmodel.PageInfo)
 	fc.Result = res
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐPageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ItemConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemConnection) (ret graphql.Marshaler) {
@@ -1213,7 +1213,7 @@ func (ec *executionContext) _ItemConnection_nodes(ctx context.Context, field gra
 	}
 	res := resTmp.([]*gqlmodel.Item)
 	fc.Result = res
-	return ec.marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_trackEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1367,7 +1367,7 @@ func (ec *executionContext) _Query_search(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.(*gqlmodel.SearchResponse)
 	fc.Result = res
-	return ec.marshalNSearchResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchResponse(ctx, field.Selections, res)
+	return ec.marshalNSearchResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getQuerySuggestions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1409,7 +1409,7 @@ func (ec *executionContext) _Query_getQuerySuggestions(ctx context.Context, fiel
 	}
 	res := resTmp.(*gqlmodel.QuerySuggestionsResponse)
 	fc.Result = res
-	return ec.marshalNQuerySuggestionsResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐQuerySuggestionsResponse(ctx, field.Selections, res)
+	return ec.marshalNQuerySuggestionsResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐQuerySuggestionsResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getAllCategories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1444,7 +1444,7 @@ func (ec *executionContext) _Query_getAllCategories(ctx context.Context, field g
 	}
 	res := resTmp.([]*gqlmodel.ItemCategory)
 	fc.Result = res
-	return ec.marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemCategory(ctx, field.Selections, res)
+	return ec.marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1655,7 +1655,7 @@ func (ec *executionContext) _SearchResponse_itemConnection(ctx context.Context, 
 	}
 	res := resTmp.(*gqlmodel.ItemConnection)
 	fc.Result = res
-	return ec.marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemConnection(ctx, field.Selections, res)
+	return ec.marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2793,7 +2793,7 @@ func (ec *executionContext) unmarshalInputEvent(ctx context.Context, obj interfa
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNEventID2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐEventID(ctx, v)
+			it.ID, err = ec.unmarshalNEventID2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐEventID(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2801,7 +2801,7 @@ func (ec *executionContext) unmarshalInputEvent(ctx context.Context, obj interfa
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("action"))
-			it.Action, err = ec.unmarshalNAction2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐAction(ctx, v)
+			it.Action, err = ec.unmarshalNAction2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐAction(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2910,7 +2910,7 @@ func (ec *executionContext) unmarshalInputSearchDisplayItemsActionParams(ctx con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searchFrom"))
-			it.SearchFrom, err = ec.unmarshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchFrom(ctx, v)
+			it.SearchFrom, err = ec.unmarshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchFrom(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2918,7 +2918,7 @@ func (ec *executionContext) unmarshalInputSearchDisplayItemsActionParams(ctx con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searchInput"))
-			it.SearchInput, err = ec.unmarshalNSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchInput(ctx, v)
+			it.SearchInput, err = ec.unmarshalNSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3004,7 +3004,7 @@ func (ec *executionContext) unmarshalInputSearchInput(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-			it.Filter, err = ec.unmarshalNSearchFilter2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchFilter(ctx, v)
+			it.Filter, err = ec.unmarshalNSearchFilter2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3012,7 +3012,7 @@ func (ec *executionContext) unmarshalInputSearchInput(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortType"))
-			it.SortType, err = ec.unmarshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchSortType(ctx, v)
+			it.SortType, err = ec.unmarshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchSortType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3646,13 +3646,13 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNAction2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐAction(ctx context.Context, v interface{}) (gqlmodel.Action, error) {
+func (ec *executionContext) unmarshalNAction2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐAction(ctx context.Context, v interface{}) (gqlmodel.Action, error) {
 	var res gqlmodel.Action
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAction2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐAction(ctx context.Context, sel ast.SelectionSet, v gqlmodel.Action) graphql.Marshaler {
+func (ec *executionContext) marshalNAction2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐAction(ctx context.Context, sel ast.SelectionSet, v gqlmodel.Action) graphql.Marshaler {
 	return v
 }
 
@@ -3671,18 +3671,18 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNEvent2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐEvent(ctx context.Context, v interface{}) (gqlmodel.Event, error) {
+func (ec *executionContext) unmarshalNEvent2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐEvent(ctx context.Context, v interface{}) (gqlmodel.Event, error) {
 	res, err := ec.unmarshalInputEvent(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNEventID2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐEventID(ctx context.Context, v interface{}) (gqlmodel.EventID, error) {
+func (ec *executionContext) unmarshalNEventID2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐEventID(ctx context.Context, v interface{}) (gqlmodel.EventID, error) {
 	var res gqlmodel.EventID
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNEventID2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐEventID(ctx context.Context, sel ast.SelectionSet, v gqlmodel.EventID) graphql.Marshaler {
+func (ec *executionContext) marshalNEventID2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐEventID(ctx context.Context, sel ast.SelectionSet, v gqlmodel.EventID) graphql.Marshaler {
 	return v
 }
 
@@ -3767,7 +3767,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.Item) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3791,7 +3791,7 @@ func (ec *executionContext) marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNItem2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNItem2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3811,7 +3811,7 @@ func (ec *executionContext) marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑ
 	return ret
 }
 
-func (ec *executionContext) marshalNItem2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.Item) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3821,7 +3821,7 @@ func (ec *executionContext) marshalNItem2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmir
 	return ec._Item(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemCategory(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.ItemCategory) graphql.Marshaler {
+func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.ItemCategory) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3845,7 +3845,7 @@ func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomo�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemCategory(ctx, sel, v[i])
+			ret[i] = ec.marshalOItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3859,7 +3859,7 @@ func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomo�
 	return ret
 }
 
-func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.ItemCategory) graphql.Marshaler {
+func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.ItemCategory) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3883,7 +3883,7 @@ func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomo�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemCategory(ctx, sel, v[i])
+			ret[i] = ec.marshalNItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3903,7 +3903,7 @@ func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomo�
 	return ret
 }
 
-func (ec *executionContext) marshalNItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemCategory(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.ItemCategory) graphql.Marshaler {
+func (ec *executionContext) marshalNItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.ItemCategory) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3913,7 +3913,7 @@ func (ec *executionContext) marshalNItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋka
 	return ec._ItemCategory(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemConnection(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.ItemConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemConnection(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.ItemConnection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3923,23 +3923,23 @@ func (ec *executionContext) marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋ
 	return ec._ItemConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx context.Context, v interface{}) (gqlmodel.ItemSellingPlatform, error) {
+func (ec *executionContext) unmarshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx context.Context, v interface{}) (gqlmodel.ItemSellingPlatform, error) {
 	var res gqlmodel.ItemSellingPlatform
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx context.Context, sel ast.SelectionSet, v gqlmodel.ItemSellingPlatform) graphql.Marshaler {
+func (ec *executionContext) marshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx context.Context, sel ast.SelectionSet, v gqlmodel.ItemSellingPlatform) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemStatus(ctx context.Context, v interface{}) (gqlmodel.ItemStatus, error) {
+func (ec *executionContext) unmarshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemStatus(ctx context.Context, v interface{}) (gqlmodel.ItemStatus, error) {
 	var res gqlmodel.ItemStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemStatus(ctx context.Context, sel ast.SelectionSet, v gqlmodel.ItemStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemStatus(ctx context.Context, sel ast.SelectionSet, v gqlmodel.ItemStatus) graphql.Marshaler {
 	return v
 }
 
@@ -3964,7 +3964,7 @@ func (ec *executionContext) marshalNMap2map(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.PageInfo) graphql.Marshaler {
+func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.PageInfo) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3974,11 +3974,11 @@ func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋkᚑyomoᚋkagu�
 	return ec._PageInfo(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNQuerySuggestionsResponse2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐQuerySuggestionsResponse(ctx context.Context, sel ast.SelectionSet, v gqlmodel.QuerySuggestionsResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNQuerySuggestionsResponse2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐQuerySuggestionsResponse(ctx context.Context, sel ast.SelectionSet, v gqlmodel.QuerySuggestionsResponse) graphql.Marshaler {
 	return ec._QuerySuggestionsResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNQuerySuggestionsResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐQuerySuggestionsResponse(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.QuerySuggestionsResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNQuerySuggestionsResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐQuerySuggestionsResponse(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.QuerySuggestionsResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3988,31 +3988,31 @@ func (ec *executionContext) marshalNQuerySuggestionsResponse2ᚖgithubᚗcomᚋk
 	return ec._QuerySuggestionsResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSearchFilter2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchFilter(ctx context.Context, v interface{}) (*gqlmodel.SearchFilter, error) {
+func (ec *executionContext) unmarshalNSearchFilter2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchFilter(ctx context.Context, v interface{}) (*gqlmodel.SearchFilter, error) {
 	res, err := ec.unmarshalInputSearchFilter(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchFrom(ctx context.Context, v interface{}) (gqlmodel.SearchFrom, error) {
+func (ec *executionContext) unmarshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchFrom(ctx context.Context, v interface{}) (gqlmodel.SearchFrom, error) {
 	var res gqlmodel.SearchFrom
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchFrom(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchFrom) graphql.Marshaler {
+func (ec *executionContext) marshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchFrom(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchFrom) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchInput(ctx context.Context, v interface{}) (*gqlmodel.SearchInput, error) {
+func (ec *executionContext) unmarshalNSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx context.Context, v interface{}) (*gqlmodel.SearchInput, error) {
 	res, err := ec.unmarshalInputSearchInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSearchResponse2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchResponse(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNSearchResponse2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchResponse(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchResponse) graphql.Marshaler {
 	return ec._SearchResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNSearchResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchResponse(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.SearchResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNSearchResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchResponse(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.SearchResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4022,13 +4022,13 @@ func (ec *executionContext) marshalNSearchResponse2ᚖgithubᚗcomᚋkᚑyomoᚋ
 	return ec._SearchResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchSortType(ctx context.Context, v interface{}) (gqlmodel.SearchSortType, error) {
+func (ec *executionContext) unmarshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchSortType(ctx context.Context, v interface{}) (gqlmodel.SearchSortType, error) {
 	var res gqlmodel.SearchSortType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchSortType(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchSortType) graphql.Marshaler {
+func (ec *executionContext) marshalNSearchSortType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchSortType(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchSortType) graphql.Marshaler {
 	return v
 }
 
@@ -4394,14 +4394,14 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return graphql.MarshalInt(*v)
 }
 
-func (ec *executionContext) marshalOItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐItemCategory(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.ItemCategory) graphql.Marshaler {
+func (ec *executionContext) marshalOItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.ItemCategory) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ItemCategory(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋgraphᚋgqlmodelᚐSearchInput(ctx context.Context, v interface{}) (*gqlmodel.SearchInput, error) {
+func (ec *executionContext) unmarshalOSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx context.Context, v interface{}) (*gqlmodel.SearchInput, error) {
 	if v == nil {
 		return nil, nil
 	}

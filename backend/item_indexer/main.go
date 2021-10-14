@@ -8,10 +8,10 @@ import (
 
 	"github.com/blendle/zapdriver"
 	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/k-yomo/kagu-miru/itemindexer/config"
-	"github.com/k-yomo/kagu-miru/itemindexer/index"
-	"github.com/k-yomo/kagu-miru/itemindexer/indexworker"
-	"github.com/k-yomo/kagu-miru/pkg/rakutenichiba"
+	"github.com/k-yomo/kagu-miru/backend/item_indexer/config"
+	"github.com/k-yomo/kagu-miru/backend/item_indexer/index"
+	"github.com/k-yomo/kagu-miru/backend/item_indexer/indexworker"
+	"github.com/k-yomo/kagu-miru/backend/pkg/rakutenichiba"
 	"go.uber.org/zap"
 )
 

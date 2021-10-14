@@ -9,30 +9,24 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/k-yomo/kagu-miru/backend/request"
-
-	"cloud.google.com/go/pubsub"
-
-	"github.com/k-yomo/kagu-miru/backend/tracking"
-
-	"github.com/k-yomo/kagu-miru/backend/search"
-
 	"cloud.google.com/go/profiler"
-
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-
+	"cloud.google.com/go/pubsub"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/k-yomo/kagu-miru/backend/config"
-	"github.com/k-yomo/kagu-miru/backend/graph"
-	"github.com/k-yomo/kagu-miru/backend/graph/gqlgen"
-	"github.com/k-yomo/kagu-miru/pkg/csrf"
-	"github.com/k-yomo/kagu-miru/pkg/logging"
-	"github.com/k-yomo/kagu-miru/pkg/tracing"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/config"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/request"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/search"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
+	"github.com/k-yomo/kagu-miru/backend/pkg/csrf"
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
+	"github.com/k-yomo/kagu-miru/backend/pkg/tracing"
 	"github.com/rs/cors"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 )
 

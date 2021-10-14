@@ -10,9 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/k-yomo/kagu-miru/pkg/httputil"
-
-	"github.com/k-yomo/kagu-miru/pkg/urlutil"
+	"github.com/k-yomo/kagu-miru/backend/pkg/httputil"
+	"github.com/k-yomo/kagu-miru/backend/pkg/urlutil"
 )
 
 const (

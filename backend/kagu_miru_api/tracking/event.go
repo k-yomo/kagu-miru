@@ -7,9 +7,9 @@ import (
 
 	"github.com/avct/uasurfer"
 
-	"github.com/k-yomo/kagu-miru/backend/request"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/request"
 
-	"github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 )
 
 type Event struct {

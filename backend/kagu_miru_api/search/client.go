@@ -3,7 +3,7 @@ package search
 import (
 	"context"
 
-	"github.com/k-yomo/kagu-miru/backend/graph/gqlmodel"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 )
 
 type Client interface {
