@@ -18,7 +18,7 @@
     "@heroicons/react": "^1.0.4",
     "@tailwindcss/line-clamp": "^0.2.1",
     "apollo-link-scalars": "^3.0.0",
-    "graphql": "^15.5.3",
+    "graphql": "^15.6.1",
     "graphql-anywhere": "^4.2.7",
     "graphql-scalars": "^1.11.1",
     "graphql-tag": "^2.12.5",
