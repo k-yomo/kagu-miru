@@ -41,3 +41,4 @@ gen-graphql:
 	cd frontend && npm run codegen & \
 	gqldoc -s defs/graphql/schema.graphql -o ./docs/graphql & \
 	wait
+	make fmt

@@ -1,6 +1,5 @@
-import * as Apollo from '@apollo/client';
 import { gql } from '@apollo/client';
-
+import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
@@ -236,7 +235,6 @@ export function useGetQuerySuggestionsQuery(
     GetQuerySuggestionsQueryVariables
   >(GetQuerySuggestionsDocument, options);
 }
-
 export function useGetQuerySuggestionsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
     GetQuerySuggestionsQuery,
@@ -249,7 +247,6 @@ export function useGetQuerySuggestionsLazyQuery(
     GetQuerySuggestionsQueryVariables
   >(GetQuerySuggestionsDocument, options);
 }
-
 export type GetQuerySuggestionsQueryHookResult = ReturnType<
   typeof useGetQuerySuggestionsQuery
 >;
@@ -313,7 +310,6 @@ export function useSearchQuery(
     options
   );
 }
-
 export function useSearchLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<SearchQuery, SearchQueryVariables>
 ) {
@@ -323,7 +319,6 @@ export function useSearchLazyQuery(
     options
   );
 }
-
 export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
 export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
 export type SearchQueryResult = Apollo.QueryResult<
@@ -369,7 +364,6 @@ export function useTrackEventMutation(
     options
   );
 }
-
 export type TrackEventMutationHookResult = ReturnType<
   typeof useTrackEventMutation
 >;
