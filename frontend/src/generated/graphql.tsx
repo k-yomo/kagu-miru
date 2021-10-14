@@ -1,10 +1,16 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions =  {}
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -18,7 +24,7 @@ export type Scalars = {
 
 export enum Action {
   ClickItem = 'CLICK_ITEM',
-  Display = 'DISPLAY'
+  Display = 'DISPLAY',
 }
 
 export type Event = {
@@ -30,7 +36,7 @@ export type Event = {
 
 export enum EventId {
   QuerySuggestions = 'QUERY_SUGGESTIONS',
-  Search = 'SEARCH'
+  Search = 'SEARCH',
 }
 
 export type Item = {
@@ -60,18 +66,17 @@ export type ItemConnection = {
 };
 
 export enum ItemSellingPlatform {
-  Rakuten = 'RAKUTEN'
+  Rakuten = 'RAKUTEN',
 }
 
 export enum ItemStatus {
   Active = 'ACTIVE',
-  Inactive = 'INACTIVE'
+  Inactive = 'INACTIVE',
 }
 
 export type Mutation = {
   trackEvent: Scalars['Boolean'];
 };
-
 
 export type MutationTrackEventArgs = {
   event: Event;
@@ -88,11 +93,9 @@ export type Query = {
   search: SearchResponse;
 };
 
-
 export type QueryGetQuerySuggestionsArgs = {
   query: Scalars['String'];
 };
-
 
 export type QuerySearchArgs = {
   input?: Maybe<SearchInput>;
@@ -130,7 +133,7 @@ export type SearchFilter = {
 export enum SearchFrom {
   QuerySuggestion = 'QUERY_SUGGESTION',
   Search = 'SEARCH',
-  Url = 'URL'
+  Url = 'URL',
 }
 
 export type SearchInput = {
@@ -151,39 +154,58 @@ export enum SearchSortType {
   PriceAsc = 'PRICE_ASC',
   PriceDesc = 'PRICE_DESC',
   Rating = 'RATING',
-  ReviewCount = 'REVIEW_COUNT'
+  ReviewCount = 'REVIEW_COUNT',
 }
 
 export type GetQuerySuggestionsQueryVariables = Exact<{
   query: Scalars['String'];
 }>;
 
-
-export type GetQuerySuggestionsQuery = { getQuerySuggestions: { query: string, suggestedQueries: Array<string> } };
+export type GetQuerySuggestionsQuery = {
+  getQuerySuggestions: { query: string; suggestedQueries: Array<string> };
+};
 
 export type SearchQueryVariables = Exact<{
   input: SearchInput;
 }>;
 
-
-export type SearchQuery = { search: { searchId: string, itemConnection: { pageInfo: { page: number, totalPage: number }, nodes: Array<{ id: string, name: string, description: string, status: ItemStatus, url: string, affiliateUrl: string, price: number, imageUrls: Array<string>, averageRating: number, reviewCount: number, categoryIds: Array<string>, platform: ItemSellingPlatform }> } } };
+export type SearchQuery = {
+  search: {
+    searchId: string;
+    itemConnection: {
+      pageInfo: { page: number; totalPage: number };
+      nodes: Array<{
+        id: string;
+        name: string;
+        description: string;
+        status: ItemStatus;
+        url: string;
+        affiliateUrl: string;
+        price: number;
+        imageUrls: Array<string>;
+        averageRating: number;
+        reviewCount: number;
+        categoryIds: Array<string>;
+        platform: ItemSellingPlatform;
+      }>;
+    };
+  };
+};
 
 export type TrackEventMutationVariables = Exact<{
   event: Event;
 }>;
 
-
 export type TrackEventMutation = { trackEvent: boolean };
 
-
 export const GetQuerySuggestionsDocument = gql`
-    query getQuerySuggestions($query: String!) {
-  getQuerySuggestions(query: $query) {
-    query
-    suggestedQueries
+  query getQuerySuggestions($query: String!) {
+    getQuerySuggestions(query: $query) {
+      query
+      suggestedQueries
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useGetQuerySuggestionsQuery__
@@ -201,44 +223,67 @@ export const GetQuerySuggestionsDocument = gql`
  *   },
  * });
  */
-export function useGetQuerySuggestionsQuery(baseOptions: Apollo.QueryHookOptions<GetQuerySuggestionsQuery, GetQuerySuggestionsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetQuerySuggestionsQuery, GetQuerySuggestionsQueryVariables>(GetQuerySuggestionsDocument, options);
-      }
-export function useGetQuerySuggestionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetQuerySuggestionsQuery, GetQuerySuggestionsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetQuerySuggestionsQuery, GetQuerySuggestionsQueryVariables>(GetQuerySuggestionsDocument, options);
-        }
-export type GetQuerySuggestionsQueryHookResult = ReturnType<typeof useGetQuerySuggestionsQuery>;
-export type GetQuerySuggestionsLazyQueryHookResult = ReturnType<typeof useGetQuerySuggestionsLazyQuery>;
-export type GetQuerySuggestionsQueryResult = Apollo.QueryResult<GetQuerySuggestionsQuery, GetQuerySuggestionsQueryVariables>;
+export function useGetQuerySuggestionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetQuerySuggestionsQuery,
+    GetQuerySuggestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetQuerySuggestionsQuery,
+    GetQuerySuggestionsQueryVariables
+  >(GetQuerySuggestionsDocument, options);
+}
+export function useGetQuerySuggestionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetQuerySuggestionsQuery,
+    GetQuerySuggestionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetQuerySuggestionsQuery,
+    GetQuerySuggestionsQueryVariables
+  >(GetQuerySuggestionsDocument, options);
+}
+export type GetQuerySuggestionsQueryHookResult = ReturnType<
+  typeof useGetQuerySuggestionsQuery
+>;
+export type GetQuerySuggestionsLazyQueryHookResult = ReturnType<
+  typeof useGetQuerySuggestionsLazyQuery
+>;
+export type GetQuerySuggestionsQueryResult = Apollo.QueryResult<
+  GetQuerySuggestionsQuery,
+  GetQuerySuggestionsQueryVariables
+>;
 export const SearchDocument = gql`
-    query search($input: SearchInput!) {
-  search(input: $input) {
-    searchId
-    itemConnection {
-      pageInfo {
-        page
-        totalPage
-      }
-      nodes {
-        id
-        name
-        description
-        status
-        url
-        affiliateUrl
-        price
-        imageUrls
-        averageRating
-        reviewCount
-        categoryIds
-        platform
+  query search($input: SearchInput!) {
+    search(input: $input) {
+      searchId
+      itemConnection {
+        pageInfo {
+          page
+          totalPage
+        }
+        nodes {
+          id
+          name
+          description
+          status
+          url
+          affiliateUrl
+          price
+          imageUrls
+          averageRating
+          reviewCount
+          categoryIds
+          platform
+        }
       }
     }
   }
-}
-    `;
+`;
 
 /**
  * __useSearchQuery__
@@ -256,23 +301,39 @@ export const SearchDocument = gql`
  *   },
  * });
  */
-export function useSearchQuery(baseOptions: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SearchQuery, SearchQueryVariables>(SearchDocument, options);
-      }
-export function useSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchQuery, SearchQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SearchQuery, SearchQueryVariables>(SearchDocument, options);
-        }
+export function useSearchQuery(
+  baseOptions: Apollo.QueryHookOptions<SearchQuery, SearchQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<SearchQuery, SearchQueryVariables>(
+    SearchDocument,
+    options
+  );
+}
+export function useSearchLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<SearchQuery, SearchQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<SearchQuery, SearchQueryVariables>(
+    SearchDocument,
+    options
+  );
+}
 export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
 export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
-export type SearchQueryResult = Apollo.QueryResult<SearchQuery, SearchQueryVariables>;
+export type SearchQueryResult = Apollo.QueryResult<
+  SearchQuery,
+  SearchQueryVariables
+>;
 export const TrackEventDocument = gql`
-    mutation trackEvent($event: Event!) {
-  trackEvent(event: $event)
-}
-    `;
-export type TrackEventMutationFn = Apollo.MutationFunction<TrackEventMutation, TrackEventMutationVariables>;
+  mutation trackEvent($event: Event!) {
+    trackEvent(event: $event)
+  }
+`;
+export type TrackEventMutationFn = Apollo.MutationFunction<
+  TrackEventMutation,
+  TrackEventMutationVariables
+>;
 
 /**
  * __useTrackEventMutation__
@@ -291,10 +352,24 @@ export type TrackEventMutationFn = Apollo.MutationFunction<TrackEventMutation, T
  *   },
  * });
  */
-export function useTrackEventMutation(baseOptions?: Apollo.MutationHookOptions<TrackEventMutation, TrackEventMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<TrackEventMutation, TrackEventMutationVariables>(TrackEventDocument, options);
-      }
-export type TrackEventMutationHookResult = ReturnType<typeof useTrackEventMutation>;
-export type TrackEventMutationResult = Apollo.MutationResult<TrackEventMutation>;
-export type TrackEventMutationOptions = Apollo.BaseMutationOptions<TrackEventMutation, TrackEventMutationVariables>;
+export function useTrackEventMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    TrackEventMutation,
+    TrackEventMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<TrackEventMutation, TrackEventMutationVariables>(
+    TrackEventDocument,
+    options
+  );
+}
+export type TrackEventMutationHookResult = ReturnType<
+  typeof useTrackEventMutation
+>;
+export type TrackEventMutationResult =
+  Apollo.MutationResult<TrackEventMutation>;
+export type TrackEventMutationOptions = Apollo.BaseMutationOptions<
+  TrackEventMutation,
+  TrackEventMutationVariables
+>;

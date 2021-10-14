@@ -24,11 +24,11 @@ export default memo(function RatingFilter() {
       <div className="space-y-3 text-xs">
         <div
           className={`cursor-pointer flex items-center hover:font-bold ${
-            minRating === 3 ? 'font-bold' : ''
+            minRating === 5 ? 'font-bold' : ''
           }`}
-          onClick={() => onClickRating(3)}
+          onClick={() => onClickRating(5)}
         >
-          <Rating size={20} rating={3} maxRating={5} />
+          <Rating size={20} rating={5} maxRating={5} />
           以上
         </div>
         <div
@@ -42,11 +42,11 @@ export default memo(function RatingFilter() {
         </div>
         <div
           className={`cursor-pointer flex items-center hover:font-bold ${
-            minRating === 5 ? 'font-bold' : ''
+            minRating === 3 ? 'font-bold' : ''
           }`}
-          onClick={() => onClickRating(5)}
+          onClick={() => onClickRating(3)}
         >
-          <Rating size={20} rating={5} maxRating={5} />
+          <Rating size={20} rating={3} maxRating={5} />
           以上
         </div>
       </div>
