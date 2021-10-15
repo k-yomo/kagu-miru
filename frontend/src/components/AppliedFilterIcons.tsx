@@ -3,7 +3,7 @@ import { XIcon } from '@heroicons/react/solid';
 import { SearchActionType, useSearch } from '@src/contexts/search';
 import { itemCategoryIdNameMap } from '@src/lib/itemCategories';
 
-export default function FilterIcons() {
+export default function AppliedFilterIcons() {
   const { searchState, dispatch } = useSearch();
   const filter = searchState.searchInput.filter;
 
@@ -31,7 +31,7 @@ export default function FilterIcons() {
     } else if (filter.minPrice) {
       name = `${filter.minPrice}円 ~`;
     } else {
-      name = `~ ${filter.minPrice}円`;
+      name = `~ ${filter.maxPrice}円`;
     }
     filterIcons.push(
       <FilterIcon

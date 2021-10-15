@@ -3,7 +3,6 @@ import {
   Dispatch,
   FC,
   memo,
-  SetStateAction,
   useContext,
   useEffect,
   useReducer,

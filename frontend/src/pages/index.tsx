@@ -18,7 +18,7 @@ import SearchBar from '@src/components/SearchBar';
 import PriceFilter from '@src/components/PriceFilter';
 import RatingFilter from '@src/components/RatingFilter';
 import SortTypeSelectBox from '@src/components/SortTypeSelectBox';
-import FilterIcons from '@src/components/FilterIcons';
+import AppliedFilterIcons from '@src/components/AppliedFilterIcons';
 
 export default memo(function HomePage() {
   const { searchState, searchId, items, pageInfo, loading } = useSearch();
@@ -90,7 +90,7 @@ export default memo(function HomePage() {
           <SortTypeSelectBox />
         </div>
         <div className="mb-4">
-          <FilterIcons />
+          <AppliedFilterIcons />
         </div>
         {loading ? <Loading /> : <></>}
         <div className="flex flex-col items-center">
