@@ -58,15 +58,12 @@ export default memo(function SearchBar() {
       },
     });
 
-  const onSubmit = useCallback(
-    (query: string, searchFrom: SearchFrom) => () => {
-      dispatch({
-        type: SearchActionType.CHANGE_QUERY,
-        payload: { query, searchFrom },
-      });
-    },
-    [dispatch]
-  );
+  const onSubmit = (query: string, searchFrom: SearchFrom) => {
+    dispatch({
+      type: SearchActionType.CHANGE_QUERY,
+      payload: { query, searchFrom },
+    });
+  };
 
   const onChangeSearchQuery = (e: ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value as string;
@@ -82,14 +79,11 @@ export default memo(function SearchBar() {
     }
   };
 
-  const onClickSuggestedQuery = useCallback(
-    (query: string) => {
-      setSearchQuery(query);
-      setShowQuerySuggestions(false);
-      onSubmit(query, SearchFrom.QuerySuggestion);
-    },
-    [onSubmit]
-  );
+  const onClickSuggestedQuery = (query: string) => {
+    setSearchQuery(query);
+    setShowQuerySuggestions(false);
+    onSubmit(query, SearchFrom.QuerySuggestion);
+  };
 
   useEffect(() => {
     if (getQuerySuggestionsData?.getQuerySuggestions) {
