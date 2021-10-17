@@ -9,10 +9,8 @@ setup:
 
 .PHONY: run
 run:
-	docker compose up elasticsearch & \
-	docker compose up pubsub & \
-	./scripts/create_local_pubsub_resources.sh & \
-	goreman -set-ports=false start & \
+	docker compose up pubsub elasticsearch & \
+	(./scripts/create_local_pubsub_resources.sh && goreman -set-ports=false start) & \
 	wait
 
 .PHONY: test

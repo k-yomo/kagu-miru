@@ -11,6 +11,6 @@ function create_resources() {
 }
 
 NEXT_WAIT_TIME=0
-until create_resources || [ $NEXT_WAIT_TIME -eq 4 ]; do
+until create_resources || [ $NEXT_WAIT_TIME -eq 10 ]; do
    sleep $(( NEXT_WAIT_TIME++ ))
 done
