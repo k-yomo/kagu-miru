@@ -81,17 +81,17 @@ func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {
 		w.start(ctx)
 	}
 
-	indexGenreIDs := make([]int, 0, len(furnitureGenres))
+	fetchGenreIDs := make([]int, 0, len(furnitureGenres))
 	for _, genre := range furnitureGenres {
-		indexGenreIDs = append(indexGenreIDs, genre.ID)
+		fetchGenreIDs = append(fetchGenreIDs, genre.ID)
 	}
-	sort.Slice(indexGenreIDs, func(i, j int) bool {
-		return indexGenreIDs[i] < indexGenreIDs[j]
+	sort.Slice(fetchGenreIDs, func(i, j int) bool {
+		return fetchGenreIDs[i] < fetchGenreIDs[j]
 	})
 
 	startGenreIdx := 0
 	if option.StartGenreID != 0 {
-		for i, genreID := range indexGenreIDs {
+		for i, genreID := range fetchGenreIDs {
 			if genreID == option.StartGenreID {
 				startGenreIdx = i
 				break
@@ -99,15 +99,15 @@ func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {
 		}
 	}
 
-	r.logger.Info(fmt.Sprintf("[start] indexing %d genre", len(indexGenreIDs[startGenreIdx:])))
+	r.logger.Info(fmt.Sprintf("[start] fetching %d genre", len(fetchGenreIDs[startGenreIdx:])))
 
-	for _, genreID := range indexGenreIDs[startGenreIdx:] {
+	for _, genreID := range fetchGenreIDs[startGenreIdx:] {
 		r.wg.Add(1)
 		(<-r.pool).genreID <- genreID
 	}
 	r.wg.Wait()
 
-	r.logger.Info(fmt.Sprintf("[end] indexing %d genre", len(indexGenreIDs[startGenreIdx:])))
+	r.logger.Info(fmt.Sprintf("[end] fetching %d genre", len(fetchGenreIDs[startGenreIdx:])))
 	return nil
 }
 
@@ -147,7 +147,7 @@ func (r *worker) getFurnitureGenres(ctx context.Context) ([]*rakutenichiba.Genre
 // 1. get items in price ascending order
 // 2. when we reach 100th page, set the last item's price to `minPrice` and fetch more 100 pages
 // 3. when we get 0 items, it means we reached the end.
-// Ideally, we want to reindex only updated items since we need to do full-reindex with the current approach.
+// Ideally, we want to refetch only updated items since we need to do full-reindex with the current approach.
 // But currently we don't have a way to get item's updated time(API doesn't return it) and set `from` parameter for search
 func (w *genreItemsFetcher) start(ctx context.Context) {
 	rateLimiter := rate.NewLimiter(1, 1)
@@ -171,7 +171,7 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 					res, err := cursor.Next(ctx)
 					if err == rakutenichiba.Done {
 						w.logger.Info(fmt.Sprintf(
-							"indexed all items in genre %d", genreID),
+							"fetched all items in genre %d", genreID),
 							zap.Int("genreID", genreID),
 							zap.Int("total", totalPublishedCount),
 						)
@@ -236,7 +236,7 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 					totalPublishedCount += int(publishedCount)
 					if totalPublishedCount%300 == 0 {
 						w.logger.Info(fmt.Sprintf(
-							"indexed %d items", totalPublishedCount),
+							"published %d items", totalPublishedCount),
 							zap.Int("genreID", genreID),
 							zap.Int("minPrice", cursor.CurMinPrice()),
 							zap.Int("page", cursor.CurPage()),
@@ -304,6 +304,7 @@ func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenic
 		TagIDs:        rakutenItem.TagIDs,
 		JANCode:       janCode,
 		Platform:      es.PlatformRakuten,
-		IndexedAt:     time.Now().UnixMilli(),
+		// TODO fix since this is actually not indexedAt but fetchedAt
+		IndexedAt: time.Now().UnixMilli(),
 	}, nil
 }
