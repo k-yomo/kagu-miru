@@ -6,11 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"cloud.google.com/go/pubsub"
 	"github.com/blendle/zapdriver"
-	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/k-yomo/kagu-miru/backend/item_indexer/config"
-	"github.com/k-yomo/kagu-miru/backend/item_indexer/index"
-	"github.com/k-yomo/kagu-miru/backend/item_indexer/indexworker"
 	"github.com/k-yomo/kagu-miru/backend/pkg/rakutenichiba"
 	"go.uber.org/zap"
 )
@@ -21,23 +18,19 @@ func main() {
 		panic(err)
 	}
 
-	cfg, err := config.NewConfig()
+	cfg, err := newConfig()
 	if err != nil {
 		logger.Fatal("failed to initialize config", zap.Error(err))
 	}
 
-	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{cfg.ElasticSearchURL},
-		Username:  cfg.ElasticSearchUsername,
-		Password:  cfg.ElasticSearchPassword,
-	})
+	pubsubClient, err := pubsub.NewClient(context.Background(), cfg.GCPProjectID)
 	if err != nil {
-		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
+		logger.Fatal("failed to initialize pubsub client", zap.Error(err))
 	}
+	pubsubItemUpdateTopic := pubsubClient.Topic(cfg.PubsubItemUpdateTopicID)
 
-	indexer := index.NewItemIndexer(cfg.ItemsIndexName, esClient)
 	rakutenIchibaClient := rakutenichiba.NewClient(cfg.RakutenApplicationIDs, cfg.RakutenAffiliateID)
-	rakutenItemWorker := indexworker.NewRakutenItemWorker(indexer, rakutenIchibaClient, logger)
+	rakutenItemWorker := newWorker(pubsubItemUpdateTopic, rakutenIchibaClient, logger)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -45,7 +38,7 @@ func main() {
 	doneCh := make(chan struct{}, 1)
 	go func() {
 		logger.Info("rakutenItemWorker started running")
-		if err := rakutenItemWorker.Run(ctx, &indexworker.RakutenWorkerOption{
+		if err := rakutenItemWorker.run(ctx, &rakutenWorkerOption{
 			StartGenreID: cfg.RakutenStartGenreID,
 			MinPrice:     cfg.RakutenMinPrice,
 		}); err != nil {

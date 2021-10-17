@@ -1,15 +1,17 @@
-package indexworker
+package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
+	"cloud.google.com/go/pubsub"
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
-	"github.com/k-yomo/kagu-miru/backend/item_indexer/index"
 	"github.com/k-yomo/kagu-miru/backend/pkg/jancode"
 	"github.com/k-yomo/kagu-miru/backend/pkg/rakutenichiba"
 	"go.uber.org/multierr"
@@ -17,12 +19,12 @@ import (
 	"golang.org/x/time/rate"
 )
 
-type genreIndexWorker struct {
-	itemIndexer            *index.ItemIndexer
+type genreItemsFetcher struct {
+	pubsubItemUpdateTopic  *pubsub.Topic
 	rakutenIchibaAPIClient *rakutenichiba.Client
 
 	wg      *sync.WaitGroup
-	pool    chan<- *genreIndexWorker
+	pool    chan<- *genreItemsFetcher
 	genreID chan int
 
 	genreMap map[string]*rakutenichiba.Genre
@@ -30,22 +32,22 @@ type genreIndexWorker struct {
 	logger *zap.Logger
 }
 
-type RakutenWorker struct {
+type worker struct {
 	rakutenIchibaAPIClient *rakutenichiba.Client
-	pool                   <-chan *genreIndexWorker
-	workers                []*genreIndexWorker
+	pool                   <-chan *genreItemsFetcher
+	workers                []*genreItemsFetcher
 	logger                 *zap.Logger
 
 	wg *sync.WaitGroup
 }
 
-func NewRakutenItemWorker(indexer *index.ItemIndexer, rakutenIchibaAPIClient *rakutenichiba.Client, logger *zap.Logger) *RakutenWorker {
+func newWorker(pubsubItemUpdateTopic *pubsub.Topic, rakutenIchibaAPIClient *rakutenichiba.Client, logger *zap.Logger) *worker {
 	wg := &sync.WaitGroup{}
-	pool := make(chan *genreIndexWorker, rakutenIchibaAPIClient.ApplicationIDNum())
-	workers := make([]*genreIndexWorker, 0, cap(pool))
+	pool := make(chan *genreItemsFetcher, rakutenIchibaAPIClient.ApplicationIDNum())
+	workers := make([]*genreItemsFetcher, 0, cap(pool))
 	for i := 0; i < cap(pool); i++ {
-		workers = append(workers, &genreIndexWorker{
-			itemIndexer:            indexer,
+		workers = append(workers, &genreItemsFetcher{
+			pubsubItemUpdateTopic:  pubsubItemUpdateTopic,
 			rakutenIchibaAPIClient: rakutenIchibaAPIClient,
 			wg:                     wg,
 			pool:                   pool,
@@ -53,7 +55,7 @@ func NewRakutenItemWorker(indexer *index.ItemIndexer, rakutenIchibaAPIClient *ra
 			logger:                 logger,
 		})
 	}
-	return &RakutenWorker{
+	return &worker{
 		rakutenIchibaAPIClient: rakutenIchibaAPIClient,
 		wg:                     wg,
 		pool:                   pool,
@@ -62,13 +64,12 @@ func NewRakutenItemWorker(indexer *index.ItemIndexer, rakutenIchibaAPIClient *ra
 	}
 }
 
-type RakutenWorkerOption struct {
+type rakutenWorkerOption struct {
 	StartGenreID int
 	MinPrice     int
 }
 
-// Run starts rakuten item indexing genreIndexWorker
-func (r *RakutenWorker) Run(ctx context.Context, option *RakutenWorkerOption) error {
+func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {
 	furnitureGenres, err := r.getFurnitureGenres(ctx)
 	if err != nil {
 		return fmt.Errorf("getFurnitureGenre: %w", err)
@@ -125,7 +126,7 @@ func buildGenreMapFromGenres(genres []*rakutenichiba.Genre) map[string]*rakuteni
 	return genreMap
 }
 
-func (r *RakutenWorker) getFurnitureGenres(ctx context.Context) ([]*rakutenichiba.Genre, error) {
+func (r *worker) getFurnitureGenres(ctx context.Context) ([]*rakutenichiba.Genre, error) {
 	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakutenichiba.GenreFurnitureID)
 	if err != nil {
 		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
@@ -148,7 +149,7 @@ func (r *RakutenWorker) getFurnitureGenres(ctx context.Context) ([]*rakutenichib
 // 3. when we get 0 items, it means we reached the end.
 // Ideally, we want to reindex only updated items since we need to do full-reindex with the current approach.
 // But currently we don't have a way to get item's updated time(API doesn't return it) and set `from` parameter for search
-func (w *genreIndexWorker) start(ctx context.Context) {
+func (w *genreItemsFetcher) start(ctx context.Context) {
 	rateLimiter := rate.NewLimiter(1, 1)
 
 	go func() {
@@ -160,7 +161,7 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 				return
 			case genreID := <-w.genreID:
 
-				totalIndexCount := 0
+				totalPublishedCount := 0
 				cursor := w.rakutenIchibaAPIClient.NewGenreItemCursor(genreID)
 				for {
 					if err := rateLimiter.Wait(ctx); err != nil {
@@ -172,7 +173,7 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 						w.logger.Info(fmt.Sprintf(
 							"indexed all items in genre %d", genreID),
 							zap.Int("genreID", genreID),
-							zap.Int("total", totalIndexCount),
+							zap.Int("total", totalPublishedCount),
 						)
 						break
 					}
@@ -199,19 +200,47 @@ func (w *genreIndexWorker) start(ctx context.Context) {
 						)
 					}
 
-					if err := w.itemIndexer.BulkIndex(ctx, items); err != nil {
-						// skip if indexing failed
-						w.logger.Error("itemIndexer.BulkIndex failed", zap.Error(err))
-					} else {
-						totalIndexCount += len(items)
-						if totalIndexCount%300 == 0 {
-							w.logger.Info(fmt.Sprintf(
-								"indexed %d items", totalIndexCount),
-								zap.Int("genreID", genreID),
-								zap.Int("minPrice", cursor.CurMinPrice()),
-								zap.Int("page", cursor.CurPage()),
-							)
-						}
+					wg := sync.WaitGroup{}
+					var publishedCount int64
+					for _, item := range items {
+						item := item
+
+						wg.Add(1)
+						go func() {
+							defer wg.Done()
+
+							itemJSON, err := json.Marshal(item)
+							if err != nil {
+								w.logger.Error(
+									"json.Marshal item failed",
+									zap.Error(err),
+									zap.Any("item", item),
+								)
+								return
+							}
+							res := w.pubsubItemUpdateTopic.Publish(ctx, &pubsub.Message{
+								Data: itemJSON,
+							})
+							if _, err := res.Get(ctx); err != nil {
+								w.logger.Error("publish item update failed",
+									zap.Error(err),
+									zap.String("itemId", item.ID),
+								)
+								return
+							}
+							atomic.AddInt64(&publishedCount, 1)
+						}()
+					}
+					wg.Wait()
+
+					totalPublishedCount += int(publishedCount)
+					if totalPublishedCount%300 == 0 {
+						w.logger.Info(fmt.Sprintf(
+							"indexed %d items", totalPublishedCount),
+							zap.Int("genreID", genreID),
+							zap.Int("minPrice", cursor.CurMinPrice()),
+							zap.Int("page", cursor.CurPage()),
+						)
 					}
 				}
 
