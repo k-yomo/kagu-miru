@@ -30,7 +30,7 @@ lint:
 
 .PHONY: fmt
 fmt:
-	goimports -w -d $(find ./backend -type f -name '*.go') & \
+	goimports -w backend & \
 	cd frontend && npm run fmt & \
 	wait
 
