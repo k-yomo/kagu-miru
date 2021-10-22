@@ -99,7 +99,7 @@ func main() {
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: otelhttp.NewHandler(r, "server"),
+		Handler: r,
 	}
 
 	go func() {
