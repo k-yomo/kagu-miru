@@ -1,0 +1,27 @@
+{
+  "name": "kagumirumedia",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "package.json",
+  "author": "Kanji Yomoda <Kanji.yy@gmail.com>",
+  "license": "UNLICENSED",
+  "scripts": {
+    "deploy": "sanity deploy",
+    "build": "sanity build",
+    "start": "sanity start"
+  },
+  "keywords": [
+    "sanity"
+  ],
+  "dependencies": {
+    "@sanity/base": "^2.21.9",
+    "@sanity/core": "^2.21.8",
+    "@sanity/default-layout": "^2.21.9",
+    "@sanity/default-login": "^2.21.9",
+    "@sanity/desk-tool": "^2.21.9",
+    "@sanity/vision": "^2.21.9",
+    "prop-types": "^15.7",
+    "styled-components": "^5.2.0"
+  }
+}
