@@ -11,7 +11,10 @@ import CategoryTag from '@src/components/CategoryTag';
 import TableOfContents from '@src/components/TableOfContents';
 import { useRouter } from 'next/router';
 
-const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0]{
+// Copy to `@src/pages/media/posts/preview/[slug]`
+// TODO: Fix to use identical query
+//  For now importing fetchPostQuery results in `undefined`
+export const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0]{
   title,
   description,
   mainImage,
@@ -31,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return { props };
 };
 
-interface Props {
+export interface Props {
   title: string;
   description: string;
   mainImage: SanityImageSource;
