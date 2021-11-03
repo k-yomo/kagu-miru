@@ -19,5 +19,9 @@ export const sanityPreviewClient = client({
 });
 
 export function buildSanityImageSrc(source: SanityImageSource) {
-  return imageUrlBuilder(sanityClient).image(source);
+  return imageUrlBuilder(sanityClient)
+    .image(source)
+    .auto('format')
+    .maxWidth(1000)
+    .quality(50);
 }

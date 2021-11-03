@@ -61,7 +61,7 @@ const Post = ({
   const bodyBeforeTOC = [...body.slice(0, firstH2)];
   const bodyAfterTOC = [...body.slice(firstH2)];
 
-  const mainImgUrl = buildSanityImageSrc(mainImage).url() || '';
+  const mainImgUrl = buildSanityImageSrc(mainImage).maxWidth(1000).url() || '';
 
   useEffect(() => {
     const hash = router.asPath.split('#')[1] ?? '';
