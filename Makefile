@@ -13,6 +13,10 @@ run:
 	(./scripts/create_local_pubsub_resources.sh && goreman -set-ports=false start) & \
 	wait
 
+.PHONY: run-item-fetcher
+run-item-fetcher:
+	cd backend/item_fetcher/rakuten_item_fetcher && air
+
 .PHONY: test
 test:
 	gotestsum -- -race -coverprofile=coverage.out $(TESTARGS) ./backend/...
