@@ -22,8 +22,8 @@ export default memo(function TableOfContents({ headings }: Props) {
     </li>
   ));
   return (
-    <div className="py-4 space-y-2">
-      <div className="font-bold">- 目次</div>
+    <div className="px-2 sm:px-4 py-4 bg-gray-50 dark:bg-gray-900">
+      <div className="font-bold">目次</div>
       <ul className="space-y-3 font-bold">{listItems}</ul>
     </div>
   );
