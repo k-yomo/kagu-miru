@@ -79,7 +79,7 @@ const Post = ({
         img={{ src: mainImgUrl }}
       />
       <article id="post" className="max-w-[1000px] mx-auto sm:my-8">
-        <img src={mainImgUrl} alt={title} className="rounded-md" />
+        <img src={mainImgUrl} alt={title} className="sm:rounded-md" />
         <div className="mx-3">
           <div className="my-4 space-x-2">
             {categories.map((category) => (
