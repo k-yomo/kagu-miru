@@ -7,11 +7,19 @@ export default {
       name: 'id',
       title: 'ID',
       type: 'string',
+      validation: Rule => Rule.required()
+    },
+    {
+      name: `parent`,
+      title: `Parent Category`,
+      type: `reference`,
+      to: [{ type: `category` }]
     },
     {
       name: 'name',
       title: 'Name',
       type: 'string',
+      validation: Rule => Rule.required()
     },
     {
       name: 'description',

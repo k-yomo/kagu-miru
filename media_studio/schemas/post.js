@@ -7,11 +7,13 @@ export default {
       name: 'title',
       title: 'Title',
       type: 'string',
+      validation: Rule => Rule.required()
     },
     {
       name: 'slug',
       title: 'URL',
       type: 'slug',
+      validation: Rule => Rule.required(),
       options: {
         source: 'title',
         maxLength: 96,
@@ -27,6 +29,7 @@ export default {
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
+      validation: Rule => Rule.required(),
       options: {
         hotspot: true,
       },
@@ -41,11 +44,13 @@ export default {
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
+      validation: Rule => Rule.required(),
     },
     {
       name: 'body',
       title: 'Body',
       type: 'blockContent',
+      validation: Rule => Rule.required(),
     },
   ],
 

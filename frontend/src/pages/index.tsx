@@ -7,7 +7,7 @@ import {
   SearchQuery,
   useTrackEventMutation,
 } from '@src/generated/graphql';
-import { useSearch } from '@src/contexts/search';
+import { SearchProvider, useSearch } from '@src/contexts/search';
 import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
 import PlatformBadge from '@src/components/PlatformBadge';
@@ -44,67 +44,69 @@ export default memo(function HomePage() {
   };
 
   return (
-    <div className="flex max-w-[1200px] mx-auto my-3">
-      <SEOMeta
-        title="カグミル - 家具検索サービス"
-        excludeSiteTitle
-        description="カグミルはオンラインで買える家具を横断で検索出来るサービスです。"
-        // img={{ srcPath: TopImg.src }}
-      />
-      <div className="my-8 mx-2 lg:mx-4 lg:min-w-[300px] hidden md:block">
-        <div
-          className={`mt-1 p-3 ${
-            searchState.searchInput.filter.categoryIds.length > 0
-              ? 'bg-gray-100 dark:bg-gray-800'
-              : ''
-          }`}
-        >
-          <h3 className="my-2 text-md font-bold">カテゴリー</h3>
-          <CategoryList />
-        </div>
-        <div
-          className={`mt-6 p-3 ${
-            searchState.searchInput.filter.minPrice ||
-            searchState.searchInput.filter.maxPrice
-              ? 'bg-gray-100 dark:bg-gray-800'
-              : ''
-          }`}
-        >
-          <h3 className="mb-2 text-md font-bold">価格</h3>
-          <PriceFilter />
-        </div>
-        <div
-          className={`mt-6 p-3 ${
-            searchState.searchInput.filter.minRating
-              ? 'bg-gray-100 dark:bg-gray-800'
-              : ''
-          }`}
-        >
-          <h3 className="mb-2 text-md font-bold">レビュー評価</h3>
-          <RatingFilter />
-        </div>
-      </div>
-      <div className="flex-1 mx-2">
-        <div className="flex flex-col sm:flex-row items-end justify-between my-2 gap-2 w-full">
-          <SearchBar />
-          <SortTypeSelectBox />
-        </div>
-        <div className="mb-4">
-          <AppliedFilterIcons />
-        </div>
-        {loading ? <Loading /> : <></>}
-        <div className="flex flex-col items-center">
-          <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
-            {items && <ItemList items={items} onClickItem={onClickItem} />}
+    <SearchProvider>
+      <div className="flex max-w-[1200px] mx-auto my-3">
+        <SEOMeta
+          title="カグミル - 家具検索サービス"
+          excludeSiteTitle
+          description="カグミルはオンラインで買える家具を横断で検索出来るサービスです。"
+          // img={{ srcPath: TopImg.src }}
+        />
+        <div className="my-8 mx-2 lg:mx-4 lg:min-w-[300px] hidden md:block">
+          <div
+            className={`mt-1 p-3 ${
+              searchState.searchInput.filter.categoryIds.length > 0
+                ? 'bg-gray-100 dark:bg-gray-800'
+                : ''
+            }`}
+          >
+            <h3 className="my-2 text-md font-bold">カテゴリー</h3>
+            <CategoryList />
           </div>
-          {pageInfo && (
-            <div className="my-4 w-full">
-              <Pagination />
+          <div
+            className={`mt-6 p-3 ${
+              searchState.searchInput.filter.minPrice ||
+              searchState.searchInput.filter.maxPrice
+                ? 'bg-gray-100 dark:bg-gray-800'
+                : ''
+            }`}
+          >
+            <h3 className="mb-2 text-md font-bold">価格</h3>
+            <PriceFilter />
+          </div>
+          <div
+            className={`mt-6 p-3 ${
+              searchState.searchInput.filter.minRating
+                ? 'bg-gray-100 dark:bg-gray-800'
+                : ''
+            }`}
+          >
+            <h3 className="mb-2 text-md font-bold">レビュー評価</h3>
+            <RatingFilter />
+          </div>
+        </div>
+        <div className="flex-1 mx-2">
+          <div className="flex flex-col sm:flex-row items-end justify-between my-2 gap-2 w-full">
+            <SearchBar />
+            <SortTypeSelectBox />
+          </div>
+          <div className="mb-4">
+            <AppliedFilterIcons />
+          </div>
+          {loading ? <Loading /> : <></>}
+          <div className="flex flex-col items-center">
+            <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
+              {items && <ItemList items={items} onClickItem={onClickItem} />}
             </div>
-          )}
+            {pageInfo && (
+              <div className="my-4 w-full">
+                <Pagination />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </SearchProvider>
   );
 });
 
