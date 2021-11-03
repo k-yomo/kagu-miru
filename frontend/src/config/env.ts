@@ -4,4 +4,4 @@ export const GRAPHQL_API_URL =
   'http://localhost:8000/api/graphql';
 
 export const SANITY_DATASET_ENV =
-  process.env.SANITY_DATASET_ENV || 'development';
+  process.env.NEXT_PUBLIC_SANITY_DATASET_ENV || 'development';
