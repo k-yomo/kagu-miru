@@ -4,16 +4,22 @@ export default {
   type: 'document',
   fields: [
     {
+      name: 'slug',
+      title: 'URL Slug',
+      type: 'slug',
+      validation: Rule => Rule.required(),
+    },
+    {
       name: 'title',
       title: 'Title',
       type: 'string',
       validation: Rule => Rule.required()
     },
     {
-      name: 'slug',
-      title: 'URL Slug',
-      type: 'slug',
-      validation: Rule => Rule.required(),
+      name: 'description',
+      title: 'Description',
+      type: 'string',
+      validation: Rule => Rule.required()
     },
     {
       name: 'author',
