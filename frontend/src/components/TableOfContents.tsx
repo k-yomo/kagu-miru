@@ -27,4 +27,4 @@ export default memo(function TableOfContents({ headings }: Props) {
       <ul className="space-y-3 font-bold">{listItems}</ul>
     </div>
   );
-})
+});

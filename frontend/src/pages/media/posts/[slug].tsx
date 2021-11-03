@@ -23,8 +23,12 @@ const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0]{
 }`;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { slug = '' } = ctx.query;
-  return { props: await sanityClient.fetch(fetchPostQuery, { slug }) };
+  const { slug } = ctx.query;
+  const props = await sanityClient.fetch(fetchPostQuery, { slug });
+  if (Object.keys(props).length === 0) {
+    return { notFound: true };
+  }
+  return { props };
 };
 
 interface Props {
