@@ -123,14 +123,14 @@ export default function MobileSearchFilterModal() {
                   />
                   <hr className="my-3 border-[#F2F2F2]" />
                   <h3 className="my-2 text-md font-bold">価格</h3>
-                  <div className="flex items-center text-xs">
+                  <div className="flex items-center">
                     <div>
                       <input
                         type="text"
                         inputMode="numeric"
                         value={searchFilter.minPrice || ''}
                         onChange={(e) => setMinPrice(parseInt(e.target.value))}
-                        className="w-[5rem] bg-white mr-1 p-1 dark:bg-gray-800 border border-gray-700 leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400 text-xs"
+                        className="w-[5rem] bg-white mr-1 p-1 dark:bg-gray-800 border border-gray-700 leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
                       />
                       円
                     </div>
@@ -141,7 +141,7 @@ export default function MobileSearchFilterModal() {
                         inputMode="numeric"
                         value={searchFilter.maxPrice || ''}
                         onChange={(e) => setMaxPrice(parseInt(e.target.value))}
-                        className="w-[5rem] bg-white mr-1 p-1 dark:bg-gray-800 border border-gray-700 leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400 text-xs"
+                        className="w-[5rem] bg-white mr-1 p-1 dark:bg-gray-800 border border-gray-700 leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
                       />
                       円
                     </div>

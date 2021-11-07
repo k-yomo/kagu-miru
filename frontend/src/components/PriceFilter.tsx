@@ -37,7 +37,7 @@ export default memo(function PriceFilter() {
             inputMode="numeric"
             value={minPrice || ''}
             onChange={(e) => setMinPrice(parseInt(e.target.value))}
-            className="w-[5rem] bg-white mr-1 p-1 dark:bg-gray-800 border border-gray-700 leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400 text-xs"
+            className="w-[5rem] bg-white mr-1 p-1 dark:bg-gray-800 border border-gray-700 leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
           />
           円
         </div>
@@ -48,7 +48,7 @@ export default memo(function PriceFilter() {
             inputMode="numeric"
             value={maxPrice || ''}
             onChange={(e) => setMaxPrice(parseInt(e.target.value))}
-            className="w-[5rem] bg-white mr-1 p-1 dark:bg-gray-800 border border-gray-700 leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400 text-xs"
+            className="w-[5rem] bg-white mr-1 p-1 dark:bg-gray-800 border border-gray-700 leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
           />
           円
         </div>
