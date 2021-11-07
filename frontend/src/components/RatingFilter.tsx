@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import Rating from '@src/components/Rating';
 import { SearchActionType, useSearch } from '@src/contexts/search';
 import RatingSelect from '@src/components/RatingSelect';
 

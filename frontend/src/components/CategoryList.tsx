@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import itemCategories from '@src/static/itemCategories.json';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid';
-import { SearchActionType, useSearch } from '@src/contexts/search';
+import { useSearch } from '@src/contexts/search';
 
 function findSelectedCategoryIdPath(
   categories: typeof itemCategories,
@@ -139,7 +139,7 @@ const Category = memo(function Category({
   const [showChildren, setShowChildren] = useState(false);
 
   useEffect(() => {
-    setShowChildren((prevState) => {
+    setShowChildren((prevState: boolean) => {
       // don't close if already open
       if (prevState) return prevState;
       return (

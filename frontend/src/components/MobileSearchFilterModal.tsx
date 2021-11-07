@@ -15,21 +15,24 @@ export default function MobileSearchFilterModal() {
   const cancelButtonRef = useRef(null);
 
   const setCategoryIds = (categoryIds: string[]) => {
-    setSearchFilter((prevState) => ({ ...prevState, categoryIds }));
+    setSearchFilter((prevState: SearchFilter) => ({
+      ...prevState,
+      categoryIds,
+    }));
   };
 
   const setMinPrice = (price: number) => {
     const minPrice = price && !isNaN(price) ? price : undefined;
-    setSearchFilter((prevState) => ({ ...prevState, minPrice }));
+    setSearchFilter((prevState: SearchFilter) => ({ ...prevState, minPrice }));
   };
 
   const setMaxPrice = (price: number) => {
     const maxPrice = price && !isNaN(price) ? price : undefined;
-    setSearchFilter((prevState) => ({ ...prevState, maxPrice }));
+    setSearchFilter((prevState: SearchFilter) => ({ ...prevState, maxPrice }));
   };
 
   const setMinRating = (minRating?: number) => {
-    setSearchFilter((prevState) => ({ ...prevState, minRating }));
+    setSearchFilter((prevState: SearchFilter) => ({ ...prevState, minRating }));
   };
 
   const onClickApply = () => {
@@ -48,7 +51,7 @@ export default function MobileSearchFilterModal() {
     <>
       <div className="sm:hidden z-10 fixed right-5 bottom-5">
         <div
-          onClick={() => setOpen((prevState) => !prevState)}
+          onClick={() => setOpen((prevState: boolean) => !prevState)}
           className="flex flex-col items-center px-2 py-2.5 bg-black dark:bg-white rounded-lg cursor-pointer text-white dark:text-black"
         >
           <AdjustmentsIcon className="w-6 h-6" />

@@ -1,12 +1,9 @@
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback } from 'react';
 import { SearchActionType, useSearch } from '@src/contexts/search';
-import itemCategories from '@src/static/itemCategories.json';
 import CategoryList from '@src/components/CategoryList';
 
 export default memo(function CategoryFilter() {
-  const { searchState, items, dispatch } = useSearch();
-  const [categories, setCategories] = useState(itemCategories);
-  const [showMore, setShowMore] = useState(false);
+  const { searchState, dispatch } = useSearch();
 
   const onClickCategory = useCallback(
     (categoryId: string) => {

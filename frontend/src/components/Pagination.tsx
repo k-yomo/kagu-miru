@@ -3,7 +3,6 @@ import {
   ArrowNarrowLeftIcon,
   ArrowNarrowRightIcon,
 } from '@heroicons/react/solid';
-import { GetServerSideProps } from 'next';
 import { SearchActionType, useSearch } from '@src/contexts/search';
 
 function range(start: number, end: number) {
