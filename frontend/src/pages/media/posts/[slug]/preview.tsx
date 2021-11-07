@@ -20,6 +20,7 @@ export const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0
 
 export default function PostPreview() {
   const [data, setData] = useState<Props | undefined>(undefined);
+  console.log(data);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
