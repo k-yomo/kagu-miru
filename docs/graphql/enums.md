@@ -94,6 +94,10 @@
     <th>Description</th>
   </tr>
   <tr>
+    <td><strong>FILTER</strong></td>
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>QUERY_SUGGESTION</strong></td>
     <td></td>
   </tr>

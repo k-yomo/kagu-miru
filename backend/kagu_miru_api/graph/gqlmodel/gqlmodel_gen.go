@@ -257,17 +257,19 @@ const (
 	SearchFromURL             SearchFrom = "URL"
 	SearchFromSearch          SearchFrom = "SEARCH"
 	SearchFromQuerySuggestion SearchFrom = "QUERY_SUGGESTION"
+	SearchFromFilter          SearchFrom = "FILTER"
 )
 
 var AllSearchFrom = []SearchFrom{
 	SearchFromURL,
 	SearchFromSearch,
 	SearchFromQuerySuggestion,
+	SearchFromFilter,
 }
 
 func (e SearchFrom) IsValid() bool {
 	switch e {
-	case SearchFromURL, SearchFromSearch, SearchFromQuerySuggestion:
+	case SearchFromURL, SearchFromSearch, SearchFromQuerySuggestion, SearchFromFilter:
 		return true
 	}
 	return false

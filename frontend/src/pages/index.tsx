@@ -13,12 +13,13 @@ import Loading from '@src/components/Loading';
 import PlatformBadge from '@src/components/PlatformBadge';
 import Pagination from '@src/components/Pagination';
 import Rating from '@src/components/Rating';
-import CategoryList from '@src/components/CategoryList';
 import SearchBar from '@src/components/SearchBar';
+import CategoryFilter from '@src/components/CategoryFilter';
 import PriceFilter from '@src/components/PriceFilter';
 import RatingFilter from '@src/components/RatingFilter';
 import SortTypeSelectBox from '@src/components/SortTypeSelectBox';
 import AppliedFilterIcons from '@src/components/AppliedFilterIcons';
+import MobileSearchFilterModal from '@src/components/MobileSearchFilterModal';
 
 export default function TopPage() {
   return (
@@ -59,6 +60,7 @@ const TopPageInner = memo(function TopPageInner() {
         description="カグミルはオンラインで買える家具を横断で検索出来るサービスです。"
         // img={{ srcPath: TopImg.src }}
       />
+      <MobileSearchFilterModal />
       <div className="my-8 mx-2 lg:mx-4 lg:min-w-[300px] hidden md:block">
         <div
           className={`mt-1 p-3 ${
@@ -68,7 +70,7 @@ const TopPageInner = memo(function TopPageInner() {
           }`}
         >
           <h3 className="my-2 text-md font-bold">カテゴリー</h3>
-          <CategoryList />
+          <CategoryFilter />
         </div>
         <div
           className={`mt-6 p-3 ${

@@ -42,30 +42,29 @@ function buildCategoryIdCountMap(displayedCategoryIds: string[]): {
   return categoryIdDisplayCountMap;
 }
 
-export default memo(function CategoryList() {
-  const { searchState, items, dispatch } = useSearch();
+interface Props {
+  categoryIds: string[];
+  onClickCategory: (categoryId: string) => void;
+  onClearCategory: () => void;
+  showCategoryCount?: number;
+}
+
+export default memo(function CategoryList({
+  categoryIds,
+  onClickCategory,
+  onClearCategory,
+  showCategoryCount,
+}: Props) {
+  const { items } = useSearch();
   const [categories, setCategories] = useState(itemCategories);
   const [showMore, setShowMore] = useState(false);
   const selectedCategoryIdPath = findSelectedCategoryIdPath(
     itemCategories,
-    searchState.searchInput.filter.categoryIds.length > 0
-      ? searchState.searchInput.filter.categoryIds[0]
-      : undefined
+    categoryIds.length > 0 ? categoryIds[0] : undefined
   );
 
-  const onClickCategory = useCallback(
-    (categoryId: string) => {
-      dispatch({
-        type: SearchActionType.SET_CATEGORY_FILTER,
-        payload: [categoryId],
-      });
-    },
-    [dispatch]
-  );
-
-  const onClearCategory = useCallback(() => {
-    dispatch({ type: SearchActionType.SET_CATEGORY_FILTER, payload: [] });
-  }, [dispatch]);
+  const onClick = useCallback(onClickCategory, [onClickCategory]);
+  const onClear = useCallback(onClearCategory, [onClearCategory]);
 
   useEffect(() => {
     const categoryIdCountMap = buildCategoryIdCountMap(
@@ -85,17 +84,20 @@ export default memo(function CategoryList() {
     <>
       <span
         className="cursor-pointer hover:underline border-text-primary hover:border-b-[1px] text-sm"
-        onClick={onClearCategory}
+        onClick={onClear}
       >
         ALL
       </span>
       <div>
-        {(showMore ? categories : categories.slice(0, 10)).map((category) => (
+        {(showMore
+          ? categories
+          : categories.slice(0, showCategoryCount || 10)
+        ).map((category) => (
           <Category
             key={category.id}
             category={category}
             selectedCategoryIdPath={selectedCategoryIdPath}
-            onClick={onClickCategory}
+            onClick={onClick}
           />
         ))}
         <div
@@ -140,7 +142,10 @@ const Category = memo(function Category({
     setShowChildren((prevState) => {
       // don't close if already open
       if (prevState) return prevState;
-      return selectedCategoryIdPath.includes(category.id);
+      return (
+        selectedCategoryIdPath.length > 0 &&
+        selectedCategoryIdPath.splice(1).includes(category.id)
+      );
     });
   }, [setShowChildren, selectedCategoryIdPath, category.id]);
 

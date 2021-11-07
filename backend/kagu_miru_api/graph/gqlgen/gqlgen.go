@@ -497,6 +497,7 @@ enum SearchFrom {
     URL
     SEARCH
     QUERY_SUGGESTION
+    FILTER
 }
 
 input SearchDisplayItemsActionParams {
