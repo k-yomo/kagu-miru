@@ -7,9 +7,9 @@
   "author": "Kanji Yomoda <Kanji.yy@gmail.com>",
   "license": "UNLICENSED",
   "scripts": {
-    "deploy": "sanity deploy",
-    "build": "sanity build",
-    "start": "sanity start"
+    "deploy": "SANITY_ACTIVE_ENV=production sanity deploy",
+    "build": "SANITY_ACTIVE_ENV=production sanity build",
+    "start": "SANITY_ACTIVE_ENV=development sanity start"
   },
   "keywords": [
     "sanity"
