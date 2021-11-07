@@ -1,6 +1,6 @@
 import React, { Fragment, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { AdjustmentsIcon } from '@heroicons/react/outline';
+import { AdjustmentsIcon, XIcon } from '@heroicons/react/outline';
 import CategoryList from '@src/components/CategoryList';
 import { SearchFilter } from '@src/generated/graphql';
 import RatingSelect from '@src/components/RatingSelect';
@@ -93,10 +93,20 @@ export default function MobileSearchFilterModal() {
               <div className="fixed flex flex-col bottom-0 w-screen h-[90vh] overflow-hidden bg-white rounded-xl transition-all transform">
                 <Dialog.Title
                   as="h3"
-                  className="my-4 text-xl font-bold text-center"
+                  className="my-5 text-xl font-bold text-center"
                 >
                   絞り込み検索
                 </Dialog.Title>
+                <div className="absolute top-0 right-0 mt-3 pr-3">
+                  <button
+                    type="button"
+                    className="bg-white rounded-md text-gray-400"
+                    onClick={() => setOpen(false)}
+                  >
+                    <span className="sr-only">Close</span>
+                    <XIcon className="h-6 w-6" aria-hidden="true" />
+                  </button>
+                </div>
                 <hr className="border-[#F2F2F2]" />
                 <div className="flex-1 px-6 mt-2 mb-6 overflow-y-scroll text-left">
                   <h3 className="my-2 text-md font-bold">カテゴリー</h3>
