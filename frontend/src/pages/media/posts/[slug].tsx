@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { GetServerSideProps } from 'next';
-import { parseISO, format } from 'date-fns';
+import { parseISO, formatDistance } from 'date-fns';
 import groq from 'groq';
 import BlockContent from '@sanity/block-content-to-react';
 import { SanityImageSource } from '@sanity/image-url/lib/types/types';
@@ -10,6 +10,7 @@ import SEOMeta from '@src/components/SEOMeta';
 import CategoryTag from '@src/components/CategoryTag';
 import TableOfContents from '@src/components/TableOfContents';
 import { useRouter } from 'next/router';
+import AuthorIcon from '@src/components/AuthorIcon';
 
 // Copy to `@src/pages/media/posts/preview/[slug]`
 // TODO: Fix to use identical query
@@ -38,10 +39,10 @@ export interface Props {
   title: string;
   description: string;
   mainImage: SanityImageSource;
+  authorName?: string;
+  authorImage?: SanityImageSource;
   publishedAt?: string;
   categories?: string[];
-  authorName: string;
-  authorImage: SanityImageSource;
   body: any[];
 }
 
@@ -49,6 +50,8 @@ const Post = ({
   title,
   description,
   mainImage,
+  authorName,
+  authorImage,
   publishedAt,
   categories,
   body,
@@ -61,7 +64,10 @@ const Post = ({
   const bodyBeforeTOC = [...body.slice(0, firstH2)];
   const bodyAfterTOC = [...body.slice(firstH2)];
 
-  const mainImgUrl = buildSanityImageSrc(mainImage).width(1000).url() || '';
+  const mainImgUrl = buildSanityImageSrc(mainImage).width(1000).url()!;
+  const authorImgUrl = authorImage
+    ? buildSanityImageSrc(authorImage).width(100).url()!
+    : '';
 
   useEffect(() => {
     const hash = router.asPath.split('#')[1] ?? '';
@@ -88,9 +94,16 @@ const Post = ({
           </div>
 
           <h1 className="my-4 text-3xl font-bold">{title}</h1>
-          <div className="flex items-center justify-end text-gray-400">
-            <ClockIcon className="w-5 h-5 mr-1" />{' '}
-            {publishedAt && format(parseISO(publishedAt), 'yyyy/M/d')}
+          <div className="flex items-center text-sm text-gray-400">
+            {authorName && (
+              <AuthorIcon name={authorName} imgSrc={authorImgUrl} />
+            )}
+            <span className="ml-2">
+              {publishedAt &&
+                formatDistance(parseISO(publishedAt), new Date(), {
+                  addSuffix: true,
+                })}
+            </span>
           </div>
           <BlockContent
             blocks={bodyBeforeTOC}

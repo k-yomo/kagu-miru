@@ -7,20 +7,23 @@ export default {
       name: 'name',
       title: 'Name',
       type: 'string',
+      validation: Rule => Rule.required(),
     },
     {
       name: 'id',
       title: 'Author ID',
       type: 'slug',
+      validation: Rule => Rule.required(),
       options: {
         source: 'name',
         maxLength: 96,
       },
     },
     {
-      name: 'Image',
+      name: 'image',
       title: 'Image',
       type: 'image',
+      validation: Rule => Rule.required(),
       options: {
         hotspot: true,
       },
