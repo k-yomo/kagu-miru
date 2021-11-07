@@ -12,6 +12,7 @@ import {
   Action,
   EventId,
   SearchDisplayItemsActionParams,
+  SearchFilter,
   SearchFrom,
   SearchInput,
   SearchQuery,
@@ -60,6 +61,7 @@ export enum SearchActionType {
   CHANGE_QUERY,
   CHANGE_SORT_BY,
   CHANGE_PAGE,
+  SET_FILTER,
   SET_CATEGORY_FILTER,
   SET_PRICE_FILTER,
   SET_RATING_FILTER,
@@ -72,6 +74,7 @@ type SearchAction =
     }
   | { type: SearchActionType.CHANGE_SORT_BY; payload: SearchSortType }
   | { type: SearchActionType.CHANGE_PAGE; payload: number }
+  | { type: SearchActionType.SET_FILTER; payload: SearchFilter }
   | { type: SearchActionType.SET_CATEGORY_FILTER; payload: string[] }
   | {
       type: SearchActionType.SET_PRICE_FILTER;
@@ -109,13 +112,21 @@ const searchReducer = (
         },
         searchFrom: SearchFrom.Search,
       };
+    case SearchActionType.SET_FILTER:
+      return {
+        searchInput: {
+          ...searchInput,
+          filter: action.payload,
+        },
+        searchFrom: SearchFrom.Filter,
+      };
     case SearchActionType.SET_CATEGORY_FILTER:
       return {
         searchInput: {
           ...searchInput,
           filter: { ...searchInput.filter, categoryIds: action.payload },
         },
-        searchFrom: SearchFrom.Search,
+        searchFrom: SearchFrom.Filter,
       };
     case SearchActionType.SET_PRICE_FILTER:
       const { minPrice, maxPrice } = action.payload;
@@ -124,7 +135,7 @@ const searchReducer = (
           ...searchInput,
           filter: { ...searchInput.filter, minPrice, maxPrice },
         },
-        searchFrom: SearchFrom.Search,
+        searchFrom: SearchFrom.Filter,
       };
     case SearchActionType.SET_RATING_FILTER:
       return {
@@ -132,7 +143,7 @@ const searchReducer = (
           ...searchInput,
           filter: { ...searchInput.filter, minRating: action.payload },
         },
-        searchFrom: SearchFrom.Search,
+        searchFrom: SearchFrom.Filter,
       };
     default:
       return state;

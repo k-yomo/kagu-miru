@@ -23,46 +23,46 @@ export type Scalars = {
 };
 
 export enum Action {
-  ClickItem = 'CLICK_ITEM',
   Display = 'DISPLAY',
+  ClickItem = 'CLICK_ITEM',
 }
 
 export type Event = {
+  id: EventId;
   action: Action;
   createdAt: Scalars['Time'];
-  id: EventId;
   params: Scalars['Map'];
 };
 
 export enum EventId {
-  QuerySuggestions = 'QUERY_SUGGESTIONS',
   Search = 'SEARCH',
+  QuerySuggestions = 'QUERY_SUGGESTIONS',
 }
 
 export type Item = {
-  affiliateUrl: Scalars['String'];
-  averageRating: Scalars['Float'];
-  categoryIds: Array<Scalars['ID']>;
-  description: Scalars['String'];
   id: Scalars['ID'];
-  imageUrls: Array<Scalars['String']>;
   name: Scalars['String'];
-  platform: ItemSellingPlatform;
-  price: Scalars['Int'];
-  reviewCount: Scalars['Int'];
+  description: Scalars['String'];
   status: ItemStatus;
   url: Scalars['String'];
+  affiliateUrl: Scalars['String'];
+  price: Scalars['Int'];
+  imageUrls: Array<Scalars['String']>;
+  averageRating: Scalars['Float'];
+  reviewCount: Scalars['Int'];
+  categoryIds: Array<Scalars['ID']>;
+  platform: ItemSellingPlatform;
 };
 
 export type ItemCategory = {
-  children: Array<ItemCategory>;
   id: Scalars['ID'];
   name: Scalars['String'];
+  children: Array<ItemCategory>;
 };
 
 export type ItemConnection = {
-  nodes: Array<Item>;
   pageInfo: PageInfo;
+  nodes: Array<Item>;
 };
 
 export enum ItemSellingPlatform {
@@ -88,17 +88,17 @@ export type PageInfo = {
 };
 
 export type Query = {
-  getAllCategories: Array<Maybe<ItemCategory>>;
-  getQuerySuggestions: QuerySuggestionsResponse;
   search: SearchResponse;
-};
-
-export type QueryGetQuerySuggestionsArgs = {
-  query: Scalars['String'];
+  getQuerySuggestions: QuerySuggestionsResponse;
+  getAllCategories: Array<Maybe<ItemCategory>>;
 };
 
 export type QuerySearchArgs = {
   input?: Maybe<SearchInput>;
+};
+
+export type QueryGetQuerySuggestionsArgs = {
+  query: Scalars['String'];
 };
 
 export type QuerySuggestionsDisplayActionParams = {
@@ -112,49 +112,50 @@ export type QuerySuggestionsResponse = {
 };
 
 export type SearchClickItemActionParams = {
-  itemId: Scalars['String'];
   searchId: Scalars['String'];
+  itemId: Scalars['String'];
 };
 
 export type SearchDisplayItemsActionParams = {
-  itemIds: Array<Scalars['ID']>;
-  searchFrom: SearchFrom;
   searchId: Scalars['String'];
+  searchFrom: SearchFrom;
   searchInput: SearchInput;
+  itemIds: Array<Scalars['ID']>;
 };
 
 export type SearchFilter = {
   categoryIds: Array<Scalars['ID']>;
-  maxPrice?: Maybe<Scalars['Int']>;
   minPrice?: Maybe<Scalars['Int']>;
+  maxPrice?: Maybe<Scalars['Int']>;
   minRating?: Maybe<Scalars['Int']>;
 };
 
 export enum SearchFrom {
-  QuerySuggestion = 'QUERY_SUGGESTION',
-  Search = 'SEARCH',
   Url = 'URL',
+  Search = 'SEARCH',
+  QuerySuggestion = 'QUERY_SUGGESTION',
+  Filter = 'FILTER',
 }
 
 export type SearchInput = {
+  query: Scalars['String'];
   filter: SearchFilter;
+  sortType: SearchSortType;
   page?: Maybe<Scalars['Int']>;
   pageSize?: Maybe<Scalars['Int']>;
-  query: Scalars['String'];
-  sortType: SearchSortType;
 };
 
 export type SearchResponse = {
-  itemConnection: ItemConnection;
   searchId: Scalars['String'];
+  itemConnection: ItemConnection;
 };
 
 export enum SearchSortType {
   BestMatch = 'BEST_MATCH',
   PriceAsc = 'PRICE_ASC',
   PriceDesc = 'PRICE_DESC',
-  Rating = 'RATING',
   ReviewCount = 'REVIEW_COUNT',
+  Rating = 'RATING',
 }
 
 export type GetQuerySuggestionsQueryVariables = Exact<{
