@@ -93,7 +93,7 @@ export default function MobileSearchFilterModal() {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-4"
             >
-              <div className="fixed flex flex-col bottom-0 w-screen h-[90vh] overflow-hidden bg-white rounded-xl transition-all transform">
+              <div className="fixed flex flex-col bottom-0 w-screen h-[90vh] overflow-hidden bg-white dark:bg-black rounded-xl transition-all transform">
                 <Dialog.Title
                   as="h3"
                   className="my-5 text-xl font-bold text-center"
@@ -103,15 +103,15 @@ export default function MobileSearchFilterModal() {
                 <div className="absolute top-0 right-0 mt-3 pr-3">
                   <button
                     type="button"
-                    className="bg-white rounded-md text-gray-400"
+                    className="rounded-md text-gray-400"
                     onClick={() => setOpen(false)}
                   >
                     <span className="sr-only">Close</span>
                     <XIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
                 </div>
-                <hr className="border-[#F2F2F2]" />
-                <div className="flex-1 px-6 mt-2 mb-6 overflow-y-scroll text-left">
+                <hr className="border-gray-100 dark:border-gray-800" />
+                <div className="flex-1 px-6 mt-2 overflow-y-scroll text-left">
                   <h3 className="my-2 text-md font-bold">カテゴリー</h3>
                   <CategoryList
                     categoryIds={searchFilter.categoryIds}
@@ -121,7 +121,7 @@ export default function MobileSearchFilterModal() {
                     }
                     onClearCategory={() => setCategoryIds([])}
                   />
-                  <hr className="my-3 border-[#F2F2F2]" />
+                  <hr className="my-3 border-gray-100 dark:border-gray-800" />
                   <h3 className="my-2 text-md font-bold">価格</h3>
                   <div className="flex items-center">
                     <div>
@@ -146,15 +146,15 @@ export default function MobileSearchFilterModal() {
                       円
                     </div>
                   </div>
-                  <hr className="my-3 border-[#F2F2F2]" />
+                  <hr className="my-3 border-gray-100 dark:border-gray-800" />
                   <h3 className="my-2 text-md font-bold">レビュー評価</h3>
                   <RatingSelect
                     minRating={searchFilter.minRating || undefined}
                     onChangeRating={setMinRating}
                   />
-                  <hr className="my-3 border-[#F2F2F2]" />
+                  <div className="mb-2" />
                 </div>
-                <hr className="border-[#F2F2F2]" />
+                <hr className="border-gray-100 dark:border-gray-800" />
                 <div className="flex justify-center my-4 space-x-2 px-2">
                   <button
                     type="button"
