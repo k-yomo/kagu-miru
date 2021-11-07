@@ -38,8 +38,8 @@ export interface Props {
   title: string;
   description: string;
   mainImage: SanityImageSource;
-  publishedAt: string;
-  categories: string[];
+  publishedAt?: string;
+  categories?: string[];
   authorName: string;
   authorImage: SanityImageSource;
   body: any[];
@@ -82,7 +82,7 @@ const Post = ({
         <img src={mainImgUrl} alt={title} className="sm:rounded-md" />
         <div className="mx-3">
           <div className="my-4 space-x-2">
-            {categories.map((category) => (
+            {categories?.map((category) => (
               <CategoryTag key={category} name={category} />
             ))}
           </div>
@@ -90,7 +90,7 @@ const Post = ({
           <h1 className="my-4 text-3xl font-bold">{title}</h1>
           <div className="flex items-center justify-end text-gray-400">
             <ClockIcon className="w-5 h-5 mr-1" />{' '}
-            {format(parseISO(publishedAt), 'yyyy/M/d')}
+            {publishedAt && format(parseISO(publishedAt), 'yyyy/M/d')}
           </div>
           <BlockContent
             blocks={bodyBeforeTOC}
