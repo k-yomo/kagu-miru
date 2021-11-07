@@ -4,7 +4,7 @@ import EditIcon from 'part:@sanity/base/edit-icon'
 
 
 
-const getCategoryMenuItems = id => {
+const getCategoryMenuItems = (id: string) => {
     const customEditButton = S.menuItem()
         .icon(EditIcon)
         .title(`Edit Category`)
@@ -20,7 +20,7 @@ const getCategoryMenuItems = id => {
 
 
 
-const subCategoryList = async (categoryId) => {
+const subCategoryList = async (categoryId: string) => {
     const category = await client.getDocument(categoryId)
 
     return S.documentTypeList(`category`)
@@ -33,7 +33,7 @@ const subCategoryList = async (categoryId) => {
             S.initialValueTemplateItem(
                 `subCategory`,
                 { parentCategoryId: categoryId }
-            )
+            ).serialize()
         ])
         .child(subCategoryList)
 }
