@@ -4,7 +4,6 @@ import { parseISO, formatDistance } from 'date-fns';
 import groq from 'groq';
 import BlockContent from '@sanity/block-content-to-react';
 import { SanityImageSource } from '@sanity/image-url/lib/types/types';
-import { ClockIcon } from '@heroicons/react/solid';
 import { sanityClient, buildSanityImageSrc } from '@src/lib/sanityClient';
 import SEOMeta from '@src/components/SEOMeta';
 import CategoryTag from '@src/components/CategoryTag';
@@ -94,7 +93,7 @@ const Post = ({
           </div>
 
           <h1 className="my-4 text-3xl font-bold">{title}</h1>
-          <div className="flex items-center text-sm text-gray-400">
+          <div className="flex items-center my-4 text-sm text-gray-400">
             {authorName && (
               <AuthorIcon name={authorName} imgSrc={authorImgUrl} />
             )}
