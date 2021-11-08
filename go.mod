@@ -14,7 +14,7 @@ require (
 	github.com/blendle/zapdriver v1.3.1
 	github.com/cenkalti/backoff/v4 v4.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.15.1
-	github.com/go-chi/chi/v5 v5.0.4
+	github.com/go-chi/chi/v5 v5.0.5
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/k-yomo/pm v0.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
