@@ -18,7 +18,7 @@
     "@heroicons/react": "^1.0.5",
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/client": "^2.21.7",
-    "@sanity/image-url": "^0.140.22",
+    "@sanity/image-url": "^1.0.1",
     "@tailwindcss/line-clamp": "^0.2.2",
     "apollo-link-scalars": "^3.0.0",
     "date-fns": "^2.25.0",
