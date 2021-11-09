@@ -1,3 +1,5 @@
+import { DocumentTextIcon } from "@heroicons/react/outline"
+import post from "./post"
 /**
  * This is the schema definition for the rich text fields used for
  * for this blog studio. When you import it in schemas.js it can be
@@ -40,12 +42,12 @@ export default {
         // Annotations can be any object structure – e.g. a link or a footnote.
         annotations: [
           {
-            title: 'URL',
+            title: '外部リンク',
             name: 'link',
             type: 'object',
             fields: [
               {
-                title: 'URL',
+                title: '外部リンクURL',
                 name: 'href',
                 type: 'url',
               },
@@ -54,10 +56,14 @@ export default {
         ],
       },
     },
-    // You can add additional types here. Note that you can't use
-    // primitive types such as 'string' and 'number' in the same array
-    // as a block type.
     {
+      title: '記事リンク',
+      name: 'internalLink',
+      type: 'reference',
+      to: [{ type: 'post' }]
+    },
+    {
+      title: '画像',
       type: 'image',
       options: {hotspot: true},
     },

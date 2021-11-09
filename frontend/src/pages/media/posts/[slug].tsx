@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react';
 import { GetServerSideProps } from 'next';
-import { parseISO, formatDistance } from 'date-fns';
+import { useRouter } from 'next/router';
+import { formatDistance, parseISO } from 'date-fns';
 import groq from 'groq';
 import BlockContent from '@sanity/block-content-to-react';
 import { SanityImageSource } from '@sanity/image-url/lib/types/types';
-import { sanityClient, buildSanityImageSrc } from '@src/lib/sanityClient';
+import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
 import SEOMeta from '@src/components/SEOMeta';
 import CategoryTag from '@src/components/CategoryTag';
 import TableOfContents from '@src/components/TableOfContents';
-import { useRouter } from 'next/router';
 import AuthorIcon from '@src/components/AuthorIcon';
+import LinkWithThumbnail from '@src/components/LinkWithThumbnail';
+import { routes } from '@src/routes/routes';
 
 // Copy to `@src/pages/media/posts/preview/[slug]`
 // TODO: Fix to use identical query
@@ -22,8 +24,47 @@ export const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0
   "categories": categories[]->name,
   "authorName": author->name,
   "authorImage": author->image,
-  body
+  body[]{
+    ...,
+    _type == "internalLink" => {
+      "slug": @->slug.current,
+      "title": @->title,
+      "description": @->description,
+      "mainImage": @->mainImage,
+    } 
+  }
 }`;
+
+interface InternalLink {
+  slug: string;
+  title: string;
+  description: string;
+  mainImage: SanityImageSource;
+}
+
+const serializers = {
+  marks: {
+    link: ({ mark, children }: { mark: { href: string }; children: any }) => {
+      return (
+        <a href={mark.href} rel="noopener" className="underline">
+          {children}
+        </a>
+      );
+    },
+  },
+  types: {
+    internalLink: ({ node }: { node: InternalLink }) => {
+      return (
+        <LinkWithThumbnail
+          url={routes.post(node.slug)}
+          title={node.title}
+          subTitle={node.description}
+          imgSrc={buildSanityImageSrc(node.mainImage).url()}
+        />
+      );
+    },
+  },
+};
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { slug } = ctx.query;
@@ -115,6 +156,7 @@ const Post = ({
           </div>
           <BlockContent
             blocks={bodyAfterTOC}
+            serializers={serializers}
             imageOptions={{ w: 320, h: 240, fit: 'max' }}
             {...sanityClient.config()}
           />
