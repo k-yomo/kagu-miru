@@ -57,7 +57,7 @@ const TopPageInner = memo(function TopPageInner() {
       <SEOMeta
         title="カグミル - 家具検索サービス"
         excludeSiteTitle
-        description="カグミルはオンラインで買える家具を横断で検索出来るサービスです。"
+        description="カグミルはオンラインで買える家具を横断で一括検索・比較出来るサービスです。"
         // img={{ srcPath: TopImg.src }}
       />
       <MobileSearchFilterModal />
