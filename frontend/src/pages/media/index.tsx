@@ -87,10 +87,10 @@ const PostCard = memo(function PostCard({ postMeta }: { postMeta: PostMeta }) {
               </div>
             )}
             <h3 className="font-bold mb-1">{postMeta.title}</h3>
-            <span className="text-text-secondary dark:text-text-secondary-dark">
+            <span className="text-sm text-text-secondary dark:text-text-secondary-dark">
               {truncate(postMeta.description, 50)}
             </span>
-            <div className="my-2">
+            <div className="my-2 text-sm text-text-secondary dark:text-text-secondary-dark">
               {postMeta.publishedAt &&
                 formatDistance(parseISO(postMeta.publishedAt), new Date(), {
                   addSuffix: true,
