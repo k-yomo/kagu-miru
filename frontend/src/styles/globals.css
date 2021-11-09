@@ -63,8 +63,3 @@ li {
   @apply text-gray-500;
   @apply dark:text-gray-400;
 }
-
-#post a {
-  /*@apply text-text-secondary;*/
-  @apply underline;
-}

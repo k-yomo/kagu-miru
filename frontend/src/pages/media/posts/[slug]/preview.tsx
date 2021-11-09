@@ -15,12 +15,19 @@ export const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0
   "categories": categories[]->name,
   "authorName": author->name,
   "authorImage": author->image,
-  body
+  body[]{
+    ...,
+    _type == "internalLink" => {
+      "slug": @->slug.current,
+      "title": @->title,
+      "description": @->description,
+      "mainImage": @->mainImage,
+    } 
+  }
 }`;
 
 export default function PostPreview() {
   const [data, setData] = useState<Props | undefined>(undefined);
-  console.log(data);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
