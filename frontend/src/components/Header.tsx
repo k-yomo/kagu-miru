@@ -2,6 +2,7 @@ import React, { memo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { MoonIcon, SunIcon } from '@heroicons/react/outline';
+import { routes } from '@src/routes/routes';
 
 export default memo(function Header() {
   const { theme, setTheme } = useTheme();
@@ -21,18 +22,26 @@ export default memo(function Header() {
           </div>
 
           <div className="flex items-center justify-end flex-1">
-            {mounted &&
-              (theme === 'light' ? (
-                <SunIcon
-                  className="w-8 h-8 cursor-pointer dark:text-white hover:text-gray-500 dark:hover:text-gray-300"
-                  onClick={() => setTheme('dark')}
-                />
-              ) : (
-                <MoonIcon
-                  className="w-8 h-8 cursor-pointer dark:text-white hover:text-gray-500 dark:hover:text-gray-300"
-                  onClick={() => setTheme('light')}
-                />
-              ))}
+            <Link href={routes.media()}>
+              <a>
+                <span className="font-bold hover:underline">メディア</span>
+              </a>
+            </Link>
+            {mounted && (
+              <div className="ml-2 sm:ml-4">
+                {theme === 'light' ? (
+                  <SunIcon
+                    className="w-8 h-8 cursor-pointer dark:text-white hover:text-gray-500 dark:hover:text-gray-300"
+                    onClick={() => setTheme('dark')}
+                  />
+                ) : (
+                  <MoonIcon
+                    className="w-8 h-8 cursor-pointer dark:text-white hover:text-gray-500 dark:hover:text-gray-300"
+                    onClick={() => setTheme('light')}
+                  />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
