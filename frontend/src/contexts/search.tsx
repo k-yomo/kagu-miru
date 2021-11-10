@@ -93,6 +93,7 @@ const searchReducer = (
         searchInput: {
           ...searchInput,
           query: action.payload.query,
+          page: 0,
         },
         searchFrom: action.payload.searchFrom,
       };
@@ -101,6 +102,7 @@ const searchReducer = (
         searchInput: {
           ...searchInput,
           sortType: action.payload,
+          page: 0,
         },
         searchFrom: SearchFrom.Search,
       };
@@ -117,6 +119,7 @@ const searchReducer = (
         searchInput: {
           ...searchInput,
           filter: action.payload,
+          page: 0,
         },
         searchFrom: SearchFrom.Filter,
       };
@@ -125,6 +128,7 @@ const searchReducer = (
         searchInput: {
           ...searchInput,
           filter: { ...searchInput.filter, categoryIds: action.payload },
+          page: 0,
         },
         searchFrom: SearchFrom.Filter,
       };
@@ -134,6 +138,7 @@ const searchReducer = (
         searchInput: {
           ...searchInput,
           filter: { ...searchInput.filter, minPrice, maxPrice },
+          page: 0,
         },
         searchFrom: SearchFrom.Filter,
       };
@@ -142,6 +147,7 @@ const searchReducer = (
         searchInput: {
           ...searchInput,
           filter: { ...searchInput.filter, minRating: action.payload },
+          page: 0,
         },
         searchFrom: SearchFrom.Filter,
       };
