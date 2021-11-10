@@ -59,6 +59,10 @@
     <td><strong>RAKUTEN</strong></td>
     <td></td>
   </tr>
+  <tr>
+    <td><strong>YAHOO_SHOPPING</strong></td>
+    <td></td>
+  </tr>
 </table>
 
 ---

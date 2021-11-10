@@ -23,6 +23,8 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 	switch item.Platform {
 	case es.PlatformRakuten:
 		platform = gqlmodel.ItemSellingPlatformRakuten
+	case es.PlatformYahooShopping:
+		platform = gqlmodel.ItemSellingPlatformYahooShopping
 	default:
 		return nil, fmt.Errorf("unknown platform %d, item: %v", item.Status, item)
 	}

@@ -9,6 +9,8 @@ function platFormText(platform: ItemSellingPlatform) {
   switch (platform) {
     case ItemSellingPlatform.Rakuten:
       return '楽天';
+    case ItemSellingPlatform.YahooShopping:
+      return 'Yahoo';
   }
 }
 
@@ -16,6 +18,8 @@ function platFormColor(platform: ItemSellingPlatform) {
   switch (platform) {
     case ItemSellingPlatform.Rakuten:
       return 'text-rakuten';
+    case ItemSellingPlatform.YahooShopping:
+      return 'text-yahoo-shopping';
   }
 }
 
