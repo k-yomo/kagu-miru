@@ -1,10 +1,11 @@
-import React, { Fragment, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { AdjustmentsIcon, XIcon } from '@heroicons/react/outline';
 import CategoryList from '@src/components/CategoryList';
-import { SearchFilter } from '@src/generated/graphql';
+import { ItemSellingPlatform, SearchFilter } from '@src/generated/graphql';
 import RatingSelect from '@src/components/RatingSelect';
 import { SearchActionType, useSearch } from '@src/contexts/search';
+import PlatformSelect from '@src/components/PlatformSelect';
 
 export default function MobileSearchFilterModal() {
   const { searchState, dispatch } = useSearch();
@@ -19,6 +20,10 @@ export default function MobileSearchFilterModal() {
       ...prevState,
       categoryIds,
     }));
+  };
+
+  const setPlatforms = (platforms: ItemSellingPlatform[]) => {
+    setSearchFilter((prevState: SearchFilter) => ({ ...prevState, platforms }));
   };
 
   const setMinPrice = (price: number) => {
@@ -41,11 +46,15 @@ export default function MobileSearchFilterModal() {
   };
 
   const onClickClear = () => {
-    const clearedFilter = { categoryIds: [] };
+    const clearedFilter = { categoryIds: [], platforms: [] };
     setSearchFilter(clearedFilter);
     dispatch({ type: SearchActionType.SET_FILTER, payload: clearedFilter });
     setOpen(false);
   };
+
+  useEffect(() => {
+    setSearchFilter(searchState.searchInput.filter);
+  }, [searchState.searchInput.filter]);
 
   return (
     <>
@@ -120,6 +129,12 @@ export default function MobileSearchFilterModal() {
                       setCategoryIds([categoryId])
                     }
                     onClearCategory={() => setCategoryIds([])}
+                  />
+                  <hr className="my-3 border-gray-100 dark:border-gray-800" />
+                  <h3 className="my-2 text-md font-bold">ECサイト</h3>
+                  <PlatformSelect
+                    platforms={searchFilter.platforms}
+                    onChangePlatforms={setPlatforms}
                   />
                   <hr className="my-3 border-gray-100 dark:border-gray-800" />
                   <h3 className="my-2 text-md font-bold">価格</h3>

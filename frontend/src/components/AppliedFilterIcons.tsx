@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { XIcon } from '@heroicons/react/solid';
 import { SearchActionType, useSearch } from '@src/contexts/search';
 import { itemCategoryIdNameMap } from '@src/lib/itemCategories';
+import { platFormText } from '@src/conv/platform';
 
 export default function AppliedFilterIcons() {
   const { searchState, dispatch } = useSearch();
@@ -22,6 +23,22 @@ export default function AppliedFilterIcons() {
       />
     ));
     filterIcons.push(categoryFilterIcons);
+  }
+
+  if (filter.platforms.length > 0) {
+    const platformFilterIcons = filter.platforms.map((platform) => (
+      <FilterIcon
+        key={`platformFilter:${platform}`}
+        name={platFormText(platform)}
+        onClear={() =>
+          dispatch({
+            type: SearchActionType.SET_PLATFORM_FILTER,
+            payload: filter.platforms.filter((p) => p !== platform),
+          })
+        }
+      />
+    ));
+    filterIcons.push(platformFilterIcons);
   }
 
   if (filter.minPrice || filter.maxPrice) {
@@ -72,7 +89,7 @@ const FilterIcon = memo(function FilterIcon({
   onClear,
 }: FilterIconProps) {
   return (
-    <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-indigo-100 dark:bg-indigo-600 text-indigo-800 dark:text-indigo-100 text-xs focus:outline-none">
+    <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-primary-100 dark:bg-primary-600 text-primary-800 dark:text-primary-100 text-xs focus:outline-none">
       {name}
       <XIcon className="w-3 h-3 ml-2 cursor-pointer" onClick={onClear} />
     </span>

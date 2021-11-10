@@ -103,6 +103,18 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 		boolQuery.Filter(esquery.Terms(es.ItemFieldCategoryIDs, categoryIDs...))
 	}
 
+	if len(input.Filter.Platforms) > 0 {
+		var platforms []interface{}
+		for _, filterPlatform := range input.Filter.Platforms {
+			platform, err := mapGraphqlPlatformToPlatform(filterPlatform)
+			if err != nil {
+				return nil, fmt.Errorf("platform comversion faild: %w", err)
+			}
+			platforms = append(platforms, platform)
+		}
+		boolQuery.Filter(esquery.Terms(es.ItemFieldPlatform, platforms...))
+	}
+
 	if input.Filter.MinPrice != nil && input.Filter.MaxPrice != nil {
 		boolQuery.Filter(
 			esquery.Range(es.ItemFieldPrice).
@@ -284,4 +296,15 @@ func calcElasticSearchPage(inputPage *int) uint64 {
 		page = uint64(*inputPage) - 1
 	}
 	return page
+}
+
+func mapGraphqlPlatformToPlatform(platform gqlmodel.ItemSellingPlatform) (es.Platform, error) {
+	switch platform {
+	case gqlmodel.ItemSellingPlatformRakuten:
+		return es.PlatformRakuten, nil
+	case gqlmodel.ItemSellingPlatformYahooShopping:
+		return es.PlatformYahooShopping, nil
+	default:
+		return "", fmt.Errorf("unknown platform %s", platform.String())
+	}
 }

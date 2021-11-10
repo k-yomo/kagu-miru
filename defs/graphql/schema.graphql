@@ -80,6 +80,7 @@ input SearchInput {
 
 input SearchFilter {
     categoryIds: [ID!]!
+    platforms: [ItemSellingPlatform!]!
     minPrice: Int
     maxPrice: Int
     minRating: Int
