@@ -15,7 +15,7 @@ run:
 
 .PHONY: run-item-fetcher
 run-item-fetcher:
-	cd backend/item_fetcher/rakuten_item_fetcher && air
+	goreman -set-ports=false -f item_fetcher.Procfile start
 
 .PHONY: test
 test:

@@ -135,7 +135,7 @@ func (r *worker) getFurnitureGenres(ctx context.Context) ([]*rakutenichiba.Genre
 	for _, child := range furnitureGenre.Children {
 		genre, err := r.rakutenIchibaAPIClient.GetGenreWithAllChildren(ctx, strconv.Itoa(child.Child.ID))
 		if err != nil {
-			return nil, fmt.Errorf("rakutenIchibaAPIClient.GetGenreWithAllChildren: %w", err)
+			return nil, fmt.Errorf("rakutenIchibaAPIClient.GetCategoryWithAllChildren: %w", err)
 		}
 		genres = append(genres, genre)
 	}

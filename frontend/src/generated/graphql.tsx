@@ -67,6 +67,7 @@ export type ItemConnection = {
 
 export enum ItemSellingPlatform {
   Rakuten = 'RAKUTEN',
+  YahooShopping = 'YAHOO_SHOPPING',
 }
 
 export enum ItemStatus {

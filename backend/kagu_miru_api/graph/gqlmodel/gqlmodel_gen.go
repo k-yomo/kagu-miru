@@ -174,16 +174,18 @@ func (e EventID) MarshalGQL(w io.Writer) {
 type ItemSellingPlatform string
 
 const (
-	ItemSellingPlatformRakuten ItemSellingPlatform = "RAKUTEN"
+	ItemSellingPlatformRakuten       ItemSellingPlatform = "RAKUTEN"
+	ItemSellingPlatformYahooShopping ItemSellingPlatform = "YAHOO_SHOPPING"
 )
 
 var AllItemSellingPlatform = []ItemSellingPlatform{
 	ItemSellingPlatformRakuten,
+	ItemSellingPlatformYahooShopping,
 }
 
 func (e ItemSellingPlatform) IsValid() bool {
 	switch e {
-	case ItemSellingPlatformRakuten:
+	case ItemSellingPlatformRakuten, ItemSellingPlatformYahooShopping:
 		return true
 	}
 	return false

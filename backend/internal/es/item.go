@@ -9,7 +9,8 @@ import (
 type Platform string
 
 const (
-	PlatformRakuten Platform = "rakuten"
+	PlatformRakuten       Platform = "rakuten"
+	PlatformYahooShopping Platform = "yahoo_shopping"
 )
 
 type Status int
