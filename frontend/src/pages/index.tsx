@@ -75,7 +75,7 @@ const TopPageInner = memo(function TopPageInner() {
         </div>
         <div
           className={`mt-6 p-3 ${
-            searchState.searchInput.filter.platform
+            searchState.searchInput.filter.platforms.length > 0
               ? 'bg-gray-100 dark:bg-gray-800'
               : ''
           }`}
