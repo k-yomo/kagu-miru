@@ -11,6 +11,7 @@ import {
 import {
   Action,
   EventId,
+  ItemSellingPlatform,
   SearchDisplayItemsActionParams,
   SearchFilter,
   SearchFrom,
@@ -24,6 +25,7 @@ import { ParsedUrlQuery } from 'querystring';
 import { useNextQueryParams } from '@src/lib/nextqueryparams';
 import { useRouter } from 'next/router';
 import gql from 'graphql-tag';
+import { map } from 'rxjs/operators';
 
 gql`
   query search($input: SearchInput!) {
@@ -63,6 +65,7 @@ export enum SearchActionType {
   CHANGE_PAGE,
   SET_FILTER,
   SET_CATEGORY_FILTER,
+  SET_PLATFORM_FILTER,
   SET_PRICE_FILTER,
   SET_RATING_FILTER,
 }
@@ -76,6 +79,10 @@ type SearchAction =
   | { type: SearchActionType.CHANGE_PAGE; payload: number }
   | { type: SearchActionType.SET_FILTER; payload: SearchFilter }
   | { type: SearchActionType.SET_CATEGORY_FILTER; payload: string[] }
+  | {
+      type: SearchActionType.SET_PLATFORM_FILTER;
+      payload: ItemSellingPlatform[];
+    }
   | {
       type: SearchActionType.SET_PRICE_FILTER;
       payload: { minPrice?: number; maxPrice?: number };
@@ -132,6 +139,15 @@ const searchReducer = (
         },
         searchFrom: SearchFrom.Filter,
       };
+    case SearchActionType.SET_PLATFORM_FILTER:
+      return {
+        searchInput: {
+          ...searchInput,
+          filter: { ...searchInput.filter, platforms: action.payload },
+          page: 0,
+        },
+        searchFrom: SearchFrom.Filter,
+      };
     case SearchActionType.SET_PRICE_FILTER:
       const { minPrice, maxPrice } = action.payload;
       return {
@@ -168,7 +184,7 @@ const SearchContext = createContext<{
   searchState: {
     searchInput: {
       query: '',
-      filter: { categoryIds: [] },
+      filter: { categoryIds: [], platforms: [] },
       sortType: SearchSortType.BestMatch,
     },
     searchFrom: SearchFrom.Url,
@@ -194,6 +210,18 @@ export function queryParamsToSearchParams(
         categoryIds: ((queryParams.categoryIds as string) || '')
           .split(',')
           .filter((s) => s),
+        platforms: ((queryParams.platforms as string) || '')
+          .split(',')
+          .flatMap((s: string) => {
+            switch (s) {
+              case ItemSellingPlatform.Rakuten:
+                return ItemSellingPlatform.Rakuten;
+              case ItemSellingPlatform.YahooShopping:
+                return ItemSellingPlatform.YahooShopping;
+              default:
+                return [];
+            }
+          }),
         minPrice: parseInt(queryParams.minPrice as string) || undefined,
         maxPrice: parseInt(queryParams.maxPrice as string) || undefined,
         minRating: parseInt(queryParams.minRating as string) || undefined,
@@ -272,6 +300,8 @@ export const SearchProvider: FC = memo((props) => {
     };
     if (filter.categoryIds.length > 0)
       urlQuery.categoryIds = filter.categoryIds.join(',');
+    if (filter.platforms.length > 0)
+      urlQuery.platforms = filter.platforms.join(',');
     if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
     if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
     if (filter.minRating) urlQuery.minRating = filter.minRating.toString();

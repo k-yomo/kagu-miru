@@ -470,6 +470,7 @@ input SearchInput {
 
 input SearchFilter {
     categoryIds: [ID!]!
+    platforms: [ItemSellingPlatform!]!
     minPrice: Int
     maxPrice: Int
     minRating: Int
@@ -2955,6 +2956,14 @@ func (ec *executionContext) unmarshalInputSearchFilter(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "platforms":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("platforms"))
+			it.Platforms, err = ec.unmarshalNItemSellingPlatform2ᚕgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatformᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "minPrice":
 			var err error
 
@@ -3933,6 +3942,71 @@ func (ec *executionContext) unmarshalNItemSellingPlatform2githubᚗcomᚋkᚑyom
 
 func (ec *executionContext) marshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx context.Context, sel ast.SelectionSet, v gqlmodel.ItemSellingPlatform) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNItemSellingPlatform2ᚕgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatformᚄ(ctx context.Context, v interface{}) ([]gqlmodel.ItemSellingPlatform, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]gqlmodel.ItemSellingPlatform, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNItemSellingPlatform2ᚕgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatformᚄ(ctx context.Context, sel ast.SelectionSet, v []gqlmodel.ItemSellingPlatform) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNItemSellingPlatform2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemSellingPlatform(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNItemStatus2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemStatus(ctx context.Context, v interface{}) (gqlmodel.ItemStatus, error) {

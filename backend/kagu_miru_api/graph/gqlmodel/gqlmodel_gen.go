@@ -70,10 +70,11 @@ type SearchDisplayItemsActionParams struct {
 }
 
 type SearchFilter struct {
-	CategoryIds []string `json:"categoryIds"`
-	MinPrice    *int     `json:"minPrice"`
-	MaxPrice    *int     `json:"maxPrice"`
-	MinRating   *int     `json:"minRating"`
+	CategoryIds []string              `json:"categoryIds"`
+	Platforms   []ItemSellingPlatform `json:"platforms"`
+	MinPrice    *int                  `json:"minPrice"`
+	MaxPrice    *int                  `json:"maxPrice"`
+	MinRating   *int                  `json:"minRating"`
 }
 
 type SearchInput struct {

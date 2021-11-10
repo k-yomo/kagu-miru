@@ -126,6 +126,7 @@ export type SearchDisplayItemsActionParams = {
 
 export type SearchFilter = {
   categoryIds: Array<Scalars['ID']>;
+  platforms: Array<ItemSellingPlatform>;
   minPrice?: Maybe<Scalars['Int']>;
   maxPrice?: Maybe<Scalars['Int']>;
   minRating?: Maybe<Scalars['Int']>;

@@ -20,6 +20,7 @@ import RatingFilter from '@src/components/RatingFilter';
 import SortTypeSelectBox from '@src/components/SortTypeSelectBox';
 import AppliedFilterIcons from '@src/components/AppliedFilterIcons';
 import MobileSearchFilterModal from '@src/components/MobileSearchFilterModal';
+import PlatformFilter from '@src/components/PlatformFilter';
 
 export default function TopPage() {
   return (
@@ -71,6 +72,16 @@ const TopPageInner = memo(function TopPageInner() {
         >
           <h3 className="my-2 text-md font-bold">カテゴリー</h3>
           <CategoryFilter />
+        </div>
+        <div
+          className={`mt-6 p-3 ${
+            searchState.searchInput.filter.platform
+              ? 'bg-gray-100 dark:bg-gray-800'
+              : ''
+          }`}
+        >
+          <h3 className="mb-2 text-md font-bold">ECサイト</h3>
+          <PlatformFilter />
         </div>
         <div
           className={`mt-6 p-3 ${
@@ -140,23 +151,21 @@ const ItemList = memo(function ItemList({ items, onClickItem }: ItemListProps) {
               height={300}
               layout="responsive"
               objectFit="cover"
-              className="w-20 h-20 rounded-md"
+              className="w-20 h-20 rounded-t-md"
               unoptimized
             />
             <div className="py-0.5 sm:p-2">
-              <div className="flex justify-between">
-                <PlatformBadge platform={item.platform} />
-                <div className="flex items-center">
-                  <Rating rating={item.averageRating} maxRating={5} />
-                  <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
-                    {item.reviewCount}
-                  </div>
+              <PlatformBadge platform={item.platform} />
+              <div className="flex items-center">
+                <Rating rating={item.averageRating} maxRating={5} />
+                <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
+                  {item.reviewCount}
                 </div>
               </div>
-              <h4 className="my-1 break-all line-clamp-2 text-sm sm:text-md">
+              <h4 className="mt-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
               </h4>
-              <div className=" my-1 text-lg font-bold">￥{item.price}</div>
+              <div className=" text-lg font-bold">￥{item.price}</div>
             </div>
           </div>
         </a>
