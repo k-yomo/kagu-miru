@@ -179,6 +179,7 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 					}
 					if err != nil {
 						w.logger.Error("cursor.Next failed",
+							zap.Error(err),
 							zap.Int("genreID", genreID),
 							zap.Int("minPrice", cursor.CurMinPrice()),
 							zap.Int("page", cursor.CurPage()),

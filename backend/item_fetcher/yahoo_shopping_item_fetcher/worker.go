@@ -150,6 +150,7 @@ func (w *categoryItemsFetcher) start(ctx context.Context) {
 					}
 					if err != nil {
 						w.logger.Error("cursor.Next failed",
+							zap.Error(err),
 							zap.Int("categoryID", categoryID),
 							zap.Int("minPrice", cursor.CurMinPrice()),
 							zap.Int("page", cursor.CurPage()),
