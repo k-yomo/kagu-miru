@@ -23,16 +23,16 @@ type Item struct {
 	Price               int     `json:"price"`
 	PremiumPrice        int     `json:"premiumPrice"`
 	PremiumPriceStatus  bool    `json:"premiumPriceStatus"`
-	PremiumDiscountType string  `json:"premiumDiscountType"`
-	PremiumDiscountRate int     `json:"premiumDiscountRate"`
+	PremiumDiscountType *string `json:"premiumDiscountType,omitempty"`
+	PremiumDiscountRate *int    `json:"premiumDiscountRate,omitempty"`
 	PriceLabel          struct {
 		Taxable         bool `json:"taxable"`
 		DefaultPrice    int  `json:"defaultPrice"`
-		DiscountedPrice int  `json:"discountedPrice"`
-		FixedPrice      int  `json:"fixedPrice"`
-		PremiumPrice    int  `json:"premiumPrice"`
-		PeriodStart     int  `json:"periodStart"`
-		PeriodEnd       int  `json:"periodEnd"`
+		DiscountedPrice *int `json:"discountedPrice,omitempty"`
+		FixedPrice      *int `json:"fixedPrice,omitempty"`
+		PremiumPrice    *int `json:"premiumPrice,omitempty"`
+		PeriodStart     *int `json:"periodStart,omitempty"`
+		PeriodEnd       *int `json:"periodEnd,omitempty"`
 	} `json:"priceLabel"`
 	Point struct {
 		Amount        int `json:"amount"`
@@ -63,7 +63,7 @@ type Item struct {
 		Name string `json:"name"`
 	} `json:"parentBrands"`
 	JanCode     string `json:"janCode"`
-	ReleaseDate int    `json:"releaseDate"`
+	ReleaseDate *int   `json:"releaseDate,omitempty"`
 	Seller      struct {
 		SellerId      string `json:"sellerId"`
 		Name          string `json:"name"`
@@ -78,8 +78,8 @@ type Item struct {
 	} `json:"seller"`
 	Delivery struct {
 		Area     string `json:"area"`
-		DeadLine int    `json:"deadLine"`
-		Day      int    `json:"day"`
+		DeadLine *int   `json:"deadLine,omitempty"`
+		Day      *int   `json:"day,omitempty"`
 	} `json:"delivery"`
 	Payment string `json:"payment"`
 }
