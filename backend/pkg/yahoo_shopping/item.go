@@ -30,7 +30,7 @@ type Item struct {
 		DefaultPrice    int  `json:"defaultPrice"`
 		DiscountedPrice int  `json:"discountedPrice"`
 		FixedPrice      int  `json:"fixedPrice"`
-		PremiumPrice    bool `json:"premiumPrice"`
+		PremiumPrice    int  `json:"premiumPrice"`
 		PeriodStart     int  `json:"periodStart"`
 		PeriodEnd       int  `json:"periodEnd"`
 	} `json:"priceLabel"`
