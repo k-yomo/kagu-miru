@@ -12,7 +12,7 @@ require (
 	github.com/aquasecurity/esquery v0.2.0
 	github.com/avct/uasurfer v0.0.0-20191028135549-26b5daa857f1
 	github.com/blendle/zapdriver v1.3.1
-	github.com/cenkalti/backoff/v4 v4.1.1
+	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/elastic/go-elasticsearch/v7 v7.15.1
 	github.com/go-chi/chi/v5 v5.0.5
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
