@@ -66,7 +66,7 @@ type yahooShoppingWorkerOption struct {
 }
 
 func (r *worker) run(ctx context.Context, option *yahooShoppingWorkerOption) error {
-	furnitureCategories, err := r.getFurnitureGenres(ctx)
+	furnitureCategories, err := r.getFurnitureCategories(ctx)
 	if err != nil {
 		return fmt.Errorf("getFurnitureGenre: %w", err)
 	}
@@ -105,7 +105,7 @@ func (r *worker) run(ctx context.Context, option *yahooShoppingWorkerOption) err
 	return nil
 }
 
-func (r *worker) getFurnitureGenres(ctx context.Context) ([]*yahoo_shopping.Category, error) {
+func (r *worker) getFurnitureCategories(ctx context.Context) ([]*yahoo_shopping.Category, error) {
 	category, err := r.yahooShoppingAPIClient.GetCategoryWithAllChildren(ctx, yahoo_shopping.CategoryFurnitureID)
 	if err != nil {
 		return nil, fmt.Errorf("yahooShoppingAPIClient.GetCategoryWithAllChildren: %w", err)

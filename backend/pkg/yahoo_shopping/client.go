@@ -143,12 +143,14 @@ func (c *Client) SearchItem(ctx context.Context, params *SearchItemParams) (*Sea
 	}
 
 	start := (params.Page-1)*maxResultCount + 1
+	if start+maxResultCount > maxResultTotalCount {
+		start = maxResultTotalCount - maxResultCount
+	}
 
 	reqParams := map[string]string{
 		"sort":    string(params.SortType),
-		"results": "50",
+		"results": strconv.Itoa(maxResultCount),
 		"start":   strconv.Itoa(start),
-		"page":    strconv.Itoa(start),
 	}
 	if params.Query != "" {
 		reqParams["query"] = params.Query

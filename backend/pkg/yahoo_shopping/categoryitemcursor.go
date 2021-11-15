@@ -11,17 +11,17 @@ var Done = errors.New("DONE")
 
 type CategoryItemCursor struct {
 	shoppingClient *Client
-	genreID        int
+	categoryID     int
 	curPage        int
 	curMinPrice    int
 
 	isDone bool
 }
 
-func (c *Client) NewCategoryItemCursor(genreID int) *CategoryItemCursor {
+func (c *Client) NewCategoryItemCursor(categoryID int) *CategoryItemCursor {
 	return &CategoryItemCursor{
 		shoppingClient: c,
-		genreID:        genreID,
+		categoryID:     categoryID,
 		curPage:        1,
 		curMinPrice:    0,
 	}
@@ -40,7 +40,7 @@ func (g *CategoryItemCursor) Next(ctx context.Context) (*SearchItemResponse, err
 		return nil, Done
 	}
 	searchItemParams := &SearchItemParams{
-		CategoryID: g.genreID,
+		CategoryID: g.categoryID,
 		PriceFrom:  g.curMinPrice,
 		Page:       g.curPage,
 		SortType:   SearchItemSortTypePriceAsc,
@@ -57,7 +57,7 @@ func (g *CategoryItemCursor) Next(ctx context.Context) (*SearchItemResponse, err
 	}
 
 	lastResultPosition := (searchItemRes.FirstResultPosition - 1) + searchItemRes.TotalResultsReturned
-	if lastResultPosition == searchItemRes.TotalResultsAvailable {
+	if g.curPage*maxResultCount >= maxResultTotalCount || lastResultPosition == searchItemRes.TotalResultsAvailable {
 		if searchItemRes.TotalResultsAvailable < maxResultTotalCount {
 			g.isDone = true
 		} else {

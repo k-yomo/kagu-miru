@@ -58,10 +58,10 @@ func main() {
 	err = pubsubSubscriber.HandleSubscriptionFunc(
 		pubsubClient.Subscription(cfg.PubsubItemUpdateSubscriptionID),
 		pm.NewBatchMessageHandler(newItemUpdateHandler(indexer, logger), pm.BatchMessageHandlerConfig{
-			DelayThreshold: 100 * time.Millisecond,
-			CountThreshold: 100,
-			ByteThreshold:  1e5,
-			NumGoroutines:  2,
+			DelayThreshold: 1 * time.Second,
+			CountThreshold: 1000,
+			ByteThreshold:  1e7, // 10MB
+			NumGoroutines:  10,
 		}),
 	)
 	if err != nil {
