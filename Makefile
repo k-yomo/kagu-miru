@@ -22,7 +22,7 @@ test:
 	gotestsum -- -race -coverprofile=coverage.out $(TESTARGS) ./backend/...
 
 .PHONY: test-cover
-test-cover: testacc
+test-cover: test
 	go tool cover -func=coverage.out
 	go tool cover -html=coverage.out
 
