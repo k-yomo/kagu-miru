@@ -4,7 +4,11 @@ import { AdjustmentsIcon, XIcon } from '@heroicons/react/outline';
 import CategoryList from '@src/components/CategoryList';
 import { ItemSellingPlatform, SearchFilter } from '@src/generated/graphql';
 import RatingSelect from '@src/components/RatingSelect';
-import { SearchActionType, useSearch } from '@src/contexts/search';
+import {
+  defaultSearchFilter,
+  SearchActionType,
+  useSearch,
+} from '@src/contexts/search';
 import PlatformSelect from '@src/components/PlatformSelect';
 
 export default function MobileSearchFilterModal() {
@@ -46,8 +50,7 @@ export default function MobileSearchFilterModal() {
   };
 
   const onClickClear = () => {
-    const clearedFilter = { categoryIds: [], platforms: [] };
-    setSearchFilter(clearedFilter);
+    setSearchFilter(defaultSearchFilter);
   };
 
   useEffect(() => {

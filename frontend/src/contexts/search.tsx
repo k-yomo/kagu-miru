@@ -25,7 +25,6 @@ import { ParsedUrlQuery } from 'querystring';
 import { useNextQueryParams } from '@src/lib/nextqueryparams';
 import { useRouter } from 'next/router';
 import gql from 'graphql-tag';
-import { map } from 'rxjs/operators';
 
 gql`
   query search($input: SearchInput!) {
@@ -172,6 +171,11 @@ const searchReducer = (
   }
 };
 
+export const defaultSearchFilter: SearchFilter = {
+  categoryIds: [],
+  platforms: [],
+};
+
 const SearchContext = createContext<{
   searchState: SearchState;
   searchId: string;
@@ -184,7 +188,7 @@ const SearchContext = createContext<{
   searchState: {
     searchInput: {
       query: '',
-      filter: { categoryIds: [], platforms: [] },
+      filter: defaultSearchFilter,
       sortType: SearchSortType.BestMatch,
     },
     searchFrom: SearchFrom.Url,
