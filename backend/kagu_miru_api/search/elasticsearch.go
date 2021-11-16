@@ -182,8 +182,6 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 		return nil, fmt.Errorf("esQuery.MarshalJSON(): %w", err)
 	}
 
-	fmt.Println(string(esQueryJSON))
-
 	return bytes.NewReader(esQueryJSON), nil
 }
 
