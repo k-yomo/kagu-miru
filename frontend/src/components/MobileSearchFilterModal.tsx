@@ -48,8 +48,6 @@ export default function MobileSearchFilterModal() {
   const onClickClear = () => {
     const clearedFilter = { categoryIds: [], platforms: [] };
     setSearchFilter(clearedFilter);
-    dispatch({ type: SearchActionType.SET_FILTER, payload: clearedFilter });
-    setOpen(false);
   };
 
   useEffect(() => {
