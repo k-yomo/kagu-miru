@@ -28,6 +28,12 @@ To populate item data, we need to run item fetcher
 make run-item-fetcher
 ```
 
+### Run CMS
+To work on the CMS used in our Media, we can run local CMS server
+```
+make run-media-studio
+```
+
 ## Test
 ```
 make test

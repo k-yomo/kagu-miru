@@ -17,6 +17,10 @@ run:
 run-item-fetcher:
 	goreman -set-ports=false -f item_fetcher.Procfile start
 
+.PHONY: run-media-studio
+run-media-studio:
+	cd media_studio && npm run start
+
 .PHONY: test
 test:
 	gotestsum -- -race -coverprofile=coverage.out $(TESTARGS) ./backend/...
