@@ -81,6 +81,7 @@ const serializers = {
             objectFit="cover"
             objectPosition="center"
             loading="lazy"
+            unoptimized
           />
         </div>
       );
@@ -161,6 +162,7 @@ const Post = ({
             layout="fill"
             objectFit="cover"
             objectPosition="center"
+            unoptimized
           />
         </div>
         <div className="mx-3">
