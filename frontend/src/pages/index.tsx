@@ -54,7 +54,7 @@ const TopPageInner = memo(function TopPageInner() {
   };
 
   return (
-    <div className="flex max-w-[1200px] mx-auto my-3">
+    <div className="flex max-w-[1200px] mx-auto mt-3 mb-6">
       <SEOMeta
         title="カグミル - 家具検索サービス"
         excludeSiteTitle
