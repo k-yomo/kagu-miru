@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { formatDistance, parseISO } from 'date-fns';
 import groq from 'groq';
 import BlockContent from '@sanity/block-content-to-react';
-import { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import {
+  SanityImageObject,
+  SanityImageSource,
+} from '@sanity/image-url/lib/types/types';
 import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
 import SEOMeta from '@src/components/SEOMeta';
 import CategoryTag from '@src/components/CategoryTag';
@@ -63,6 +67,24 @@ const serializers = {
         />
       );
     },
+    image: ({ node }: { node: SanityImageObject }) => {
+      const imgUrl = buildSanityImageSrc(node).url();
+      const blurImgUrl = buildSanityImageSrc(node).blur(10).url();
+      return (
+        <div className="relative w-full h-[250px] sm:h-[500px]">
+          <Image
+            src={imgUrl}
+            blurDataURL={blurImgUrl}
+            placeholder="blur"
+            alt=""
+            layout="fill"
+            objectFit="cover"
+            objectPosition="center"
+            loading="lazy"
+          />
+        </div>
+      );
+    },
   },
 };
 
@@ -106,6 +128,10 @@ const Post = ({
   const bodyAfterTOC = [...body.slice(firstH2)];
 
   const mainImgUrl = buildSanityImageSrc(mainImage).width(1000).url()!;
+  const mainImgBlurUrl = buildSanityImageSrc(mainImage)
+    .blur(10)
+    .width(1000)
+    .url()!;
   const authorImgUrl = authorImage
     ? buildSanityImageSrc(authorImage).width(100).url()!
     : '';
@@ -126,7 +152,17 @@ const Post = ({
         img={{ src: mainImgUrl }}
       />
       <article id="post" className="max-w-[1000px] mx-auto sm:my-8">
-        <img src={mainImgUrl} alt={title} className="sm:rounded-md" />
+        <div className="relative w-full h-[300px] sm:h-[600px]">
+          <Image
+            src={mainImgUrl}
+            blurDataURL={mainImgBlurUrl}
+            alt={title}
+            placeholder="blur"
+            layout="fill"
+            objectFit="cover"
+            objectPosition="center"
+          />
+        </div>
         <div className="mx-3">
           <div className="my-4 space-x-2">
             {categories?.map((category) => (

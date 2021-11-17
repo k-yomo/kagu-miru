@@ -34,7 +34,11 @@ const securityHeaders = [
 module.exports = {
   reactStrictMode: true,
   images: {
-    domains: ['thumbnail.image.rakuten.co.jp', 'via.placeholder.com'],
+    domains: [
+      'thumbnail.image.rakuten.co.jp',
+      'via.placeholder.com',
+      'cdn.sanity.io',
+    ],
   },
   async headers() {
     return [
