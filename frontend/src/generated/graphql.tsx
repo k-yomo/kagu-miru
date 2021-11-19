@@ -91,6 +91,7 @@ export type PageInfo = {
 export type Query = {
   search: SearchResponse;
   getQuerySuggestions: QuerySuggestionsResponse;
+  getItem: Item;
   getAllCategories: Array<Maybe<ItemCategory>>;
 };
 
@@ -100,6 +101,10 @@ export type QuerySearchArgs = {
 
 export type QueryGetQuerySuggestionsArgs = {
   query: Scalars['String'];
+};
+
+export type QueryGetItemArgs = {
+  id: Scalars['ID'];
 };
 
 export type QuerySuggestionsDisplayActionParams = {
@@ -200,6 +205,27 @@ export type TrackEventMutationVariables = Exact<{
 }>;
 
 export type TrackEventMutation = { trackEvent: boolean };
+
+export type ItemDetailPageGetItemQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+export type ItemDetailPageGetItemQuery = {
+  getItem: {
+    id: string;
+    name: string;
+    description: string;
+    status: ItemStatus;
+    url: string;
+    affiliateUrl: string;
+    price: number;
+    imageUrls: Array<string>;
+    averageRating: number;
+    reviewCount: number;
+    categoryIds: Array<string>;
+    platform: ItemSellingPlatform;
+  };
+};
 
 export const GetQuerySuggestionsDocument = gql`
   query getQuerySuggestions($query: String!) {
@@ -375,4 +401,73 @@ export type TrackEventMutationResult =
 export type TrackEventMutationOptions = Apollo.BaseMutationOptions<
   TrackEventMutation,
   TrackEventMutationVariables
+>;
+export const ItemDetailPageGetItemDocument = gql`
+  query itemDetailPageGetItem($id: ID!) {
+    getItem(id: $id) {
+      id
+      name
+      description
+      status
+      url
+      affiliateUrl
+      price
+      imageUrls
+      averageRating
+      reviewCount
+      categoryIds
+      platform
+    }
+  }
+`;
+
+/**
+ * __useItemDetailPageGetItemQuery__
+ *
+ * To run a query within a React component, call `useItemDetailPageGetItemQuery` and pass it any options that fit your needs.
+ * When your component renders, `useItemDetailPageGetItemQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useItemDetailPageGetItemQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useItemDetailPageGetItemQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ItemDetailPageGetItemQuery,
+    ItemDetailPageGetItemQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ItemDetailPageGetItemQuery,
+    ItemDetailPageGetItemQueryVariables
+  >(ItemDetailPageGetItemDocument, options);
+}
+export function useItemDetailPageGetItemLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ItemDetailPageGetItemQuery,
+    ItemDetailPageGetItemQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ItemDetailPageGetItemQuery,
+    ItemDetailPageGetItemQueryVariables
+  >(ItemDetailPageGetItemDocument, options);
+}
+export type ItemDetailPageGetItemQueryHookResult = ReturnType<
+  typeof useItemDetailPageGetItemQuery
+>;
+export type ItemDetailPageGetItemLazyQueryHookResult = ReturnType<
+  typeof useItemDetailPageGetItemLazyQuery
+>;
+export type ItemDetailPageGetItemQueryResult = Apollo.QueryResult<
+  ItemDetailPageGetItemQuery,
+  ItemDetailPageGetItemQueryVariables
 >;

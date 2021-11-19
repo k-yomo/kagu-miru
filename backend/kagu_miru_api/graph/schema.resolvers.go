@@ -38,6 +38,14 @@ func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (
 	}, nil
 }
 
+func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodell.Item, error) {
+	item, err := r.SearchClient.GetItem(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("SearchClient.GetItem: %w", err)
+	}
+	return mapSearchItemToGraphqlItem(item)
+}
+
 func (r *queryResolver) GetAllCategories(ctx context.Context) ([]*gqlmodell.ItemCategory, error) {
 	panic(fmt.Errorf("not implemented"))
 }

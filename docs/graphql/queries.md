@@ -12,6 +12,20 @@
 
 ---
 
+### getItem
+
+#### Type: [Item!](objects.md#item)
+
+ 
+
+#### Arguments
+
+| Name | Description |
+|------|-------------|
+| id ([ID!](scalars.md#id)) |  |
+
+---
+
 ### getQuerySuggestions
 
 #### Type: [QuerySuggestionsResponse!](objects.md#querysuggestionsresponse)

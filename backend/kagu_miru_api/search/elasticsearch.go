@@ -22,6 +22,8 @@ import (
 	"go.uber.org/zap"
 )
 
+var NotFoundErr = errors.New("item not found")
+
 type elasticsearchClient struct {
 	itemsIndexName                 string
 	itemsQuerySuggestionsIndexName string
@@ -40,6 +42,32 @@ type Response struct {
 	Items     []*es.Item
 	Page      uint64
 	TotalPage uint64
+}
+
+func (c *elasticsearchClient) GetItem(ctx context.Context, id string) (*es.Item, error) {
+	ctx, span := otel.Tracer("search").Start(ctx, "search.GetItem")
+	defer span.End()
+
+	response, err := c.esClient.Get(c.itemsIndexName, id, c.esClient.Get.WithContext(ctx))
+	if err != nil {
+		return nil, fmt.Errorf("esClient.Get: %w", err)
+	}
+
+	result := elastic.GetResult{}
+	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("json.Decoder.Decode: %w", err)
+	}
+
+	if !result.Found {
+		return nil, fmt.Errorf("get '%s': %w", id, NotFoundErr)
+	}
+
+	var item es.Item
+	if err := json.Unmarshal(result.Source, &item); err != nil {
+		return nil, fmt.Errorf("json.Unmarshal: %w", err)
+	}
+
+	return &item, nil
 }
 
 func (c *elasticsearchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error) {

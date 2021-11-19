@@ -4,6 +4,7 @@ scalar Time
 type Query {
     search(input: SearchInput): SearchResponse!
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
+    getItem(id: ID!): Item!
     getAllCategories: [ItemCategory]!
 }
 
