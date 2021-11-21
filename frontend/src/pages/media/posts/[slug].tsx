@@ -82,7 +82,7 @@ const serializers = {
             objectFit="cover"
             objectPosition="center"
             loading="lazy"
-            lazyBoundary="300px"
+            lazyBoundary="600px"
             unoptimized
           />
         </div>
