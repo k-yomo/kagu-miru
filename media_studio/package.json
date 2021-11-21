@@ -7,6 +7,7 @@
   "author": "Kanji Yomoda <Kanji.yy@gmail.com>",
   "license": "UNLICENSED",
   "scripts": {
+    "codegen": "graphql-codegen --config codegen.yml",
     "deploy": "SANITY_ACTIVE_ENV=production sanity deploy",
     "build": "SANITY_ACTIVE_ENV=production sanity build",
     "start": "SANITY_ACTIVE_ENV=development sanity start"
@@ -15,6 +16,7 @@
     "sanity"
   ],
   "dependencies": {
+    "@apollo/client": "^3.4.17",
     "@heroicons/react": "^1.0.5",
     "@sanity/base": "^2.21.9",
     "@sanity/core": "^2.21.8",
@@ -23,8 +25,19 @@
     "@sanity/desk-tool": "^2.21.9",
     "@sanity/production-preview": "^2.15.0",
     "@sanity/vision": "^2.21.9",
+    "apollo-link-scalars": "^3.0.0",
+    "graphql": "^15.7.2",
+    "isomorphic-unfetch": "^3.1.0",
     "prop-types": "^15.7",
     "react": "^17.0.2",
+    "react-select": "^5.2.1",
     "styled-components": "^5.2.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^2.3.0",
+    "@graphql-codegen/introspection": "^2.1.0",
+    "@graphql-codegen/typescript": "^2.4.1",
+    "@graphql-codegen/typescript-operations": "^2.2.1",
+    "@graphql-codegen/typescript-react-apollo": "^3.2.2"
   }
 }
