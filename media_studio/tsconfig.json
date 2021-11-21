@@ -4,6 +4,9 @@
   // here will be ignored.
   "include": ["./node_modules/@sanity/base/types/**/*.ts", "./**/*.ts", "./**/*.tsx"],
   "compilerOptions": {
-    "jsx": "react"
+    "strict": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   }
 }
