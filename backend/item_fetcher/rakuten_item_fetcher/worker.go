@@ -65,7 +65,6 @@ func newWorker(pubsubItemUpdateTopic *pubsub.Topic, rakutenIchibaAPIClient *raku
 
 type rakutenWorkerOption struct {
 	StartGenreID int
-	MinPrice     int
 }
 
 func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {

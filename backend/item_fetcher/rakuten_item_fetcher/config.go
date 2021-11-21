@@ -10,7 +10,6 @@ type config struct {
 	RakutenApplicationIDs []string `required:"true" envconfig:"RAKUTEN_APPLICATION_IDS"`
 	RakutenAffiliateID    string   `required:"true" envconfig:"RAKUTEN_AFFILIATE_ID"`
 	RakutenStartGenreID   int      `default:"0" envconfig:"RAKUTEN_START_GENRE_ID"`
-	RakutenMinPrice       int      `default:"0" envconfig:"RAKUTEN_MIN_PRICE"`
 }
 
 func newConfig() (*config, error) {
