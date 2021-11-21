@@ -10,6 +10,8 @@ import (
 	"math"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
+
 	"github.com/aquasecurity/esquery"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
@@ -326,12 +328,12 @@ func calcElasticSearchPage(inputPage *int) uint64 {
 	return page
 }
 
-func mapGraphqlPlatformToPlatform(platform gqlmodel.ItemSellingPlatform) (es.Platform, error) {
+func mapGraphqlPlatformToPlatform(platform gqlmodel.ItemSellingPlatform) (xitem.Platform, error) {
 	switch platform {
 	case gqlmodel.ItemSellingPlatformRakuten:
-		return es.PlatformRakuten, nil
+		return xitem.PlatformRakuten, nil
 	case gqlmodel.ItemSellingPlatformYahooShopping:
-		return es.PlatformYahooShopping, nil
+		return xitem.PlatformYahooShopping, nil
 	default:
 		return "", fmt.Errorf("unknown platform %s", platform.String())
 	}
