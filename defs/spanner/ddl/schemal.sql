@@ -10,7 +10,7 @@ CREATE TABLE item_categories (
 CREATE TABLE items (
     id STRING(256) NOT NULL,
     name STRING(256) NOT NULL,
-    description STRING(2048) NOT NULL,
+    description STRING(16384) NOT NULL,
     status INT64 NOT NULL,
     url STRING(1024) NOT NULL,
     affiliate_url STRING(1024) NOT NULL,
