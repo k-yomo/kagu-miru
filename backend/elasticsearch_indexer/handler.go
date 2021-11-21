@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
+	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/pm"
 	"go.uber.org/zap"
 )
@@ -15,7 +17,7 @@ func newItemUpdateHandler(itemIndexer *ItemIndexer, logger *zap.Logger) pm.Messa
 	return func(messages []*pubsub.Message) error {
 		items := make([]*es.Item, 0, len(messages))
 		for _, m := range messages {
-			var item es.Item
+			var item xitem.Item
 			if err := json.Unmarshal(m.Data, &item); err != nil {
 				logger.Error(
 					"json.Unmarshal failed",
@@ -25,7 +27,7 @@ func newItemUpdateHandler(itemIndexer *ItemIndexer, logger *zap.Logger) pm.Messa
 				)
 				continue
 			}
-			items = append(items, &item)
+			items = append(items, mapItemFetcherItemToElasticsearchItem(&item))
 		}
 
 		if err := itemIndexer.BulkIndex(context.Background(), items); err != nil {
@@ -33,5 +35,27 @@ func newItemUpdateHandler(itemIndexer *ItemIndexer, logger *zap.Logger) pm.Messa
 		}
 		logger.Info(fmt.Sprintf("bluk indexed %d items", len(items)))
 		return nil
+	}
+}
+
+func mapItemFetcherItemToElasticsearchItem(item *xitem.Item) *es.Item {
+	return &es.Item{
+		ID:            item.ID,
+		Name:          item.Name,
+		Description:   item.Description,
+		Status:        item.Status,
+		URL:           item.URL,
+		AffiliateURL:  item.AffiliateURL,
+		Price:         item.Price,
+		ImageURLs:     item.ImageURLs,
+		AverageRating: item.AverageRating,
+		ReviewCount:   item.ReviewCount,
+		CategoryID:    item.CategoryID,
+		CategoryIDs:   item.CategoryIDs,
+		CategoryNames: item.CategoryNames,
+		TagIDs:        item.TagIDs,
+		JANCode:       item.JANCode,
+		Platform:      item.Platform,
+		IndexedAt:     time.Now().UnixMilli(),
 	}
 }

@@ -7,10 +7,9 @@ import (
 	"sort"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/k-yomo/kagu-miru/backend/internal/es"
+	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/pkg/yahoo_shopping"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
@@ -218,8 +217,8 @@ func (w *categoryItemsFetcher) start(ctx context.Context) {
 	}()
 }
 
-func mapYahooShoppingItemsToIndexItems(yahooShoppingItems []*yahoo_shopping.Item) ([]*es.Item, error) {
-	items := make([]*es.Item, 0, len(yahooShoppingItems))
+func mapYahooShoppingItemsToIndexItems(yahooShoppingItems []*yahoo_shopping.Item) ([]*xitem.Item, error) {
+	items := make([]*xitem.Item, 0, len(yahooShoppingItems))
 	var errors []error
 	for _, yahooShoppingItem := range yahooShoppingItems {
 		item, err := mapYahooShoppingItemToIndexItem(yahooShoppingItem)
@@ -232,19 +231,19 @@ func mapYahooShoppingItemsToIndexItems(yahooShoppingItems []*yahoo_shopping.Item
 	return items, multierr.Combine(errors...)
 }
 
-func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item) (*es.Item, error) {
-	var status es.Status
+func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item) (*xitem.Item, error) {
+	var status xitem.Status
 	if yahooShoppingItem.InStock {
-		status = es.StatusActive
+		status = xitem.StatusActive
 	} else {
-		status = es.StatusInactive
+		status = xitem.StatusInactive
 	}
 
 	// TODO: convert to kagu-miru category id
 	// categoryID := strconv.Itoa(yahooShoppingItem.GenreCategory.Id)
 
-	return &es.Item{
-		ID:            es.ItemUniqueID(es.PlatformYahooShopping, yahooShoppingItem.Code),
+	return &xitem.Item{
+		ID:            xitem.ItemUniqueID(xitem.PlatformYahooShopping, yahooShoppingItem.Code),
 		Name:          yahooShoppingItem.Name,
 		Description:   yahooShoppingItem.Description,
 		Status:        status,
@@ -254,12 +253,12 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item) (*e
 		ImageURLs:     []string{yahooShoppingItem.Image.Medium, yahooShoppingItem.Image.Small},
 		AverageRating: yahooShoppingItem.Review.Rate,
 		ReviewCount:   yahooShoppingItem.Review.Count,
+		CategoryID:    "101859", // その他, TODO: Replace with appropriate category id
 		// CategoryID:    categoryID,
 		// CategoryIDs:
 		// CategoryNames:
 		// TagIDs:
-		JANCode:   yahooShoppingItem.JanCode,
-		Platform:  es.PlatformYahooShopping,
-		IndexedAt: time.Now().UnixMilli(),
+		JANCode:  yahooShoppingItem.JanCode,
+		Platform: xitem.PlatformYahooShopping,
 	}, nil
 }

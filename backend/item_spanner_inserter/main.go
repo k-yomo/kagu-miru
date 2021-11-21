@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/spanner"
 	"github.com/blendle/zapdriver"
-	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/pm"
 	"github.com/k-yomo/pm/middleware/logging/pm_zap"
 	"github.com/k-yomo/pm/middleware/pm_autoack"
@@ -30,13 +30,12 @@ func main() {
 		logger.Fatal("failed to initialize config", zap.Error(err))
 	}
 
-	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{cfg.ElasticSearchURL},
-		Username:  cfg.ElasticSearchUsername,
-		Password:  cfg.ElasticSearchPassword,
-	})
+	spannerClient, err := spanner.NewClient(
+		context.Background(),
+		fmt.Sprintf("projects/%s/instances/%s/databases/%s", cfg.GCPProjectID, cfg.SpannerInstanceID, cfg.SpannerDatabaseID),
+	)
 	if err != nil {
-		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
+		logger.Fatal("failed to initialize spanner client", zap.Error(err))
 	}
 
 	pubsubClient, err := pubsub.NewClient(context.Background(), cfg.GCPProjectID)
@@ -54,10 +53,9 @@ func main() {
 
 	defer pubsubSubscriber.Close()
 
-	indexer := NewItemIndexer(cfg.ItemsIndexName, esClient)
 	err = pubsubSubscriber.HandleSubscriptionFunc(
 		pubsubClient.Subscription(cfg.PubsubItemUpdateSubscriptionID),
-		pm.NewBatchMessageHandler(newItemUpdateHandler(indexer, logger), pm.BatchMessageHandlerConfig{
+		pm.NewBatchMessageHandler(newItemUpdateHandler(spannerClient, logger), pm.BatchMessageHandlerConfig{
 			DelayThreshold: 1 * time.Second,
 			CountThreshold: 1000,
 			ByteThreshold:  1e7, // 10MB

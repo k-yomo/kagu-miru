@@ -8,10 +8,9 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/k-yomo/kagu-miru/backend/internal/es"
+	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/pkg/jancode"
 	"github.com/k-yomo/kagu-miru/backend/pkg/rakutenichiba"
 	"go.uber.org/multierr"
@@ -66,7 +65,6 @@ func newWorker(pubsubItemUpdateTopic *pubsub.Topic, rakutenIchibaAPIClient *raku
 
 type rakutenWorkerOption struct {
 	StartGenreID int
-	MinPrice     int
 }
 
 func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {
@@ -251,8 +249,8 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 	}()
 }
 
-func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap map[string]*rakutenichiba.Genre) ([]*es.Item, error) {
-	items := make([]*es.Item, 0, len(rakutenItems))
+func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap map[string]*rakutenichiba.Genre) ([]*xitem.Item, error) {
+	items := make([]*xitem.Item, 0, len(rakutenItems))
 	var errors []error
 	for _, rakutenItem := range rakutenItems {
 		genre, ok := genreMap[rakutenItem.GenreID]
@@ -270,13 +268,13 @@ func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap ma
 	return items, multierr.Combine(errors...)
 }
 
-func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenichiba.Genre) (*es.Item, error) {
-	var status es.Status
+func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenichiba.Genre) (*xitem.Item, error) {
+	var status xitem.Status
 	switch rakutenItem.Availability {
 	case 0:
-		status = es.StatusInactive
+		status = xitem.StatusInactive
 	case 1:
-		status = es.StatusActive
+		status = xitem.StatusActive
 	default:
 		return nil, fmt.Errorf("unknown status %d, item id: %v", rakutenItem.Availability, rakutenItem.ID())
 	}
@@ -288,8 +286,8 @@ func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenic
 
 	janCode := jancode.ExtractJANCode(rakutenItem.ItemCaption)
 
-	return &es.Item{
-		ID:            es.ItemUniqueID(es.PlatformRakuten, rakutenItem.ID()),
+	return &xitem.Item{
+		ID:            xitem.ItemUniqueID(xitem.PlatformRakuten, rakutenItem.ID()),
 		Name:          rakutenItem.ItemName,
 		Description:   rakutenItem.ItemCaption,
 		Status:        status,
@@ -304,8 +302,6 @@ func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenic
 		CategoryNames: genre.GenreNames(),
 		TagIDs:        rakutenItem.TagIDs,
 		JANCode:       janCode,
-		Platform:      es.PlatformRakuten,
-		// TODO fix since this is actually not indexedAt but fetchedAt
-		IndexedAt: time.Now().UnixMilli(),
+		Platform:      xitem.PlatformRakuten,
 	}, nil
 }

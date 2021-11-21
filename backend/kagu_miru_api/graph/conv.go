@@ -3,6 +3,8 @@ package graph
 import (
 	"fmt"
 
+	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
+
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/search"
@@ -11,9 +13,9 @@ import (
 func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 	var status gqlmodel.ItemStatus
 	switch item.Status {
-	case es.StatusActive:
+	case xitem.StatusActive:
 		status = gqlmodel.ItemStatusActive
-	case es.StatusInactive:
+	case xitem.StatusInactive:
 		status = gqlmodel.ItemStatusInactive
 	default:
 		return nil, fmt.Errorf("unknown status %d, item: %v", item.Status, item)
@@ -21,9 +23,9 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 
 	var platform gqlmodel.ItemSellingPlatform
 	switch item.Platform {
-	case es.PlatformRakuten:
+	case xitem.PlatformRakuten:
 		platform = gqlmodel.ItemSellingPlatformRakuten
-	case es.PlatformYahooShopping:
+	case xitem.PlatformYahooShopping:
 		platform = gqlmodel.ItemSellingPlatformYahooShopping
 	default:
 		return nil, fmt.Errorf("unknown platform %s, item: %v", item.Platform, item)

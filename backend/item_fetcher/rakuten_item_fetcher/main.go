@@ -40,7 +40,6 @@ func main() {
 		logger.Info("rakutenItemWorker started running")
 		if err := rakutenItemWorker.run(ctx, &rakutenWorkerOption{
 			StartGenreID: cfg.RakutenStartGenreID,
-			MinPrice:     cfg.RakutenMinPrice,
 		}); err != nil {
 			logger.Error("rakutenItemWorker failed", zap.Error(err))
 		}
