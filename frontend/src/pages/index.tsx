@@ -155,7 +155,7 @@ const ItemList = memo(function ItemList({ items, onClickItem }: ItemListProps) {
               unoptimized
             />
             <div className="py-0.5 sm:p-2">
-              <PlatformBadge platform={item.platform} />
+              <PlatformBadge platform={item.platform} size="xs" />
               <div className="flex items-center">
                 <Rating rating={item.averageRating} maxRating={5} />
                 <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
@@ -165,7 +165,7 @@ const ItemList = memo(function ItemList({ items, onClickItem }: ItemListProps) {
               <h4 className="mt-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
               </h4>
-              <div className=" text-lg font-bold">￥{item.price}</div>
+              <div className="text-lg font-bold">{item.price}円</div>
             </div>
           </div>
         </a>

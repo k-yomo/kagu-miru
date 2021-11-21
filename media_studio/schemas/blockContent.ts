@@ -67,5 +67,9 @@ export default {
       type: 'image',
       options: {hotspot: true},
     },
+    {
+      title: '商品',
+      type: 'item',
+    },
   ],
 }

@@ -46,6 +46,7 @@ fmt:
 gen-graphql:
 	go generate ./... & \
 	cd frontend && npm run codegen & \
+	cd media_studio && npm run codegen & \
 	gqldoc -s defs/graphql/schema.graphql -o ./docs/graphql & \
 	wait
 	make fmt
