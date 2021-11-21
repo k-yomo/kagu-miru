@@ -16,11 +16,7 @@ import TableOfContents from '@src/components/TableOfContents';
 import AuthorIcon from '@src/components/AuthorIcon';
 import LinkWithThumbnail from '@src/components/LinkWithThumbnail';
 import { routes } from '@src/routes/routes';
-import { useItemDetailPageGetItemQuery } from '@src/generated/graphql';
-import Link from 'next/link';
-import { truncate } from '@src/lib/string';
-import Rating from '@src/components/Rating';
-import PlatformBadge from '@src/components/PlatformBadge';
+import ItemDetailCard from '@src/components/ItemDetailCard';
 
 // Copy to `@src/pages/media/posts/preview/[slug]`
 // TODO: Fix to use identical query
@@ -86,58 +82,14 @@ const serializers = {
             objectFit="cover"
             objectPosition="center"
             loading="lazy"
+            lazyBoundary="300px"
             unoptimized
           />
         </div>
       );
     },
     item: ({ node }: { node: { id: string } }) => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { data, loading, error } = useItemDetailPageGetItemQuery({
-        variables: { id: node.id },
-      });
-      const item = data?.getItem;
-      if (!item || loading) {
-        return <div>loading...</div>;
-      }
-      if (error) {
-        return (
-          <div className="p-3 shadow-md rounded-md">
-            商品の取得に失敗しました。
-          </div>
-        );
-      }
-      return (
-        <a href={!!item.affiliateUrl ? item.affiliateUrl : item.url}>
-          <div className="flex items-center shadow-md rounded-md">
-            <div className="w-[40%] h-full overflow-hidden">
-              <img
-                src={item.imageUrls[0]}
-                alt={item.name}
-                className="w-full h-full max-h-[250px] object-cover object-center"
-              />
-            </div>
-            <div className="ml-2 sm:ml-3 w-[70%]">
-              <PlatformBadge platform={item.platform} size="sm" />
-              <div className="my-1 line-clamp-3  font-bold text-sm sm:text-md">
-                {item.name}
-              </div>
-              <div className="hidden sm:block text-text-secondary dark:text-text-secondary-dark">
-                {truncate(item.description, 100)}
-              </div>
-              <div className="my-1 flex items-center">
-                <Rating rating={item.averageRating} maxRating={5} />
-                <div className="ml-1 text-sm text-gray-600 dark:text-gray-300">
-                  {item.reviewCount}
-                </div>
-              </div>
-              <div className="my-2 text-xl sm:text-2xl font-bold">
-                {item.price}円
-              </div>
-            </div>
-          </div>
-        </a>
-      );
+      return <ItemDetailCard itemId={node.id} />;
     },
   },
 };
@@ -215,6 +167,7 @@ const Post = ({
             layout="fill"
             objectFit="cover"
             objectPosition="center"
+            loading="eager"
             unoptimized
           />
         </div>

@@ -21,9 +21,15 @@ export default memo(function Rating({ size, rating, maxRating }: Props) {
 
   return (
     <span className="flex sm:space-x-[0.05rem] text-amber-400">
-      {Array(fullStarCount).fill(<ImStarFull size={size} />)}
-      {Array(halfStarCount).fill(<ImStarHalf size={size} />)}
-      {Array(emptyStarCount).fill(<ImStarEmpty size={size} />)}
+      {Array(fullStarCount).map((_, i) => (
+        <ImStarFull key={`full_star_${i}`} size={size} />
+      ))}
+      {Array(halfStarCount).map((_, i) => (
+        <ImStarHalf key={`half_start_${i}`} size={size} />
+      ))}
+      {Array(emptyStarCount).map((_, i) => (
+        <ImStarEmpty key={`empty_star_${i}`} size={size} />
+      ))}
     </span>
   );
 });

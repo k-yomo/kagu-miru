@@ -27,11 +27,13 @@ export default function LinkWithThumbnail({
             />
           </div>
           <div className="ml-2 sm:ml-3 w-[70%]">
-            <div className="mb-2 text-xl font-bold underline">
-              {truncate(title, 30)}
+            <div className="mb-2 line-clamp-3 sm:line-clamp-2 text-xl font-bold underline">
+              {title}
             </div>
-            <div className="hidden sm:block text-text-secondary dark:text-text-secondary-dark">
-              {truncate(subTitle, 100)}
+            <div className="hidden sm:block">
+              <span className="line-clamp-3 text-text-secondary dark:text-text-secondary-dark">
+                {subTitle}
+              </span>
             </div>
           </div>
         </div>
