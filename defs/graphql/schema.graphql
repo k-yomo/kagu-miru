@@ -15,6 +15,7 @@ type Mutation {
 type PageInfo {
     page: Int!
     totalPage: Int!
+    totalCount: Int!
 }
 
 type ItemCategory {

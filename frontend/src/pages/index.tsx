@@ -114,6 +114,12 @@ const TopPageInner = memo(function TopPageInner() {
           <AppliedFilterIcons />
         </div>
         {loading ? <Loading /> : <></>}
+        {pageInfo && (
+          <div className="my-2 text-sm">
+            検索結果: {pageInfo.totalCount.toLocaleString()}件{' '}
+            {pageInfo.totalCount === 10_000 && '以上'}
+          </div>
+        )}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
             {items && <ItemList items={items} onClickItem={onClickItem} />}

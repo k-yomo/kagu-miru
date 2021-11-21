@@ -39,9 +39,10 @@ func NewElasticsearchClient(itemsIndexName string, itemsQuerySuggestionsIndexNam
 }
 
 type Response struct {
-	Items     []*es.Item
-	Page      uint64
-	TotalPage uint64
+	Items      []*es.Item
+	Page       uint64
+	TotalPage  uint64
+	TotalCount uint64
 }
 
 func (c *elasticsearchClient) GetItem(ctx context.Context, id string) (*es.Item, error) {
@@ -101,9 +102,10 @@ func (c *elasticsearchClient) SearchItems(ctx context.Context, input *gqlmodel.S
 	}
 
 	return &Response{
-		Items:     items,
-		Page:      calcElasticSearchPage(input.Page) + 1,
-		TotalPage: calcTotalPage(uint64(searchResult.Hits.TotalHits.Value), 100),
+		Items:      items,
+		Page:       calcElasticSearchPage(input.Page) + 1,
+		TotalPage:  calcTotalPage(uint64(searchResult.Hits.TotalHits.Value), 100),
+		TotalCount: uint64(searchResult.Hits.TotalHits.Value),
 	}, nil
 }
 

@@ -86,6 +86,7 @@ export type MutationTrackEventArgs = {
 export type PageInfo = {
   page: Scalars['Int'];
   totalPage: Scalars['Int'];
+  totalCount: Scalars['Int'];
 };
 
 export type Query = {
@@ -181,7 +182,7 @@ export type SearchQuery = {
   search: {
     searchId: string;
     itemConnection: {
-      pageInfo: { page: number; totalPage: number };
+      pageInfo: { page: number; totalPage: number; totalCount: number };
       nodes: Array<{
         id: string;
         name: string;
@@ -294,6 +295,7 @@ export const SearchDocument = gql`
         pageInfo {
           page
           totalPage
+          totalCount
         }
         nodes {
           id

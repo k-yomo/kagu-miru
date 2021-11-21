@@ -66,8 +66,9 @@ func mapSearchResponseToGraphqlSearchResponse(res *search.Response, searchID str
 		SearchID: searchID,
 		ItemConnection: &gqlmodel.ItemConnection{
 			PageInfo: &gqlmodel.PageInfo{
-				Page:      int(res.Page),
-				TotalPage: int(res.TotalPage),
+				Page:       int(res.Page),
+				TotalPage:  int(res.TotalPage),
+				TotalCount: int(res.TotalCount),
 			},
 			Nodes: graphqlItems,
 		},

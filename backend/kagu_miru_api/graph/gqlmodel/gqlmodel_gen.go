@@ -43,8 +43,9 @@ type ItemConnection struct {
 }
 
 type PageInfo struct {
-	Page      int `json:"page"`
-	TotalPage int `json:"totalPage"`
+	Page       int `json:"page"`
+	TotalPage  int `json:"totalPage"`
+	TotalCount int `json:"totalCount"`
 }
 
 type QuerySuggestionsDisplayActionParams struct {

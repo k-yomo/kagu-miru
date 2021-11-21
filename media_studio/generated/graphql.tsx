@@ -81,6 +81,7 @@ export type MutationTrackEventArgs = {
 
 export type PageInfo = {
   page: Scalars['Int'];
+  totalCount: Scalars['Int'];
   totalPage: Scalars['Int'];
 };
 

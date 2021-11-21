@@ -34,6 +34,7 @@ gql`
         pageInfo {
           page
           totalPage
+          totalCount
         }
         nodes {
           id

@@ -133,6 +133,10 @@
     <td></td>
   </tr>
   <tr>
+    <td><strong>totalCount</strong> (<a href="scalars.md#int">Int!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>totalPage</strong> (<a href="scalars.md#int">Int!</a>)</td> 
     <td></td>
   </tr>

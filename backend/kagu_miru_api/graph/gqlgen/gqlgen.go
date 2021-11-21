@@ -75,8 +75,9 @@ type ComplexityRoot struct {
 	}
 
 	PageInfo struct {
-		Page      func(childComplexity int) int
-		TotalPage func(childComplexity int) int
+		Page       func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+		TotalPage  func(childComplexity int) int
 	}
 
 	Query struct {
@@ -260,6 +261,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PageInfo.Page(childComplexity), true
 
+	case "PageInfo.totalCount":
+		if e.complexity.PageInfo.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.TotalCount(childComplexity), true
+
 	case "PageInfo.totalPage":
 		if e.complexity.PageInfo.TotalPage == nil {
 			break
@@ -419,6 +427,7 @@ type Mutation {
 type PageInfo {
     page: Int!
     totalPage: Int!
+    totalCount: Int!
 }
 
 type ItemCategory {
@@ -1345,6 +1354,41 @@ func (ec *executionContext) _PageInfo_totalPage(ctx context.Context, field graph
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.TotalPage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PageInfo_totalCount(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.PageInfo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3329,6 +3373,11 @@ func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "totalPage":
 			out.Values[i] = ec._PageInfo_totalPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._PageInfo_totalCount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
