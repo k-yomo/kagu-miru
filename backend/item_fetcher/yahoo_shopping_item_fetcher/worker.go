@@ -253,6 +253,7 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item) (*x
 		ImageURLs:     []string{yahooShoppingItem.Image.Medium, yahooShoppingItem.Image.Small},
 		AverageRating: yahooShoppingItem.Review.Rate,
 		ReviewCount:   yahooShoppingItem.Review.Count,
+		CategoryID:    "101859", // その他, TODO: Replace with appropriate category id
 		// CategoryID:    categoryID,
 		// CategoryIDs:
 		// CategoryNames:
