@@ -167,7 +167,7 @@ const Post = ({
             layout="fill"
             objectFit="cover"
             objectPosition="center"
-            loading="eager"
+            priority
             unoptimized
           />
         </div>
