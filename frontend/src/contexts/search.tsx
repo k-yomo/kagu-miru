@@ -3,6 +3,7 @@ import {
   Dispatch,
   FC,
   memo,
+  PropsWithChildren,
   useContext,
   useEffect,
   useReducer,
@@ -241,109 +242,117 @@ export function queryParamsToSearchParams(
 
 export const useSearch = () => useContext(SearchContext);
 
-export const SearchProvider: FC = memo((props) => {
-  const router = useRouter();
-  const queryParams = useNextQueryParams();
-  const [searchId, setSearchId] = useState<string>('');
-  const [items, setItems] = useState<
-    SearchQuery['search']['itemConnection']['nodes']
-  >([]);
-  const [pageInfo, setPageInfo] = useState<
-    SearchQuery['search']['itemConnection']['pageInfo'] | undefined
-  >();
-  const [searchState, dispatch] = useReducer(
-    searchReducer,
-    queryParamsToSearchParams(queryParams)
-  );
+type Props = PropsWithChildren<{ isAdmin?: boolean }>;
 
-  const [trackEvent] = useTrackEventMutation();
-  const [search, { loading }] = useSearchLazyQuery({
-    fetchPolicy: 'no-cache',
-    nextFetchPolicy: 'no-cache',
-    onCompleted: (data) => {
-      setSearchId(data.search.searchId);
-      setItems(data.search.itemConnection.nodes);
-      setPageInfo(data.search.itemConnection.pageInfo);
-      const params: SearchDisplayItemsActionParams = {
-        searchId: data.search.searchId,
-        searchInput: searchState.searchInput,
-        searchFrom: searchState.searchFrom,
-        itemIds: data.search.itemConnection.nodes.map((item) => item.id),
-      };
-      trackEvent({
-        variables: {
-          event: {
-            id: EventId.Search,
-            action: Action.Display,
-            createdAt: new Date(),
-            params,
+export const SearchProvider: FC<Props> = memo(
+  ({ isAdmin, children }: Props) => {
+    const router = useRouter();
+    const queryParams = useNextQueryParams();
+    const [searchId, setSearchId] = useState<string>('');
+    const [items, setItems] = useState<
+      SearchQuery['search']['itemConnection']['nodes']
+    >([]);
+    const [pageInfo, setPageInfo] = useState<
+      SearchQuery['search']['itemConnection']['pageInfo'] | undefined
+    >();
+    const [searchState, dispatch] = useReducer(
+      searchReducer,
+      queryParamsToSearchParams(queryParams)
+    );
+
+    const [trackEvent] = useTrackEventMutation();
+    const [search, { loading }] = useSearchLazyQuery({
+      fetchPolicy: 'no-cache',
+      nextFetchPolicy: 'no-cache',
+      onCompleted: (data) => {
+        setSearchId(data.search.searchId);
+        setItems(data.search.itemConnection.nodes);
+        setPageInfo(data.search.itemConnection.pageInfo);
+
+        if (isAdmin) {
+          return;
+        }
+        const params: SearchDisplayItemsActionParams = {
+          searchId: data.search.searchId,
+          searchInput: searchState.searchInput,
+          searchFrom: searchState.searchFrom,
+          itemIds: data.search.itemConnection.nodes.map((item) => item.id),
+        };
+        trackEvent({
+          variables: {
+            event: {
+              id: EventId.Search,
+              action: Action.Display,
+              createdAt: new Date(),
+              params,
+            },
           },
-        },
-      }).catch(() => {
-        // do nothing
-      });
-    },
-  });
-
-  useEffect(() => {
-    setItems([]);
-    setPageInfo(undefined);
-
-    const { searchInput, searchFrom } = searchState;
-    const { query, filter, sortType, page } = searchInput;
-    search({
-      variables: {
-        input: {
-          ...searchInput,
-          query: query.trim(),
-        },
+        }).catch(() => {
+          // do nothing
+        });
       },
     });
 
-    const urlQuery: { [key: string]: string } = {
-      q: query,
-    };
-    if (filter.categoryIds.length > 0)
-      urlQuery.categoryIds = filter.categoryIds.join(',');
-    if (filter.platforms.length > 0)
-      urlQuery.platforms = filter.platforms.join(',');
-    if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
-    if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
-    if (filter.minRating) urlQuery.minRating = filter.minRating.toString();
-    if (sortType !== SearchSortType.BestMatch) urlQuery.sort = sortType;
-    if (page && page >= 2) urlQuery.page = page.toString();
+    useEffect(() => {
+      setItems([]);
+      setPageInfo(undefined);
 
-    router.push(
-      {
-        pathname: router.pathname,
-        query: {
-          ...urlQuery,
-          searchFrom,
+      const { searchInput, searchFrom } = searchState;
+      const { query, filter, sortType, page } = searchInput;
+      search({
+        variables: {
+          input: {
+            ...searchInput,
+            query: query.trim(),
+          },
         },
-      },
-      // Exclude searchFrom to track actual searched from, since url can be shared.
-      `${router.pathname}?${new URLSearchParams(urlQuery).toString()}`,
-      {
-        shallow: true,
-        scroll: true,
-      }
-    );
-  }, [searchState]);
+      });
 
-  return (
-    <>
-      <SearchContext.Provider
-        value={{
-          searchState,
-          searchId,
-          items,
-          pageInfo,
-          dispatch,
-          loading,
-        }}
-      >
-        {props.children}
-      </SearchContext.Provider>
-    </>
-  );
-});
+      const urlQuery: { [key: string]: string } = {
+        q: query,
+      };
+      if (filter.categoryIds.length > 0)
+        urlQuery.categoryIds = filter.categoryIds.join(',');
+      if (filter.platforms.length > 0)
+        urlQuery.platforms = filter.platforms.join(',');
+      if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
+      if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
+      if (filter.minRating) urlQuery.minRating = filter.minRating.toString();
+      if (sortType !== SearchSortType.BestMatch) urlQuery.sort = sortType;
+      if (page && page >= 2) urlQuery.page = page.toString();
+
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            ...urlQuery,
+            searchFrom,
+          },
+        },
+        // Exclude searchFrom to track actual searched from, since url can be shared.
+        `${router.pathname}?${new URLSearchParams(urlQuery).toString()}`,
+        {
+          shallow: true,
+          scroll: true,
+        }
+      );
+    }, [searchState]);
+
+    return (
+      <>
+        <SearchContext.Provider
+          value={{
+            searchState,
+            searchId,
+            items,
+            pageInfo,
+            dispatch,
+            loading,
+          }}
+        >
+          {children}
+        </SearchContext.Provider>
+      </>
+    );
+  }
+);
