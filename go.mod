@@ -5,6 +5,7 @@ go 1.17
 require (
 	cloud.google.com/go/profiler v0.1.1
 	cloud.google.com/go/pubsub v1.17.1
+	cloud.google.com/go/spanner v1.27.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/Code-Hex/gqldoc v0.0.4
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
@@ -14,7 +15,7 @@ require (
 	github.com/blendle/zapdriver v1.3.1
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/elastic/go-elasticsearch/v7 v7.15.1
-	github.com/go-chi/chi/v5 v5.0.5
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/k-yomo/pm v0.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -34,7 +35,6 @@ require (
 
 require (
 	cloud.google.com/go v0.97.0 // indirect
-	cloud.google.com/go/spanner v1.27.0 // indirect
 	cloud.google.com/go/trace v0.1.0 // indirect
 	github.com/agnivade/levenshtein v1.1.0 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
