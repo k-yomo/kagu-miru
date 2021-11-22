@@ -22,7 +22,7 @@ export default function ItemDetailCard({ itemId }: Props) {
   }
   return (
     <a href={!!item.affiliateUrl ? item.affiliateUrl : item.url}>
-      <div className="flex items-center border-[1px] border-gray-200 rounded-md">
+      <div className="flex items-center border-[1px] border-gray-200 dark:border-gray-800 rounded-md">
         <div className="w-[40%] sm:w-[30%] h-full overflow-hidden">
           <img
             src={item.imageUrls[0]}

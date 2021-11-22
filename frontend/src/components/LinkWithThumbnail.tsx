@@ -18,7 +18,7 @@ export default function LinkWithThumbnail({
   return (
     <Link href={url}>
       <a>
-        <div className="flex items-center h-[100px] sm:h-[150px] shadow-md rounded-md">
+        <div className="flex items-center h-[100px] sm:h-[150px] shadow-md dark:shadow-none dark:border-[1px] dark:border-gray-800 rounded-md">
           <div className="w-[30%] h-full overflow-hidden">
             <img
               src={imgSrc}
