@@ -71,5 +71,9 @@ export default {
       title: '商品',
       type: 'item',
     },
+    {
+      title: 'アフィリエイトリンク',
+      type: 'affiliateLink',
+    },
   ],
 }
