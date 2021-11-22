@@ -5,6 +5,7 @@ go 1.17
 require (
 	cloud.google.com/go/profiler v0.1.1
 	cloud.google.com/go/pubsub v1.17.1
+	cloud.google.com/go/spanner v1.27.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/Code-Hex/gqldoc v0.0.4
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
@@ -23,7 +24,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.8.0
 	github.com/vektah/gqlparser/v2 v2.2.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.26.1
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.27.0
 	go.opentelemetry.io/otel v1.2.0
 	go.opentelemetry.io/otel/sdk v1.2.0
 	go.uber.org/multierr v1.7.0
@@ -34,7 +35,6 @@ require (
 
 require (
 	cloud.google.com/go v0.97.0 // indirect
-	cloud.google.com/go/spanner v1.27.0 // indirect
 	cloud.google.com/go/trace v0.1.0 // indirect
 	github.com/agnivade/levenshtein v1.1.0 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
@@ -71,8 +71,8 @@ require (
 	github.com/urfave/cli/v2 v2.3.0 // indirect
 	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.opentelemetry.io/otel/internal/metric v0.24.0 // indirect
-	go.opentelemetry.io/otel/metric v0.24.0 // indirect
+	go.opentelemetry.io/otel/internal/metric v0.25.0 // indirect
+	go.opentelemetry.io/otel/metric v0.25.0 // indirect
 	go.opentelemetry.io/otel/trace v1.2.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/mod v0.5.0 // indirect
