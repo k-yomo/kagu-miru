@@ -39,7 +39,7 @@
     "@graphql-codegen/introspection": "^2.1.0",
     "@graphql-codegen/typescript": "^2.2.2",
     "@graphql-codegen/typescript-operations": "^2.1.8",
-    "@graphql-codegen/typescript-react-apollo": "^3.2.0",
+    "@graphql-codegen/typescript-react-apollo": "^3.2.2",
     "@types/gtag.js": "^0.0.8",
     "@types/react": "17.0.36",
     "autoprefixer": "^10.4.0",
