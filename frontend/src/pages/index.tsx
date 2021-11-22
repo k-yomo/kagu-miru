@@ -26,9 +26,17 @@ import PlatformFilter from '@src/components/PlatformFilter';
 
 export default function TopPage() {
   return (
-    <SearchProvider>
-      <TopPageInner />
-    </SearchProvider>
+    <>
+      <SEOMeta
+        title="カグミル - 家具検索サービス"
+        excludeSiteTitle
+        description="カグミルはオンラインで買える家具を横断で一括検索・比較出来るサービスです。"
+        // img={{ srcPath: TopImg.src }}
+      />
+      <SearchProvider>
+        <TopPageInner />
+      </SearchProvider>
+    </>
   );
 }
 
@@ -68,12 +76,6 @@ export const TopPageInner = memo(function TopPageInner({
 
   return (
     <div className="flex max-w-[1200px] mx-auto mt-3 mb-6">
-      <SEOMeta
-        title="カグミル - 家具検索サービス"
-        excludeSiteTitle
-        description="カグミルはオンラインで買える家具を横断で一括検索・比較出来るサービスです。"
-        // img={{ srcPath: TopImg.src }}
-      />
       <MobileSearchFilterModal />
       <div className="my-8 mx-2 lg:mx-4 lg:min-w-[300px] hidden md:block">
         <div
