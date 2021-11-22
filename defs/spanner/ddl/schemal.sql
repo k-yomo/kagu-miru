@@ -24,3 +24,5 @@ CREATE TABLE items (
     updated_at TIMESTAMP NOT NULL,
     FOREIGN KEY (category_id) REFERENCES item_categories (id)
 ) PRIMARY KEY(id);
+
+CREATE INDEX items_by_updated_at ON items (updated_at DESC);
