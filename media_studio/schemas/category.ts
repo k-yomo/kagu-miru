@@ -1,3 +1,5 @@
+import { Rule } from "@sanity/types"
+
 export default {
   name: 'category',
   title: 'Category',
@@ -7,7 +9,7 @@ export default {
       name: 'id',
       title: 'ID',
       type: 'string',
-      validation: Rule => Rule.required()
+      validation: (Rule: Rule) => Rule.required()
     },
     {
       name: `parent`,
@@ -19,7 +21,7 @@ export default {
       name: 'name',
       title: 'Name',
       type: 'string',
-      validation: Rule => Rule.required()
+      validation: (Rule: Rule) => Rule.required()
     },
     {
       name: 'description',

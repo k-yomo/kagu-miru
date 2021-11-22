@@ -1,3 +1,5 @@
+import { Rule } from "@sanity/types"
+
 export default {
   name: 'author',
   title: 'Author',
@@ -7,13 +9,13 @@ export default {
       name: 'name',
       title: 'Name',
       type: 'string',
-      validation: Rule => Rule.required(),
+      validation: (Rule: Rule) => Rule.required(),
     },
     {
       name: 'id',
       title: 'Author ID',
       type: 'slug',
-      validation: Rule => Rule.required(),
+      validation: (Rule: Rule) => Rule.required(),
       options: {
         source: 'name',
         maxLength: 96,
@@ -23,7 +25,7 @@ export default {
       name: 'image',
       title: 'Image',
       type: 'image',
-      validation: Rule => Rule.required(),
+      validation: (Rule: Rule) => Rule.required(),
       options: {
         hotspot: true,
       },

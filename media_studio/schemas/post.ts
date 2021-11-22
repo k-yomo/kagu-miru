@@ -1,3 +1,5 @@
+import { Rule } from "@sanity/types"
+
 export default {
   name: 'post',
   title: 'Post',
@@ -7,19 +9,19 @@ export default {
       name: 'slug',
       title: 'URL Slug',
       type: 'slug',
-      validation: Rule => Rule.required(),
+      validation: (Rule: Rule) => Rule.required(),
     },
     {
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: Rule => Rule.required()
+      validation: (Rule: Rule) => Rule.required(),
     },
     {
       name: 'description',
       title: 'Description',
       type: 'string',
-      validation: Rule => Rule.required()
+      validation: (Rule: Rule) => Rule.required(),
     },
     {
       name: 'author',
@@ -31,7 +33,7 @@ export default {
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
-      validation: Rule => Rule.required(),
+      validation: (Rule: Rule) => Rule.required(),
       options: {
         hotspot: true,
       },
@@ -46,13 +48,13 @@ export default {
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
-      validation: Rule => Rule.required(),
+      validation: (Rule: Rule) => Rule.required(),
     },
     {
       name: 'body',
       title: 'Body',
       type: 'blockContent',
-      validation: Rule => Rule.required(),
+      validation: (Rule: Rule) => Rule.required(),
     },
   ],
 
@@ -62,7 +64,7 @@ export default {
       author: 'author.name',
       media: 'mainImage',
     },
-    prepare(selection) {
+    prepare(selection: { title: string, author: string, media: any }) {
       const {author} = selection
       return Object.assign({}, selection, {
         subtitle: author && `by ${author}`,
