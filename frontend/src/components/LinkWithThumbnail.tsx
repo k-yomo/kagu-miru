@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { truncate } from '@src/lib/string';
 
 interface Props {
   url: string;

@@ -1,5 +1,6 @@
-import React, { memo } from 'react';
+import React, { memo, PropsWithChildren } from 'react';
 import Image from 'next/image';
+import { useClipboard } from 'use-clipboard-copy';
 import {
   Action,
   EventId,
@@ -8,6 +9,7 @@ import {
   useTrackEventMutation,
 } from '@src/generated/graphql';
 import { SearchProvider, useSearch } from '@src/contexts/search';
+import { useToast } from '@src/contexts/toast';
 import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
 import PlatformBadge from '@src/components/PlatformBadge';
@@ -30,11 +32,22 @@ export default function TopPage() {
   );
 }
 
-const TopPageInner = memo(function TopPageInner() {
+export const TopPageInner = memo(function TopPageInner({
+  isAdmin,
+}: {
+  isAdmin?: boolean;
+}) {
   const { searchState, searchId, items, pageInfo, loading } = useSearch();
+  const toast = useToast();
+  const clipboard = useClipboard();
   const [trackEvent] = useTrackEventMutation();
 
   const onClickItem = (itemId: string) => {
+    if (isAdmin) {
+      clipboard.copy(itemId);
+      toast(`商品ID ${itemId} をコピーしました`, { type: 'success' });
+      return;
+    }
     const params: SearchClickItemActionParams = {
       searchId: searchId,
       itemId,
@@ -122,7 +135,13 @@ const TopPageInner = memo(function TopPageInner() {
         )}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
-            {items && <ItemList items={items} onClickItem={onClickItem} />}
+            {items && (
+              <ItemList
+                isAdmin={isAdmin!!}
+                items={items}
+                onClickItem={onClickItem}
+              />
+            )}
           </div>
           {pageInfo && (
             <div className="my-4 w-full">
@@ -138,16 +157,36 @@ const TopPageInner = memo(function TopPageInner() {
 interface ItemListProps {
   items: SearchQuery['search']['itemConnection']['nodes'];
   onClickItem: (itemId: string) => void;
+  isAdmin: boolean;
 }
 
-const ItemList = memo(function ItemList({ items, onClickItem }: ItemListProps) {
+const ItemList = memo(function ItemList({
+  items,
+  onClickItem,
+  isAdmin,
+}: ItemListProps) {
+  const ItemWrapper = function ({
+    id,
+    url,
+    children,
+  }: PropsWithChildren<{ id: string; url: string }>) {
+    if (isAdmin) {
+      return <button onClick={() => onClickItem(id)}>{children}</button>;
+    } else {
+      return (
+        <a href={url} onClick={() => onClickItem(id)}>
+          {children}
+        </a>
+      );
+    }
+  };
   return (
     <>
       {items.map((item) => (
-        <a
+        <ItemWrapper
           key={item.id}
-          href={!!item.affiliateUrl ? item.affiliateUrl : item.url}
-          onClick={() => onClickItem(item.id)}
+          id={item.id}
+          url={!!item.affiliateUrl ? item.affiliateUrl : item.url}
         >
           <div className="rounded-md sm:shadow">
             <Image
@@ -174,7 +213,7 @@ const ItemList = memo(function ItemList({ items, onClickItem }: ItemListProps) {
               <div className="text-lg font-bold">{item.price}円</div>
             </div>
           </div>
-        </a>
+        </ItemWrapper>
       ))}
     </>
   );
