@@ -27,7 +27,7 @@ export default function SEOMeta({
     <Head>
       <title>
         {title}
-        {excludeSiteTitle || ` - ${SITE_TITLE}`}
+        {excludeSiteTitle ? '' : ` - ${SITE_TITLE}`}
       </title>
       <meta name="description" content={description} />
       <meta name="twitter:site" content={TWITTER_USERNAME} />
