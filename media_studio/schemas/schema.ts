@@ -11,7 +11,6 @@ import post from './post'
 import author from './author'
 import item from './item'
 import customHtml from "./customHtml"
-import affiliateLink from "./affiliateLink"
 
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
@@ -29,7 +28,6 @@ export default createSchema({
     category,
     blockContent,
     item,
-    affiliateLink,
     customHtml,
   ]),
 })
