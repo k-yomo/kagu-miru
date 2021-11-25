@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react"
+import React, { memo, useEffect, useState } from "react"
 import gql from "graphql-tag"
 import {
   ItemPreviewGetItemDocument,
@@ -29,15 +29,24 @@ export default memo(function ({ value }: { value: { id: string } }) {
   const [item, setItem] = useState<ItemPreviewGetItemQuery['getItem']>()
   const [error, setError] = useState<GraphQLError>()
   const { id } = value
-  apolloClient.query<ItemPreviewGetItemQuery>({
-    query: ItemPreviewGetItemDocument,
-    variables: { id }
-  }).then(({ data }) => {
-    console.log(data.getItem)
-    setItem(data.getItem)
-  }).catch(e => {
-    setError(e)
-  })
+
+  useEffect(() => {
+    if (!id) {
+      return
+    }
+    apolloClient.query<ItemPreviewGetItemQuery>({
+      query: ItemPreviewGetItemDocument,
+      variables: { id }
+    }).then(({ data }) => {
+      setItem(data.getItem)
+    }).catch(e => {
+      setError(e)
+    })
+  }, [id])
+
+  if (!id) {
+    return <div>未選択</div>
+  }
   if (error) {
     return <div style={{ color: "red"}}>{error.name}</div>
   }
