@@ -91,7 +91,7 @@ const serializers = {
     item: ({ node }: { node: { id: string } }) => {
       return <ItemDetailCard itemId={node.id} />;
     },
-    affiliateLink: ({ node }: { node: { html: string } }) => {
+    customHtml: ({ node }: { node: { html: string } }) => {
       return <div dangerouslySetInnerHTML={{ __html: node.html }} />;
     },
   },

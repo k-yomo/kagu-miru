@@ -1,5 +1,3 @@
-import { DocumentTextIcon } from "@heroicons/react/outline"
-import post from "./post"
 /**
  * This is the schema definition for the rich text fields used for
  * for this blog studio. When you import it in schemas.js it can be
@@ -72,8 +70,8 @@ export default {
       type: 'item',
     },
     {
-      title: 'アフィリエイトリンク',
-      type: 'affiliateLink',
+      title: 'カスタムHTML',
+      type: 'customHtml',
     },
   ],
 }

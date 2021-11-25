@@ -1,8 +1,8 @@
-import AffiliateLinkPreview from "../components/AffiliateLinkPreview"
+import CustomHtmlPreview from "../components/CustomHtmlPreview"
 
 export default {
-  name: 'affiliateLink',
-  title: 'Item',
+  name: 'customHtml',
+  title: 'Custom HTML',
   type: 'object',
   fields: [
     {
@@ -15,7 +15,7 @@ export default {
     select: {
       html: 'html'
     },
-    component: AffiliateLinkPreview
+    component: CustomHtmlPreview
   }
 }
 
