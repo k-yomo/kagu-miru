@@ -1,4 +1,5 @@
 import ItemPreview from "../components/ItemPreview"
+import ItemIdInput from "../components/ItemIdInput"
 
 export default {
   name: 'item',
@@ -9,11 +10,12 @@ export default {
       name: 'id',
       title: 'ID',
       type: 'string',
+      inputComponent: ItemIdInput
     },
   ],
   preview: {
     select: {
-      id: 'id'
+      id: 'id',
     },
     component: ItemPreview
   }
