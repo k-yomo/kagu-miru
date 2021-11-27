@@ -47,7 +47,7 @@ export default function ItemDetailCard({ itemId }: Props) {
             </div>
           </div>
           <div className="my-2 text-xl sm:text-2xl font-bold">
-            {item.price}円
+            {item.price.toLocaleString()}円
           </div>
         </div>
       </div>
