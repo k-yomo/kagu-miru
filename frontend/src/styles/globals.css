@@ -4,62 +4,66 @@
 @tailwind utilities;
 
 body {
-  @apply text-text-primary;
-  @apply dark:text-text-primary-dark;
+    @apply text-text-primary;
+    @apply dark:text-text-primary-dark;
 
-  font-size: 18px;
+    font-size: 18px;
 }
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
+    -webkit-appearance: none;
 }
 
 .page-loader {
-  @apply border-t-black;
+    @apply border-t-black;
 }
 
 li {
-  @apply list-disc;
-  @apply ml-6;
-  @apply my-2;
+    @apply list-disc;
+    @apply ml-6;
+    @apply my-2;
 }
 
 /*
  For post's rich text
 */
 #post h2 {
-  @apply my-3;
-  @apply pb-2;
-  @apply border-b-4;
-  @apply border-black;
-  @apply text-2xl;
-  @apply font-bold;
+    @apply my-3;
+    @apply pb-2;
+    @apply border-b-4;
+    border-image: linear-gradient(90deg, #EC4899, #F43F5E) 1;
+    @apply text-2xl;
+    @apply font-bold;
 }
 
 #post h3 {
-  @apply my-2;
-  @apply text-xl;
-  @apply font-bold;
+    @apply my-2;
+    @apply text-xl;
+    @apply font-bold;
 }
 
 #post h4 {
-  @apply my-1;
-  @apply text-lg;
-  @apply font-bold;
+    @apply my-1;
+    @apply text-lg;
+    @apply font-bold;
 }
 
 #post p {
-  @apply my-5;
-  @apply leading-relaxed;
+    @apply my-5;
+    @apply leading-relaxed;
 }
 
 #post blockquote {
-  @apply my-2;
-  padding-left: calc(1rem - 1px);
-  @apply border-l-4;
-  @apply border-[rgba(123,140,168,.25)];
-  @apply dark:border-[rgba(123,140,168,.50)];
-  @apply text-gray-500;
-  @apply dark:text-gray-400;
+    @apply my-2;
+    padding-left: calc(1rem - 1px);
+    @apply border-l-4;
+    @apply border-[rgba(123,140,168,.25)];
+    @apply dark:border-[rgba(123,140,168,.50)];
+    @apply text-gray-500;
+    @apply dark:text-gray-400;
+}
+
+#post strong {
+    @apply text-primary-600
 }

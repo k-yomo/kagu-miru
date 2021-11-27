@@ -89,7 +89,7 @@ const FilterIcon = memo(function FilterIcon({
   onClear,
 }: FilterIconProps) {
   return (
-    <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-primary-100 dark:bg-primary-600 text-primary-800 dark:text-primary-100 text-xs focus:outline-none">
+    <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-white text-xs focus:outline-none">
       {name}
       <XIcon className="w-3 h-3 ml-2 cursor-pointer" onClick={onClear} />
     </span>

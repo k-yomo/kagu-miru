@@ -132,7 +132,7 @@ function ToastMessage({ show, message, type, onClose }: ToastMessageProps) {
                   </div>
                   <div className="flex flex-shrink-0 ml-4">
                     <button
-                      className="inline-flex text-gray-400 hover:text-gray-500 bg-white rounded-md focus:ring-2 focus:ring-offset-2 focus:outline-none focus:ring-indigo-500"
+                      className="inline-flex text-gray-400 hover:text-gray-500 bg-white rounded-md focus:ring-2 focus:ring-offset-2 focus:outline-none focus:ring-primary-500"
                       onClick={onClose}
                     >
                       <span className="sr-only">Close</span>
