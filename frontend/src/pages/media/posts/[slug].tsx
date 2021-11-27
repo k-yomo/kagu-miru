@@ -63,7 +63,7 @@ const serializers = {
     internalLink: ({ node }: { node: InternalLink }) => {
       return (
         <LinkWithThumbnail
-          url={routes.post(node.slug)}
+          url={routes.mediaPost(node.slug)}
           title={node.title}
           subTitle={node.description}
           imgSrc={buildSanityImageSrc(node.mainImage).url()}
@@ -183,7 +183,9 @@ const Post = ({
             {categories?.map((category) => (
               <PostCategoryBadge
                 key={category.id}
+                id={category.id}
                 name={category.names[category.names.length - 1]}
+                enableLink
               />
             ))}
           </div>
