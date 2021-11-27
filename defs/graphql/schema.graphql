@@ -5,7 +5,9 @@ type Query {
     search(input: SearchInput): SearchResponse!
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
     getItem(id: ID!): Item!
-    getAllCategories: [ItemCategory]!
+    # getAllItemCategories return item categories in a hierarchical data structure
+    # max depth is 4
+    getAllItemCategories: [ItemCategory!]!
 }
 
 type Mutation {
@@ -21,6 +23,9 @@ type PageInfo {
 type ItemCategory {
     id: ID!
     name: String!
+    level: Int!
+    parentId: ID
+    Parent: ItemCategory
     children: [ItemCategory!]!
 }
 

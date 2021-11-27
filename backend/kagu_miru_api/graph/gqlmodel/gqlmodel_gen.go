@@ -34,6 +34,9 @@ type Item struct {
 type ItemCategory struct {
 	ID       string          `json:"id"`
 	Name     string          `json:"name"`
+	Level    int             `json:"level"`
+	ParentID *string         `json:"parentId"`
+	Parent   *ItemCategory   `json:"Parent"`
 	Children []*ItemCategory `json:"children"`
 }
 

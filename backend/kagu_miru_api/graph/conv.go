@@ -3,12 +3,27 @@ package graph
 import (
 	"fmt"
 
-	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
-
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
+	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
+	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/search"
+	"github.com/k-yomo/kagu-miru/backend/pkg/pointerconv"
 )
+
+func mapSpannerItemCategoriesToGraphqlItemCategories(itemCategories []*xspanner.ItemCategory) []*gqlmodel.ItemCategory {
+	gqlItemCategories := make([]*gqlmodel.ItemCategory, 0, len(itemCategories))
+	for _, itemCategory := range itemCategories {
+		gqlItemCategory := &gqlmodel.ItemCategory{
+			ID:       itemCategory.ID,
+			Name:     itemCategory.Name,
+			Level:    int(itemCategory.Level),
+			ParentID: pointerconv.StringToPointer(itemCategory.ParentID.String()),
+		}
+		gqlItemCategories = append(gqlItemCategories, gqlItemCategory)
+	}
+	return gqlItemCategories
+}
 
 func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 	var status gqlmodel.ItemStatus

@@ -9,6 +9,9 @@ import (
 	"syscall"
 	"time"
 
+	"cloud.google.com/go/spanner"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/db"
+
 	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/pubsub"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -57,6 +60,16 @@ func main() {
 		}
 	}
 
+	spannerClient, err := spanner.NewClient(
+		context.Background(),
+		fmt.Sprintf("projects/%s/instances/%s/databases/%s", cfg.GCPProjectID, cfg.SpannerInstanceID, cfg.SpannerDatabaseID),
+	)
+	if err != nil {
+		logger.Fatal("failed to initialize spanner client", zap.Error(err))
+	}
+
+	dbClient := db.NewSpannerDBClient(spannerClient)
+
 	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
 		Addresses: []string{cfg.ElasticSearchURL},
 		Username:  cfg.ElasticSearchUsername,
@@ -85,7 +98,7 @@ func main() {
 	searchIDManager := tracking.NewSearchIDManager(cfg.Env.IsDeployed())
 
 	gqlConfig := gqlgen.Config{
-		Resolvers: graph.NewResolver(searchClient, searchIDManager, eventLoader),
+		Resolvers: graph.NewResolver(dbClient, searchClient, searchIDManager, eventLoader),
 	}
 	gqlServer := handler.NewDefaultServer(gqlgen.NewExecutableSchema(gqlConfig))
 	gqlServer.Use(tracing.GraphqlExtension{})

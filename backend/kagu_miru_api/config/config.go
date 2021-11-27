@@ -23,6 +23,9 @@ type Config struct {
 	GCPProjectID       string `default:"local" envconfig:"GCP_PROJECT_ID"`
 	PubSubEventTopicID string `envconfig:"PUBSUB_EVENT_TOPIC_ID"`
 
+	SpannerInstanceID string `envconfig:"SPANNER_INSTANCE_ID"`
+	SpannerDatabaseID string `envconfig:"SPANNER_DATABASE_ID"`
+
 	ElasticSearchUsername          string `envconfig:"ELASTICSEARCH_USERNAME"`
 	ElasticSearchPassword          string `envconfig:"ELASTICSEARCH_PASSWORD"`
 	ElasticSearchURL               string `default:"http://localhost:9200" envconfig:"ELASTICSEARCH_URL"`

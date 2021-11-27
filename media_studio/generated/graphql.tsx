@@ -2,10 +2,16 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions =  {}
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -19,7 +25,7 @@ export type Scalars = {
 
 export enum Action {
   ClickItem = 'CLICK_ITEM',
-  Display = 'DISPLAY'
+  Display = 'DISPLAY',
 }
 
 export type Event = {
@@ -31,7 +37,7 @@ export type Event = {
 
 export enum EventId {
   QuerySuggestions = 'QUERY_SUGGESTIONS',
-  Search = 'SEARCH'
+  Search = 'SEARCH',
 }
 
 export type Item = {
@@ -50,9 +56,12 @@ export type Item = {
 };
 
 export type ItemCategory = {
+  Parent?: Maybe<ItemCategory>;
   children: Array<ItemCategory>;
   id: Scalars['ID'];
+  level: Scalars['Int'];
   name: Scalars['String'];
+  parentId?: Maybe<Scalars['ID']>;
 };
 
 export type ItemConnection = {
@@ -62,18 +71,17 @@ export type ItemConnection = {
 
 export enum ItemSellingPlatform {
   Rakuten = 'RAKUTEN',
-  YahooShopping = 'YAHOO_SHOPPING'
+  YahooShopping = 'YAHOO_SHOPPING',
 }
 
 export enum ItemStatus {
   Active = 'ACTIVE',
-  Inactive = 'INACTIVE'
+  Inactive = 'INACTIVE',
 }
 
 export type Mutation = {
   trackEvent: Scalars['Boolean'];
 };
-
 
 export type MutationTrackEventArgs = {
   event: Event;
@@ -86,22 +94,19 @@ export type PageInfo = {
 };
 
 export type Query = {
-  getAllCategories: Array<Maybe<ItemCategory>>;
+  getAllItemCategories: Array<ItemCategory>;
   getItem: Item;
   getQuerySuggestions: QuerySuggestionsResponse;
   search: SearchResponse;
 };
 
-
 export type QueryGetItemArgs = {
   id: Scalars['ID'];
 };
 
-
 export type QueryGetQuerySuggestionsArgs = {
   query: Scalars['String'];
 };
-
 
 export type QuerySearchArgs = {
   input?: InputMaybe<SearchInput>;
@@ -141,7 +146,7 @@ export enum SearchFrom {
   Filter = 'FILTER',
   QuerySuggestion = 'QUERY_SUGGESTION',
   Search = 'SEARCH',
-  Url = 'URL'
+  Url = 'URL',
 }
 
 export type SearchInput = {
@@ -162,34 +167,159 @@ export enum SearchSortType {
   PriceAsc = 'PRICE_ASC',
   PriceDesc = 'PRICE_DESC',
   Rating = 'RATING',
-  ReviewCount = 'REVIEW_COUNT'
+  ReviewCount = 'REVIEW_COUNT',
 }
+
+export type SubItemCategoryFragment = {
+  id: string;
+  level: number;
+  name: string;
+  parentId?: string | null | undefined;
+};
+
+export type CategoryInputGetAllCategoriesQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type CategoryInputGetAllCategoriesQuery = {
+  getAllItemCategories: Array<{
+    id: string;
+    level: number;
+    name: string;
+    parentId?: string | null | undefined;
+    children: Array<{
+      id: string;
+      level: number;
+      name: string;
+      parentId?: string | null | undefined;
+      children: Array<{
+        id: string;
+        level: number;
+        name: string;
+        parentId?: string | null | undefined;
+        children: Array<{
+          id: string;
+          level: number;
+          name: string;
+          parentId?: string | null | undefined;
+        }>;
+      }>;
+    }>;
+  }>;
+};
 
 export type ItemPreviewGetItemQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
+export type ItemPreviewGetItemQuery = {
+  getItem: {
+    id: string;
+    name: string;
+    status: ItemStatus;
+    url: string;
+    affiliateUrl: string;
+    price: number;
+    imageUrls: Array<string>;
+    averageRating: number;
+    reviewCount: number;
+    categoryIds: Array<string>;
+    platform: ItemSellingPlatform;
+  };
+};
 
-export type ItemPreviewGetItemQuery = { getItem: { id: string, name: string, status: ItemStatus, url: string, affiliateUrl: string, price: number, imageUrls: Array<string>, averageRating: number, reviewCount: number, categoryIds: Array<string>, platform: ItemSellingPlatform } };
-
-
-export const ItemPreviewGetItemDocument = gql`
-    query itemPreviewGetItem($id: ID!) {
-  getItem(id: $id) {
+export const SubItemCategoryFragmentDoc = gql`
+  fragment subItemCategory on ItemCategory {
     id
+    level
     name
-    status
-    url
-    affiliateUrl
-    price
-    imageUrls
-    averageRating
-    reviewCount
-    categoryIds
-    platform
+    parentId
   }
+`;
+export const CategoryInputGetAllCategoriesDocument = gql`
+  query categoryInputGetAllCategories {
+    getAllItemCategories {
+      ...subItemCategory
+      children {
+        ...subItemCategory
+        children {
+          ...subItemCategory
+          children {
+            ...subItemCategory
+          }
+        }
+      }
+    }
+  }
+  ${SubItemCategoryFragmentDoc}
+`;
+
+/**
+ * __useCategoryInputGetAllCategoriesQuery__
+ *
+ * To run a query within a React component, call `useCategoryInputGetAllCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCategoryInputGetAllCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCategoryInputGetAllCategoriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCategoryInputGetAllCategoriesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    CategoryInputGetAllCategoriesQuery,
+    CategoryInputGetAllCategoriesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    CategoryInputGetAllCategoriesQuery,
+    CategoryInputGetAllCategoriesQueryVariables
+  >(CategoryInputGetAllCategoriesDocument, options);
 }
-    `;
+export function useCategoryInputGetAllCategoriesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CategoryInputGetAllCategoriesQuery,
+    CategoryInputGetAllCategoriesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    CategoryInputGetAllCategoriesQuery,
+    CategoryInputGetAllCategoriesQueryVariables
+  >(CategoryInputGetAllCategoriesDocument, options);
+}
+export type CategoryInputGetAllCategoriesQueryHookResult = ReturnType<
+  typeof useCategoryInputGetAllCategoriesQuery
+>;
+export type CategoryInputGetAllCategoriesLazyQueryHookResult = ReturnType<
+  typeof useCategoryInputGetAllCategoriesLazyQuery
+>;
+export type CategoryInputGetAllCategoriesQueryResult = Apollo.QueryResult<
+  CategoryInputGetAllCategoriesQuery,
+  CategoryInputGetAllCategoriesQueryVariables
+>;
+export const ItemPreviewGetItemDocument = gql`
+  query itemPreviewGetItem($id: ID!) {
+    getItem(id: $id) {
+      id
+      name
+      status
+      url
+      affiliateUrl
+      price
+      imageUrls
+      averageRating
+      reviewCount
+      categoryIds
+      platform
+    }
+  }
+`;
 
 /**
  * __useItemPreviewGetItemQuery__
@@ -207,14 +337,37 @@ export const ItemPreviewGetItemDocument = gql`
  *   },
  * });
  */
-export function useItemPreviewGetItemQuery(baseOptions: Apollo.QueryHookOptions<ItemPreviewGetItemQuery, ItemPreviewGetItemQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ItemPreviewGetItemQuery, ItemPreviewGetItemQueryVariables>(ItemPreviewGetItemDocument, options);
-      }
-export function useItemPreviewGetItemLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ItemPreviewGetItemQuery, ItemPreviewGetItemQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ItemPreviewGetItemQuery, ItemPreviewGetItemQueryVariables>(ItemPreviewGetItemDocument, options);
-        }
-export type ItemPreviewGetItemQueryHookResult = ReturnType<typeof useItemPreviewGetItemQuery>;
-export type ItemPreviewGetItemLazyQueryHookResult = ReturnType<typeof useItemPreviewGetItemLazyQuery>;
-export type ItemPreviewGetItemQueryResult = Apollo.QueryResult<ItemPreviewGetItemQuery, ItemPreviewGetItemQueryVariables>;
+export function useItemPreviewGetItemQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ItemPreviewGetItemQuery,
+    ItemPreviewGetItemQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ItemPreviewGetItemQuery,
+    ItemPreviewGetItemQueryVariables
+  >(ItemPreviewGetItemDocument, options);
+}
+export function useItemPreviewGetItemLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ItemPreviewGetItemQuery,
+    ItemPreviewGetItemQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ItemPreviewGetItemQuery,
+    ItemPreviewGetItemQueryVariables
+  >(ItemPreviewGetItemDocument, options);
+}
+export type ItemPreviewGetItemQueryHookResult = ReturnType<
+  typeof useItemPreviewGetItemQuery
+>;
+export type ItemPreviewGetItemLazyQueryHookResult = ReturnType<
+  typeof useItemPreviewGetItemLazyQuery
+>;
+export type ItemPreviewGetItemQueryResult = Apollo.QueryResult<
+  ItemPreviewGetItemQuery,
+  ItemPreviewGetItemQueryVariables
+>;

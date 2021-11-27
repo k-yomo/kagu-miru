@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	gqlgend "github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
 	gqlmodell "github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
@@ -46,8 +47,34 @@ func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodell.Item
 	return mapSearchItemToGraphqlItem(item)
 }
 
-func (r *queryResolver) GetAllCategories(ctx context.Context) ([]*gqlmodell.ItemCategory, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) GetAllItemCategories(ctx context.Context) ([]*gqlmodell.ItemCategory, error) {
+	allItemCategories, err := r.DBClient.GetAllItemCategories(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("DBClient.GetAllItemCategories: %w", err)
+	}
+
+	gqlItemCategories := mapSpannerItemCategoriesToGraphqlItemCategories(allItemCategories)
+	sort.Slice(gqlItemCategories, func(i, j int) bool {
+		return gqlItemCategories[i].Level < gqlItemCategories[j].Level
+	})
+
+	itemCategoryMap := make(map[string]*gqlmodell.ItemCategory)
+	for _, itemCategory := range gqlItemCategories {
+		if itemCategory.Level == 0 {
+			itemCategoryMap[itemCategory.ID] = itemCategory
+		} else {
+			itemCategoryMap[*itemCategory.ParentID].Children = append(itemCategoryMap[*itemCategory.ParentID].Children, itemCategory)
+			itemCategoryMap[itemCategory.ID] = itemCategory
+		}
+	}
+
+	var topLevelItemCategories []*gqlmodell.ItemCategory
+	for _, itemCategory := range gqlItemCategories {
+		if itemCategory.Level == 0 {
+			topLevelItemCategories = append(topLevelItemCategories, itemCategory)
+		}
+	}
+	return topLevelItemCategories, nil
 }
 
 // Mutation returns gqlgend.MutationResolver implementation.

@@ -40,6 +40,7 @@ lint:
 fmt:
 	goimports -w backend & \
 	cd frontend && npm run fmt & \
+	cd media_studio && npm run fmt & \
 	wait
 
 .PHONY: gen-graphql
