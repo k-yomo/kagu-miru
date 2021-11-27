@@ -5,11 +5,11 @@ import groq from 'groq';
 import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
 import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 import { routes } from '@src/routes/routes';
-import CategoryTag from '@src/components/PostTagBadge';
 import MediaTopImg from '@public/images/media_top.jpg';
 import { truncate } from '@src/lib/string';
 import { formatDistance, parseISO } from 'date-fns';
 import SEOMeta from '@src/components/SEOMeta';
+import PostCategoryBadge from '@src/components/PostCategoryBadge';
 
 const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"][0..9]{
   "slug": slug.current,
@@ -17,7 +17,7 @@ const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"][0..9]{
   description,
   mainImage,
   publishedAt,
-  "categories": categories[]->name,
+  categories,
 } | order(publishedAt desc)`;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -32,7 +32,7 @@ interface PostMeta {
   description: string;
   mainImage: SanityImageSource;
   publishedAt?: string;
-  categories?: string[];
+  categories?: Array<{ id: string; names: string[] }>;
 }
 
 interface Props {
@@ -82,7 +82,10 @@ const PostCard = memo(function PostCard({ postMeta }: { postMeta: PostMeta }) {
             {postMeta.categories && (
               <div className="mb-2">
                 {postMeta.categories.map((category) => (
-                  <CategoryTag key={category} name={category} />
+                  <PostCategoryBadge
+                    key={category.id}
+                    name={category.names[category.names.length - 1]}
+                  />
                 ))}
               </div>
             )}
