@@ -206,7 +206,7 @@ const ItemList = memo(function ItemList({
               <div className="flex items-center">
                 <Rating rating={item.averageRating} maxRating={5} />
                 <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
-                  {item.reviewCount}
+                  {item.reviewCount}件
                 </div>
               </div>
               <h4 className="mt-1 break-all line-clamp-2 text-sm sm:text-md">
