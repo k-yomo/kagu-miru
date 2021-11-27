@@ -63,7 +63,7 @@ export default memo(function PriceFilter() {
         </button>
         <button
           type="button"
-          className="inline-flex items-center px-2.5 py-1.5 border border-indigo-700 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none"
+          className="inline-flex items-center px-2.5 py-1.5 bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-white focus:outline-none"
           onClick={onClickApply}
         >
           適用

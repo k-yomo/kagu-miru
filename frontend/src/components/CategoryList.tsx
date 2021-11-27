@@ -150,9 +150,9 @@ const Category = memo(function Category({
   }, [setShowChildren, selectedCategoryIdPath, category.id]);
 
   return (
-    <div className="ml-2">
+    <div>
       <div
-        className={`flex items-center justify-between cursor-pointer ${
+        className={`flex pl-2 items-center justify-between cursor-pointer ${
           hasChildren ? 'hover:bg-gray-50 dark:hover:bg-gray-800' : 'py-2'
         }`}
       >
@@ -174,7 +174,7 @@ const Category = memo(function Category({
             ))}
         </div>
       </div>
-      <div>
+      <div className="pl-2">
         {showChildren &&
           category.children.map((category) => (
             <Category
