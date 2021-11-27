@@ -212,7 +212,7 @@ const ItemList = memo(function ItemList({
               <h4 className="mt-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
               </h4>
-              <div className="text-lg font-bold">{item.price}円</div>
+              <div className="text-lg font-bold">{item.price.toLocaleString()}円</div>
             </div>
           </div>
         </ItemWrapper>
