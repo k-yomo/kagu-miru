@@ -67,5 +67,5 @@ li {
 }
 
 #post strong {
-    @apply text-primary-600
+    @apply text-primary-600;
 }

@@ -34,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
         slug: { current: string };
       }) => `
   <url>
-    <loc>${SITE_ROOT_URL}${routes.post(slug.current)}</loc>
+    <loc>${SITE_ROOT_URL}${routes.mediaPost(slug.current)}</loc>
     <lastmod>${_updatedAt}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.5</priority>
