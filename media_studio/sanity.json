@@ -12,7 +12,8 @@
     "@sanity/default-layout",
     "@sanity/default-login",
     "@sanity/desk-tool",
-    "@sanity/production-preview"
+    "@sanity/production-preview",
+    "autocomplete-tags"
   ],
   "env": {
     "development": {
@@ -28,14 +29,6 @@
     {
       "name": "part:@sanity/base/schema",
       "path": "./schemas/schema"
-    },
-    {
-      "name": "part:@sanity/desk-tool/structure",
-      "path": "./deskStructure.ts"
-    },
-    {
-      "name": "part:@sanity/base/initial-value-templates",
-      "path": "./initialValueTemplates.ts"
     },
     {
       "implements": "part:@sanity/production-preview/resolve-production-url",

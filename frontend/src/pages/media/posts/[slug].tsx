@@ -11,7 +11,7 @@ import {
 } from '@sanity/image-url/lib/types/types';
 import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
 import SEOMeta from '@src/components/SEOMeta';
-import CategoryTag from '@src/components/CategoryTag';
+import PostTag from '@src/components/PostTag';
 import TableOfContents from '@src/components/TableOfContents';
 import AuthorIcon from '@src/components/AuthorIcon';
 import LinkWithThumbnail from '@src/components/LinkWithThumbnail';
@@ -26,7 +26,7 @@ export const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0
   description,
   mainImage,
   publishedAt,
-  "categories": categories[]->name,
+  "tags": tags[]->value,
   "authorName": author->name,
   "authorImage": author->image,
   body[]{
@@ -114,7 +114,7 @@ export interface Props {
   authorName?: string;
   authorImage?: SanityImageSource;
   publishedAt?: string;
-  categories?: string[];
+  tags?: string[];
   body: any[];
 }
 
@@ -125,7 +125,7 @@ const Post = ({
   authorName,
   authorImage,
   publishedAt,
-  categories,
+  tags,
   body,
 }: Props) => {
   const router = useRouter();
@@ -176,8 +176,8 @@ const Post = ({
         </div>
         <div className="mx-3">
           <div className="my-4 space-x-2">
-            {categories?.map((category) => (
-              <CategoryTag key={category} name={category} />
+            {tags?.map((tag) => (
+              <PostTag key={tag} name={tag} />
             ))}
           </div>
 

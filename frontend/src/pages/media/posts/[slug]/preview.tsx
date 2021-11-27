@@ -12,7 +12,7 @@ export const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0
   description,
   mainImage,
   publishedAt,
-  "categories": categories[]->name,
+  "tags": tags[]->value,
   "authorName": author->name,
   "authorImage": author->image,
   body[]{
