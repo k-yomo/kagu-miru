@@ -39,6 +39,9 @@ li {
 
 #post h3 {
     @apply my-2;
+    @apply pl-2;
+    @apply border-l-2;
+    border-image: linear-gradient(90deg, #EC4899, #F43F5E) 1;
     @apply text-xl;
     @apply font-bold;
 }
@@ -51,7 +54,6 @@ li {
 
 #post p {
     @apply my-5;
-    @apply leading-relaxed;
 }
 
 #post blockquote {

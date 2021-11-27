@@ -16,7 +16,7 @@ export default memo(function TableOfContents({ headings }: Props) {
       <Link href={`#${i}`}>
         <a className="flex items-center" onClick={() => onClickHeading(i)}>
           <ChevronRightIcon className="h-5 w-5 min-w-5" />
-          <span className="ml-1 underline">{heading}</span>
+          <span className="ml-1">{heading}</span>
         </a>
       </Link>
     </li>

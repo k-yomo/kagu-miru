@@ -39,7 +39,7 @@ export default function Footer() {
             border-t border-gray-800 text-gray-400 text-sm
             flex-col md:flex-row max-w-6xl"
         >
-          <div className="mt-2">© 2021 Kanji Yomoda</div>
+          <div className="mt-2">© 2021 kagu-miru.com</div>
         </div>
       </div>
     </footer>
