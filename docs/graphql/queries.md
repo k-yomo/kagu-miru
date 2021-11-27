@@ -4,9 +4,9 @@
 
 
 
-### getAllCategories
+### getAllItemCategories
 
-#### Type: [[ItemCategory]!](objects.md#itemcategory)
+#### Type: [[ItemCategory!]!](objects.md#itemcategory)
 
  
 

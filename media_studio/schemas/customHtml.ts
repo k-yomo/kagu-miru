@@ -1,4 +1,4 @@
-import CustomHtmlPreview from "../components/CustomHtmlPreview"
+import CustomHtmlPreview from '../components/CustomHtmlPreview';
 
 export default {
   name: 'customHtml',
@@ -13,9 +13,8 @@ export default {
   ],
   preview: {
     select: {
-      html: 'html'
+      html: 'html',
     },
-    component: CustomHtmlPreview
-  }
-}
-
+    component: CustomHtmlPreview,
+  },
+};

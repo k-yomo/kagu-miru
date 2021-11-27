@@ -1,4 +1,4 @@
-import { Rule } from "@sanity/types"
+import { Rule } from '@sanity/types';
 
 export default {
   name: 'post',
@@ -27,7 +27,7 @@ export default {
       name: 'author',
       title: 'Author',
       type: 'reference',
-      to: {type: 'author'},
+      to: { type: 'author' },
     },
     {
       name: 'mainImage',
@@ -37,6 +37,12 @@ export default {
       options: {
         hotspot: true,
       },
+    },
+    {
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      of: [{ type: 'category' }],
     },
     {
       name: 'tags',
@@ -63,11 +69,11 @@ export default {
       author: 'author.name',
       media: 'mainImage',
     },
-    prepare(selection: { title: string, author: string, media: any }) {
-      const {author} = selection
+    prepare(selection: { title: string; author: string; media: any }) {
+      const { author } = selection;
       return Object.assign({}, selection, {
         subtitle: author && `by ${author}`,
-      })
+      });
     },
   },
-}
+};

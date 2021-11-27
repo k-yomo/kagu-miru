@@ -10,7 +10,9 @@
     "codegen": "graphql-codegen --config codegen.yml",
     "deploy": "SANITY_ACTIVE_ENV=production sanity deploy",
     "build": "SANITY_ACTIVE_ENV=production sanity build",
-    "start": "SANITY_ACTIVE_ENV=development sanity start"
+    "start": "SANITY_ACTIVE_ENV=development sanity start",
+    "fmt": "prettier --write *.{js,ts} **/*.{js,ts,tsx}",
+    "fmtcheck": "prettier --check *.{js,ts} **/*.{js,ts,tsx}"
   },
   "keywords": [
     "sanity"
@@ -39,6 +41,7 @@
     "@graphql-codegen/introspection": "^2.1.0",
     "@graphql-codegen/typescript": "^2.4.1",
     "@graphql-codegen/typescript-operations": "^2.2.1",
-    "@graphql-codegen/typescript-react-apollo": "^3.2.2"
+    "@graphql-codegen/typescript-react-apollo": "^3.2.2",
+    "prettier": "^2.5.0"
   }
 }

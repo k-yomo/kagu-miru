@@ -62,7 +62,10 @@ type ComplexityRoot struct {
 	ItemCategory struct {
 		Children func(childComplexity int) int
 		ID       func(childComplexity int) int
+		Level    func(childComplexity int) int
 		Name     func(childComplexity int) int
+		Parent   func(childComplexity int) int
+		ParentID func(childComplexity int) int
 	}
 
 	ItemConnection struct {
@@ -81,10 +84,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetAllCategories    func(childComplexity int) int
-		GetItem             func(childComplexity int, id string) int
-		GetQuerySuggestions func(childComplexity int, query string) int
-		Search              func(childComplexity int, input *gqlmodel.SearchInput) int
+		GetAllItemCategories func(childComplexity int) int
+		GetItem              func(childComplexity int, id string) int
+		GetQuerySuggestions  func(childComplexity int, query string) int
+		Search               func(childComplexity int, input *gqlmodel.SearchInput) int
 	}
 
 	QuerySuggestionsResponse struct {
@@ -105,7 +108,7 @@ type QueryResolver interface {
 	Search(ctx context.Context, input *gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error)
 	GetQuerySuggestions(ctx context.Context, query string) (*gqlmodel.QuerySuggestionsResponse, error)
 	GetItem(ctx context.Context, id string) (*gqlmodel.Item, error)
-	GetAllCategories(ctx context.Context) ([]*gqlmodel.ItemCategory, error)
+	GetAllItemCategories(ctx context.Context) ([]*gqlmodel.ItemCategory, error)
 }
 
 type executableSchema struct {
@@ -221,12 +224,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ItemCategory.ID(childComplexity), true
 
+	case "ItemCategory.level":
+		if e.complexity.ItemCategory.Level == nil {
+			break
+		}
+
+		return e.complexity.ItemCategory.Level(childComplexity), true
+
 	case "ItemCategory.name":
 		if e.complexity.ItemCategory.Name == nil {
 			break
 		}
 
 		return e.complexity.ItemCategory.Name(childComplexity), true
+
+	case "ItemCategory.Parent":
+		if e.complexity.ItemCategory.Parent == nil {
+			break
+		}
+
+		return e.complexity.ItemCategory.Parent(childComplexity), true
+
+	case "ItemCategory.parentId":
+		if e.complexity.ItemCategory.ParentID == nil {
+			break
+		}
+
+		return e.complexity.ItemCategory.ParentID(childComplexity), true
 
 	case "ItemConnection.nodes":
 		if e.complexity.ItemConnection.Nodes == nil {
@@ -275,12 +299,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PageInfo.TotalPage(childComplexity), true
 
-	case "Query.getAllCategories":
-		if e.complexity.Query.GetAllCategories == nil {
+	case "Query.getAllItemCategories":
+		if e.complexity.Query.GetAllItemCategories == nil {
 			break
 		}
 
-		return e.complexity.Query.GetAllCategories(childComplexity), true
+		return e.complexity.Query.GetAllItemCategories(childComplexity), true
 
 	case "Query.getItem":
 		if e.complexity.Query.GetItem == nil {
@@ -417,7 +441,8 @@ type Query {
     search(input: SearchInput): SearchResponse!
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
     getItem(id: ID!): Item!
-    getAllCategories: [ItemCategory]!
+    # getAllItemCategories return item categories in a hierarchical data structure
+    getAllItemCategories: [ItemCategory!]!
 }
 
 type Mutation {
@@ -433,6 +458,9 @@ type PageInfo {
 type ItemCategory {
     id: ID!
     name: String!
+    level: Int!
+    parentId: ID
+    Parent: ItemCategory
     children: [ItemCategory!]!
 }
 
@@ -1153,6 +1181,105 @@ func (ec *executionContext) _ItemCategory_name(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ItemCategory_level(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemCategory) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ItemCategory",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Level, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ItemCategory_parentId(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemCategory) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ItemCategory",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ParentID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ItemCategory_Parent(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemCategory) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ItemCategory",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Parent, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*gqlmodel.ItemCategory)
+	fc.Result = res
+	return ec.marshalOItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ItemCategory_children(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemCategory) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1531,7 +1658,7 @@ func (ec *executionContext) _Query_getItem(ctx context.Context, field graphql.Co
 	return ec.marshalNItem2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItem(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_getAllCategories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_getAllItemCategories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1549,7 +1676,7 @@ func (ec *executionContext) _Query_getAllCategories(ctx context.Context, field g
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetAllCategories(rctx)
+		return ec.resolvers.Query().GetAllItemCategories(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1563,7 +1690,7 @@ func (ec *executionContext) _Query_getAllCategories(ctx context.Context, field g
 	}
 	res := resTmp.([]*gqlmodel.ItemCategory)
 	fc.Result = res
-	return ec.marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx, field.Selections, res)
+	return ec.marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategoryᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3276,6 +3403,15 @@ func (ec *executionContext) _ItemCategory(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "level":
+			out.Values[i] = ec._ItemCategory_level(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "parentId":
+			out.Values[i] = ec._ItemCategory_parentId(ctx, field, obj)
+		case "Parent":
+			out.Values[i] = ec._ItemCategory_Parent(ctx, field, obj)
 		case "children":
 			out.Values[i] = ec._ItemCategory_children(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3449,7 +3585,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "getAllCategories":
+		case "getAllItemCategories":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3457,7 +3593,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getAllCategories(ctx, field)
+				res = ec._Query_getAllItemCategories(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3969,44 +4105,6 @@ func (ec *executionContext) marshalNItem2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmir
 		return graphql.Null
 	}
 	return ec._Item(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.ItemCategory) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategory(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
 }
 
 func (ec *executionContext) marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.ItemCategory) graphql.Marshaler {
@@ -4592,6 +4690,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
+}
+
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalID(*v)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {

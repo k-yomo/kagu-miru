@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
 };
@@ -23,46 +24,49 @@ export type Scalars = {
 };
 
 export enum Action {
-  Display = 'DISPLAY',
   ClickItem = 'CLICK_ITEM',
+  Display = 'DISPLAY',
 }
 
 export type Event = {
-  id: EventId;
   action: Action;
   createdAt: Scalars['Time'];
+  id: EventId;
   params: Scalars['Map'];
 };
 
 export enum EventId {
-  Search = 'SEARCH',
   QuerySuggestions = 'QUERY_SUGGESTIONS',
+  Search = 'SEARCH',
 }
 
 export type Item = {
-  id: Scalars['ID'];
-  name: Scalars['String'];
+  affiliateUrl: Scalars['String'];
+  averageRating: Scalars['Float'];
+  categoryIds: Array<Scalars['ID']>;
   description: Scalars['String'];
+  id: Scalars['ID'];
+  imageUrls: Array<Scalars['String']>;
+  name: Scalars['String'];
+  platform: ItemSellingPlatform;
+  price: Scalars['Int'];
+  reviewCount: Scalars['Int'];
   status: ItemStatus;
   url: Scalars['String'];
-  affiliateUrl: Scalars['String'];
-  price: Scalars['Int'];
-  imageUrls: Array<Scalars['String']>;
-  averageRating: Scalars['Float'];
-  reviewCount: Scalars['Int'];
-  categoryIds: Array<Scalars['ID']>;
-  platform: ItemSellingPlatform;
 };
 
 export type ItemCategory = {
-  id: Scalars['ID'];
-  name: Scalars['String'];
+  Parent?: Maybe<ItemCategory>;
   children: Array<ItemCategory>;
+  id: Scalars['ID'];
+  level: Scalars['Int'];
+  name: Scalars['String'];
+  parentId?: Maybe<Scalars['ID']>;
 };
 
 export type ItemConnection = {
-  pageInfo: PageInfo;
   nodes: Array<Item>;
+  pageInfo: PageInfo;
 };
 
 export enum ItemSellingPlatform {
@@ -85,27 +89,27 @@ export type MutationTrackEventArgs = {
 
 export type PageInfo = {
   page: Scalars['Int'];
-  totalPage: Scalars['Int'];
   totalCount: Scalars['Int'];
+  totalPage: Scalars['Int'];
 };
 
 export type Query = {
-  search: SearchResponse;
-  getQuerySuggestions: QuerySuggestionsResponse;
+  getAllItemCategories: Array<ItemCategory>;
   getItem: Item;
-  getAllCategories: Array<Maybe<ItemCategory>>;
+  getQuerySuggestions: QuerySuggestionsResponse;
+  search: SearchResponse;
 };
 
-export type QuerySearchArgs = {
-  input?: Maybe<SearchInput>;
+export type QueryGetItemArgs = {
+  id: Scalars['ID'];
 };
 
 export type QueryGetQuerySuggestionsArgs = {
   query: Scalars['String'];
 };
 
-export type QueryGetItemArgs = {
-  id: Scalars['ID'];
+export type QuerySearchArgs = {
+  input?: InputMaybe<SearchInput>;
 };
 
 export type QuerySuggestionsDisplayActionParams = {
@@ -119,51 +123,51 @@ export type QuerySuggestionsResponse = {
 };
 
 export type SearchClickItemActionParams = {
-  searchId: Scalars['String'];
   itemId: Scalars['String'];
+  searchId: Scalars['String'];
 };
 
 export type SearchDisplayItemsActionParams = {
-  searchId: Scalars['String'];
-  searchFrom: SearchFrom;
-  searchInput: SearchInput;
   itemIds: Array<Scalars['ID']>;
+  searchFrom: SearchFrom;
+  searchId: Scalars['String'];
+  searchInput: SearchInput;
 };
 
 export type SearchFilter = {
   categoryIds: Array<Scalars['ID']>;
+  maxPrice?: InputMaybe<Scalars['Int']>;
+  minPrice?: InputMaybe<Scalars['Int']>;
+  minRating?: InputMaybe<Scalars['Int']>;
   platforms: Array<ItemSellingPlatform>;
-  minPrice?: Maybe<Scalars['Int']>;
-  maxPrice?: Maybe<Scalars['Int']>;
-  minRating?: Maybe<Scalars['Int']>;
 };
 
 export enum SearchFrom {
-  Url = 'URL',
-  Search = 'SEARCH',
-  QuerySuggestion = 'QUERY_SUGGESTION',
   Filter = 'FILTER',
+  QuerySuggestion = 'QUERY_SUGGESTION',
+  Search = 'SEARCH',
+  Url = 'URL',
 }
 
 export type SearchInput = {
-  query: Scalars['String'];
   filter: SearchFilter;
+  page?: InputMaybe<Scalars['Int']>;
+  pageSize?: InputMaybe<Scalars['Int']>;
+  query: Scalars['String'];
   sortType: SearchSortType;
-  page?: Maybe<Scalars['Int']>;
-  pageSize?: Maybe<Scalars['Int']>;
 };
 
 export type SearchResponse = {
-  searchId: Scalars['String'];
   itemConnection: ItemConnection;
+  searchId: Scalars['String'];
 };
 
 export enum SearchSortType {
   BestMatch = 'BEST_MATCH',
   PriceAsc = 'PRICE_ASC',
   PriceDesc = 'PRICE_DESC',
-  ReviewCount = 'REVIEW_COUNT',
   Rating = 'RATING',
+  ReviewCount = 'REVIEW_COUNT',
 }
 
 export type GetQuerySuggestionsQueryVariables = Exact<{
