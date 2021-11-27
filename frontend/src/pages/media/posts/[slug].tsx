@@ -11,12 +11,13 @@ import {
 } from '@sanity/image-url/lib/types/types';
 import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
 import SEOMeta from '@src/components/SEOMeta';
-import PostTag from '@src/components/PostTag';
+import { routes } from '@src/routes/routes';
 import TableOfContents from '@src/components/TableOfContents';
 import AuthorIcon from '@src/components/AuthorIcon';
 import LinkWithThumbnail from '@src/components/LinkWithThumbnail';
-import { routes } from '@src/routes/routes';
 import ItemDetailCard from '@src/components/ItemDetailCard';
+import PostTagBadge from '@src/components/PostTagBadge';
+import PostCategoryBadge from '@src/components/PostCategoryBadge';
 
 // Copy to `@src/pages/media/posts/preview/[slug]`
 // TODO: Fix to use identical query
@@ -26,7 +27,8 @@ export const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0
   description,
   mainImage,
   publishedAt,
-  "tags": tags[]->value,
+  categories,
+  tags,
   "authorName": author->name,
   "authorImage": author->image,
   body[]{
@@ -114,7 +116,8 @@ export interface Props {
   authorName?: string;
   authorImage?: SanityImageSource;
   publishedAt?: string;
-  tags?: string[];
+  categories?: Array<{ id: string; names: [] }>;
+  tags?: Array<{ value: string }>;
   body: any[];
 }
 
@@ -125,6 +128,7 @@ const Post = ({
   authorName,
   authorImage,
   publishedAt,
+  categories,
   tags,
   body,
 }: Props) => {
@@ -176,8 +180,16 @@ const Post = ({
         </div>
         <div className="mx-3">
           <div className="my-4 space-x-2">
+            {categories?.map((category) => (
+              <PostCategoryBadge
+                key={category.id}
+                name={category.names[category.names.length - 1]}
+              />
+            ))}
+          </div>
+          <div className="my-4 space-x-2">
             {tags?.map((tag) => (
-              <PostTag key={tag} name={tag} />
+              <PostTagBadge key={tag.value} name={tag.value} />
             ))}
           </div>
 

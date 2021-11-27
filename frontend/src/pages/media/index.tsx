@@ -5,7 +5,7 @@ import groq from 'groq';
 import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
 import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 import { routes } from '@src/routes/routes';
-import CategoryTag from '@src/components/PostTag';
+import CategoryTag from '@src/components/PostTagBadge';
 import MediaTopImg from '@public/images/media_top.jpg';
 import { truncate } from '@src/lib/string';
 import { formatDistance, parseISO } from 'date-fns';
