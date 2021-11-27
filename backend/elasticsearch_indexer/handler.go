@@ -27,6 +27,10 @@ func newItemUpdateHandler(itemIndexer *ItemIndexer, logger *zap.Logger) pm.Messa
 				)
 				continue
 			}
+			// Remove top level category not to show irrelevant items.
+			if len(item.CategoryNames) > 0 {
+				item.CategoryNames = item.CategoryNames[1:]
+			}
 			items = append(items, mapItemFetcherItemToElasticsearchItem(&item))
 		}
 
