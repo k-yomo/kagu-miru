@@ -117,9 +117,9 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 		mustQueries = append(mustQueries, esquery.MultiMatch(input.Query).
 			Type(esquery.MatchTypeBestFields).
 			Fields(
-				xesquery.Boost(es.ItemFieldName, 2),
+				xesquery.Boost(es.ItemFieldName, 20),
 				es.ItemFieldDescription,
-				xesquery.Boost(es.ItemFieldCategoryNames, 3),
+				xesquery.Boost(es.ItemFieldCategoryNames, 10),
 			))
 	} else {
 		mustQueries = append(mustQueries, esquery.MatchAll())
@@ -299,7 +299,7 @@ func (c *elasticsearchClient) insertQuerySuggestion(ctx context.Context, query s
 		c.esClient.Index.WithContext(ctx),
 	)
 	if err != nil {
-		return fmt.Errorf("esClient.Index failed: %w", err)
+		return fmt.Errorf("esClient.Delete failed: %w", err)
 	}
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {

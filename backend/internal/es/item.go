@@ -22,6 +22,10 @@ type Item struct {
 	IndexedAt     int64          `json:"indexed_at"` // unix millis
 }
 
+func (i *Item) IsActive() bool {
+	return i.Status == xitem.StatusActive
+}
+
 const (
 	ItemFieldID            = "id"
 	ItemFieldName          = "name"
