@@ -6,14 +6,14 @@ import MediaTopImg from '@public/images/media_top.jpg';
 import SEOMeta from '@src/components/SEOMeta';
 import PostCard, { PostMeta } from '@src/components/PostCard';
 
-const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"][0..9]{
+const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"]{
   "slug": slug.current,
   title,
   description,
   mainImage,
   publishedAt,
   categories,
-} | order(publishedAt desc)`;
+} | order(publishedAt desc) [0..9]`;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const props = await sanityClient.fetch(fetchRecentlyPublishedPostsQuery);

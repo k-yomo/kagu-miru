@@ -8,14 +8,14 @@ import PostCard, { PostMeta } from '@src/components/PostCard';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const tag = ctx.query.tag as string;
-  const query = groq`*[_type == "post" && "${tag}" in tags[].value][0..9]{
+  const query = groq`*[_type == "post" && "${tag}" in tags[].value]{
   "slug": slug.current,
   title,
   description,
   mainImage,
   publishedAt,
   categories
-} | order(publishedAt desc)`;
+} | order(publishedAt desc) [0..9]`;
 
   const props = await sanityClient.fetch(query);
   console.log(props);

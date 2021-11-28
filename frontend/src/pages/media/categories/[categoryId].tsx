@@ -7,14 +7,14 @@ import SEOMeta from '@src/components/SEOMeta';
 import PostCard, { PostMeta } from '@src/components/PostCard';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const query = groq`*[_type == "post" && "${ctx.query.categoryId}" in categories[].id][0..9]{
+  const query = groq`*[_type == "post" && "${ctx.query.categoryId}" in categories[].id]{
   "slug": slug.current,
   title,
   description,
   mainImage,
   publishedAt,
   categories
-} | order(publishedAt desc)`;
+} | order(publishedAt desc) [0..9]`;
 
   const props = await sanityClient.fetch(query);
   ctx.res.setHeader('Cache-Control', 'public, max-age=3600');
