@@ -24,7 +24,7 @@
     <td></td>
   </tr>
   <tr>
-    <td><strong>categoryIds</strong> (<a href="scalars.md#id">[ID!]!</a>)</td> 
+    <td><strong>categoryId</strong> (<a href="scalars.md#id">ID!</a>)</td> 
     <td></td>
   </tr>
   <tr>
