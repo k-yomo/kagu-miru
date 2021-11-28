@@ -105,7 +105,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (Object.keys(props).length === 0) {
     return { notFound: true };
   }
-  ctx.res.setHeader('Cache-Control', 'public, max-age=86400');
+  ctx.res.setHeader('Cache-Control', 'public, max-age=3600');
   return { props };
 };
 
