@@ -8,17 +8,17 @@ import (
 	"fmt"
 	"sort"
 
-	gqlgend "github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
-	gqlmodell "github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
 )
 
-func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodell.Event) (bool, error) {
+func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodel.Event) (bool, error) {
 	r.EventLoader.Load(ctx, tracking.NewEvent(ctx, event))
 	return true, nil
 }
 
-func (r *queryResolver) Search(ctx context.Context, input *gqlmodell.SearchInput) (*gqlmodell.SearchResponse, error) {
+func (r *queryResolver) Search(ctx context.Context, input *gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error) {
 	searchResponse, err := r.SearchClient.SearchItems(ctx, input)
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
@@ -27,27 +27,27 @@ func (r *queryResolver) Search(ctx context.Context, input *gqlmodell.SearchInput
 	return mapSearchResponseToGraphqlSearchResponse(searchResponse, r.SearchIDManager.GetSearchID(ctx))
 }
 
-func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (*gqlmodell.QuerySuggestionsResponse, error) {
+func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (*gqlmodel.QuerySuggestionsResponse, error) {
 	suggestedQueries, err := r.SearchClient.GetQuerySuggestions(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.GetQuerySuggestions: %w", err)
 	}
 
-	return &gqlmodell.QuerySuggestionsResponse{
+	return &gqlmodel.QuerySuggestionsResponse{
 		Query:            query,
 		SuggestedQueries: suggestedQueries,
 	}, nil
 }
 
-func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodell.Item, error) {
-	item, err := r.SearchClient.GetItem(ctx, id)
+func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodel.Item, error) {
+	item, err := r.DBClient.GetItem(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.GetItem: %w", err)
 	}
-	return mapSearchItemToGraphqlItem(item)
+	return mapSpannerItemToGraphqlItem(item)
 }
 
-func (r *queryResolver) GetAllItemCategories(ctx context.Context) ([]*gqlmodell.ItemCategory, error) {
+func (r *queryResolver) GetAllItemCategories(ctx context.Context) ([]*gqlmodel.ItemCategory, error) {
 	allItemCategories, err := r.DBClient.GetAllItemCategories(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("DBClient.GetAllItemCategories: %w", err)
@@ -58,7 +58,7 @@ func (r *queryResolver) GetAllItemCategories(ctx context.Context) ([]*gqlmodell.
 		return gqlItemCategories[i].Level < gqlItemCategories[j].Level
 	})
 
-	itemCategoryMap := make(map[string]*gqlmodell.ItemCategory)
+	itemCategoryMap := make(map[string]*gqlmodel.ItemCategory)
 	for _, itemCategory := range gqlItemCategories {
 		if itemCategory.Level == 0 {
 			itemCategoryMap[itemCategory.ID] = itemCategory
@@ -68,7 +68,7 @@ func (r *queryResolver) GetAllItemCategories(ctx context.Context) ([]*gqlmodell.
 		}
 	}
 
-	var topLevelItemCategories []*gqlmodell.ItemCategory
+	var topLevelItemCategories []*gqlmodel.ItemCategory
 	for _, itemCategory := range gqlItemCategories {
 		if itemCategory.Level == 0 {
 			topLevelItemCategories = append(topLevelItemCategories, itemCategory)
@@ -77,11 +77,11 @@ func (r *queryResolver) GetAllItemCategories(ctx context.Context) ([]*gqlmodell.
 	return topLevelItemCategories, nil
 }
 
-// Mutation returns gqlgend.MutationResolver implementation.
-func (r *Resolver) Mutation() gqlgend.MutationResolver { return &mutationResolver{r} }
+// Mutation returns gqlgen.MutationResolver implementation.
+func (r *Resolver) Mutation() gqlgen.MutationResolver { return &mutationResolver{r} }
 
-// Query returns gqlgend.QueryResolver implementation.
-func (r *Resolver) Query() gqlgend.QueryResolver { return &queryResolver{r} }
+// Query returns gqlgen.QueryResolver implementation.
+func (r *Resolver) Query() gqlgen.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

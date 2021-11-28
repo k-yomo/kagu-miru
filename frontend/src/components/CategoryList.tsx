@@ -68,7 +68,7 @@ export default memo(function CategoryList({
 
   useEffect(() => {
     const categoryIdCountMap = buildCategoryIdCountMap(
-      items.map((item) => item.categoryIds[0])
+      items.map((item) => item.categoryId)
     );
     const sortedCategories = itemCategories.sort(function (a, b) {
       const aCount = categoryIdCountMap[a.id] ? categoryIdCountMap[a.id] : 0;

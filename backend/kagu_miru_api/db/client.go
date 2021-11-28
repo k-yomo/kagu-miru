@@ -7,5 +7,6 @@ import (
 )
 
 type Client interface {
+	GetItem(ctx context.Context, itemID string) (*xspanner.Item, error)
 	GetAllItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error)
 }

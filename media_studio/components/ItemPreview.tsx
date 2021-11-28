@@ -19,7 +19,7 @@ gql`
       imageUrls
       averageRating
       reviewCount
-      categoryIds
+      categoryId
       platform
     }
   }

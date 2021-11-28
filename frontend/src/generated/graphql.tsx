@@ -43,7 +43,7 @@ export enum EventId {
 export type Item = {
   affiliateUrl: Scalars['String'];
   averageRating: Scalars['Float'];
-  categoryIds: Array<Scalars['ID']>;
+  categoryId: Scalars['ID'];
   description: Scalars['String'];
   id: Scalars['ID'];
   imageUrls: Array<Scalars['String']>;
@@ -198,7 +198,7 @@ export type SearchQuery = {
         imageUrls: Array<string>;
         averageRating: number;
         reviewCount: number;
-        categoryIds: Array<string>;
+        categoryId: string;
         platform: ItemSellingPlatform;
       }>;
     };
@@ -227,7 +227,7 @@ export type ItemDetailPageGetItemQuery = {
     imageUrls: Array<string>;
     averageRating: number;
     reviewCount: number;
-    categoryIds: Array<string>;
+    categoryId: string;
     platform: ItemSellingPlatform;
   };
 };
@@ -312,7 +312,7 @@ export const SearchDocument = gql`
           imageUrls
           averageRating
           reviewCount
-          categoryIds
+          categoryId
           platform
         }
       }
@@ -421,7 +421,7 @@ export const ItemDetailPageGetItemDocument = gql`
       imageUrls
       averageRating
       reviewCount
-      categoryIds
+      categoryId
       platform
     }
   }

@@ -47,7 +47,7 @@ type ComplexityRoot struct {
 	Item struct {
 		AffiliateURL  func(childComplexity int) int
 		AverageRating func(childComplexity int) int
-		CategoryIds   func(childComplexity int) int
+		CategoryID    func(childComplexity int) int
 		Description   func(childComplexity int) int
 		ID            func(childComplexity int) int
 		ImageUrls     func(childComplexity int) int
@@ -140,12 +140,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.AverageRating(childComplexity), true
 
-	case "Item.categoryIds":
-		if e.complexity.Item.CategoryIds == nil {
+	case "Item.categoryId":
+		if e.complexity.Item.CategoryID == nil {
 			break
 		}
 
-		return e.complexity.Item.CategoryIds(childComplexity), true
+		return e.complexity.Item.CategoryID(childComplexity), true
 
 	case "Item.description":
 		if e.complexity.Item.Description == nil {
@@ -442,6 +442,7 @@ type Query {
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
     getItem(id: ID!): Item!
     # getAllItemCategories return item categories in a hierarchical data structure
+    # max depth is 4
     getAllItemCategories: [ItemCategory!]!
 }
 
@@ -485,7 +486,7 @@ type Item {
     imageUrls: [String!]!
     averageRating: Float!
     reviewCount: Int!
-    categoryIds: [ID!]!
+    categoryId: ID!
     platform: ItemSellingPlatform!
 }
 
@@ -1041,7 +1042,7 @@ func (ec *executionContext) _Item_reviewCount(ctx context.Context, field graphql
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_categoryIds(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_categoryId(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1059,7 +1060,7 @@ func (ec *executionContext) _Item_categoryIds(ctx context.Context, field graphql
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CategoryIds, nil
+		return obj.CategoryID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1071,9 +1072,9 @@ func (ec *executionContext) _Item_categoryIds(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNID2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Item_platform(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
@@ -3361,8 +3362,8 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "categoryIds":
-			out.Values[i] = ec._Item_categoryIds(ctx, field, obj)
+		case "categoryId":
+			out.Values[i] = ec._Item_categoryId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

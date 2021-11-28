@@ -57,7 +57,7 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 		ImageUrls:     item.ImageURLs,
 		AverageRating: item.AverageRating,
 		ReviewCount:   item.ReviewCount,
-		CategoryIds:   item.CategoryIDs,
+		CategoryID:    item.CategoryID,
 		Platform:      platform,
 	}, nil
 }
@@ -89,5 +89,42 @@ func mapSearchResponseToGraphqlSearchResponse(res *search.Response, searchID str
 			},
 			Nodes: graphqlItems,
 		},
+	}, nil
+}
+
+func mapSpannerItemToGraphqlItem(item *xspanner.Item) (*gqlmodel.Item, error) {
+	var status gqlmodel.ItemStatus
+	switch xitem.Status(item.Status) {
+	case xitem.StatusActive:
+		status = gqlmodel.ItemStatusActive
+	case xitem.StatusInactive:
+		status = gqlmodel.ItemStatusInactive
+	default:
+		return nil, fmt.Errorf("unknown status %d, item: %v", item.Status, item)
+	}
+
+	var platform gqlmodel.ItemSellingPlatform
+	switch item.Platform {
+	case xitem.PlatformRakuten:
+		platform = gqlmodel.ItemSellingPlatformRakuten
+	case xitem.PlatformYahooShopping:
+		platform = gqlmodel.ItemSellingPlatformYahooShopping
+	default:
+		return nil, fmt.Errorf("unknown platform %s, item: %v", item.Platform, item)
+	}
+
+	return &gqlmodel.Item{
+		ID:            item.ID,
+		Name:          item.Name,
+		Description:   item.Description,
+		Status:        status,
+		URL:           item.URL,
+		AffiliateURL:  item.AffiliateURL,
+		Price:         int(item.Price),
+		ImageUrls:     item.ImageURLs,
+		AverageRating: item.AverageRating,
+		ReviewCount:   int(item.ReviewCount),
+		CategoryID:    item.CategoryID,
+		Platform:      platform,
 	}, nil
 }

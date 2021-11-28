@@ -37,7 +37,7 @@ export enum EventId {
 export type Item = {
   affiliateUrl: Scalars['String'];
   averageRating: Scalars['Float'];
-  categoryIds: Array<Scalars['ID']>;
+  categoryId: Scalars['ID'];
   description: Scalars['String'];
   id: Scalars['ID'];
   imageUrls: Array<Scalars['String']>;
@@ -184,7 +184,7 @@ export const ItemPreviewGetItemDocument = gql`
     imageUrls
     averageRating
     reviewCount
-    categoryIds
+    categoryId
     platform
   }
 }
