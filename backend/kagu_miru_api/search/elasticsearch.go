@@ -115,7 +115,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 	var mustQueries []esquery.Mappable
 	if input.Query != "" {
 		mustQueries = append(mustQueries, esquery.MultiMatch(input.Query).
-			Type(esquery.MatchTypeBestFields).
+			Type(esquery.MatchTypeMostFields).
 			Fields(
 				xesquery.Boost(es.ItemFieldName, 20),
 				es.ItemFieldDescription,
@@ -126,6 +126,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 	}
 
 	boolQuery := esquery.Bool().Must(mustQueries...)
+	boolQuery.Filter()
 
 	if len(input.Filter.CategoryIds) > 0 {
 		var categoryIDs []interface{}
