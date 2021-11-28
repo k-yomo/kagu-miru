@@ -23,11 +23,15 @@ func NewItemIndexer(indexName string, esClient *elasticsearch.Client) *ItemIndex
 	}
 }
 
-type indexParams struct {
-	Index *indexParamsIndex `json:"index"`
+type indexingParams struct {
+	Index *documentMeta `json:"index"`
 }
 
-type indexParamsIndex struct {
+type deleteParams struct {
+	Delete *documentMeta `json:"delete"`
+}
+
+type documentMeta struct {
 	Index string `json:"_index"`
 	ID    string `json:"_id"`
 }
@@ -36,24 +40,34 @@ func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*es.Item) error {
 	if len(items) == 0 {
 		return nil
 	}
-	var bulkIndexParamsByte []byte
+	var bulkParamsBytes []byte
 	for _, item := range items {
-		params := &indexParams{Index: &indexParamsIndex{Index: i.indexName, ID: item.ID}}
-		paramsJSON, err := json.Marshal(params)
-		if err != nil {
-			return fmt.Errorf("json.Marshal failed, param: %v,  err: %w", params, err)
+		if item.IsActive() {
+			params := &indexingParams{Index: &documentMeta{Index: i.indexName, ID: item.ID}}
+			paramsJSON, err := json.Marshal(params)
+			if err != nil {
+				return fmt.Errorf("json.Marshal failed, params: %v,  err: %w", params, err)
+			}
+			itemJSON, err := json.Marshal(item)
+			if err != nil {
+				return err
+			}
+			bulkParamsBytes = append(bulkParamsBytes, paramsJSON...)
+			bulkParamsBytes = append(bulkParamsBytes, []byte("\n")...)
+			bulkParamsBytes = append(bulkParamsBytes, itemJSON...)
+			bulkParamsBytes = append(bulkParamsBytes, []byte("\n")...)
+		} else {
+			params := &deleteParams{Delete: &documentMeta{Index: i.indexName, ID: item.ID}}
+			paramsJSON, err := json.Marshal(params)
+			if err != nil {
+				return fmt.Errorf("json.Marshal failed, params: %v,  err: %w", params, err)
+			}
+			bulkParamsBytes = append(bulkParamsBytes, paramsJSON...)
+			bulkParamsBytes = append(bulkParamsBytes, []byte("\n")...)
 		}
-		itemJSON, err := json.Marshal(item)
-		if err != nil {
-			return err
-		}
-		bulkIndexParamsByte = append(bulkIndexParamsByte, paramsJSON...)
-		bulkIndexParamsByte = append(bulkIndexParamsByte, []byte("\n")...)
-		bulkIndexParamsByte = append(bulkIndexParamsByte, itemJSON...)
-		bulkIndexParamsByte = append(bulkIndexParamsByte, []byte("\n")...)
 	}
 
-	response, err := i.esClient.Bulk(bytes.NewReader(bulkIndexParamsByte), i.esClient.Bulk.WithContext(ctx))
+	response, err := i.esClient.Bulk(bytes.NewReader(bulkParamsBytes), i.esClient.Bulk.WithContext(ctx))
 	if err != nil {
 		return fmt.Errorf("esClient.Bulk failed: %w", err)
 	}
