@@ -553,6 +553,7 @@ enum SearchFrom {
     SEARCH
     QUERY_SUGGESTION
     FILTER
+    MEDIA
 }
 
 input SearchDisplayItemsActionParams {

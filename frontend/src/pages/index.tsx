@@ -23,6 +23,7 @@ import SortTypeSelectBox from '@src/components/SortTypeSelectBox';
 import AppliedFilterIcons from '@src/components/AppliedFilterIcons';
 import MobileSearchFilterModal from '@src/components/MobileSearchFilterModal';
 import PlatformFilter from '@src/components/PlatformFilter';
+import SearchPageScreenImg from '@public/images/search_screen.jpeg';
 
 export default function TopPage() {
   return (
@@ -31,7 +32,7 @@ export default function TopPage() {
         title="カグミル - 家具検索サービス"
         excludeSiteTitle
         description="カグミルはオンラインで買える家具を横断で一括検索・比較出来るサービスです。"
-        // img={{ srcPath: TopImg.src }}
+        img={{ srcPath: SearchPageScreenImg.src }}
       />
       <SearchProvider>
         <TopPageInner />

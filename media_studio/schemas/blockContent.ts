@@ -61,6 +61,11 @@ export default {
       to: [{ type: 'post' }],
     },
     {
+      title: '検索ページリンク',
+      name: 'searchPageLink',
+      type: 'searchPageLink',
+    },
+    {
       title: '画像',
       type: 'image',
       options: { hotspot: true },

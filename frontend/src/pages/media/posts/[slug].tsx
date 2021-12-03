@@ -18,6 +18,9 @@ import LinkWithThumbnail from '@src/components/LinkWithThumbnail';
 import ItemDetailCard from '@src/components/ItemDetailCard';
 import PostTagBadge from '@src/components/PostTagBadge';
 import PostCategoryBadge from '@src/components/PostCategoryBadge';
+import { buildSearchUrlQuery, defaultSearchFilter } from '@src/contexts/search';
+import { SearchFrom } from '@src/generated/graphql';
+import SearchPageScreenImg from '@public/images/search_screen.jpeg';
 
 // Copy to `@src/pages/media/posts/preview/[slug]`
 // TODO: Fix to use identical query
@@ -49,6 +52,15 @@ interface InternalLink {
   mainImage: SanityImageSource;
 }
 
+interface SearchPageLink {
+  title: string;
+  query: string;
+  category?: {
+    id: string;
+    names: string[];
+  };
+}
+
 const serializers = {
   marks: {
     link: ({ mark, children }: { mark: { href: string }; children: any }) => {
@@ -67,6 +79,41 @@ const serializers = {
           title={node.title}
           subTitle={node.description}
           imgSrc={buildSanityImageSrc(node.mainImage).url()}
+        />
+      );
+    },
+    searchPageLink: ({ node }: { node: SearchPageLink }) => {
+      const filter = {
+        ...defaultSearchFilter,
+        categoryIds: node.category ? [node.category.id] : [],
+      };
+      const urlQuery = buildSearchUrlQuery(
+        node.query,
+        filter,
+        SearchFrom.Media
+      );
+      const urlQueryWithoutSearchFrom = { ...urlQuery };
+      delete urlQueryWithoutSearchFrom.searchFrom;
+      const url = `${routes.top()}?${new URLSearchParams(urlQuery).toString()}`;
+      // Exclude searchFrom to track actual searched from, since url can be shared.
+      const urlAs = `${routes.top()}?${new URLSearchParams(
+        urlQueryWithoutSearchFrom
+      ).toString()}`;
+
+      let subTitle = '';
+      if (node.query) {
+        subTitle += `「${node.query}」`;
+      }
+      if (node.category) {
+        subTitle += ` - ${node.category.names.join(' > ')}`;
+      }
+      return (
+        <LinkWithThumbnail
+          url={url}
+          urlAs={urlAs}
+          title={node.title}
+          subTitle={subTitle}
+          imgSrc={SearchPageScreenImg.src}
         />
       );
     },
@@ -164,7 +211,7 @@ const Post = ({
         description={description}
         img={{ src: mainImgUrl }}
       />
-      <article id="post" className="max-w-[1000px] mx-auto sm:my-8">
+      <article id="post" className="max-w-[1000px] mx-auto mb-4 sm:my-8">
         <div className="relative w-full h-[300px] sm:h-[600px]">
           <Image
             src={mainImgUrl}

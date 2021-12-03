@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 interface Props {
   url: string;
+  urlAs?: string;
   title: string;
   subTitle: string;
   imgSrc: string;
@@ -10,12 +11,13 @@ interface Props {
 
 export default function LinkWithThumbnail({
   url,
+  urlAs,
   title,
   subTitle,
   imgSrc,
 }: Props) {
   return (
-    <Link href={url}>
+    <Link href={url} as={urlAs}>
       <a>
         <div className="flex items-center h-[100px] sm:h-[150px] shadow-md dark:shadow-none dark:border-[1px] dark:border-gray-800 rounded-md">
           <div className="w-[30%] h-full overflow-hidden">

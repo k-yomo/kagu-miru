@@ -240,6 +240,31 @@ export function queryParamsToSearchParams(
   };
 }
 
+export function buildSearchUrlQuery(
+  query: string,
+  filter: SearchFilter,
+  searchFrom: SearchFrom,
+  sortType?: SearchSortType,
+  page?: number
+) {
+  const urlQuery: { [key: string]: string } = {
+    q: query,
+    searchFrom: searchFrom.toString(),
+  };
+  if (filter.categoryIds.length > 0)
+    urlQuery.categoryIds = filter.categoryIds.join(',');
+  if (filter.platforms.length > 0)
+    urlQuery.platforms = filter.platforms.join(',');
+  if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
+  if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
+  if (filter.minRating) urlQuery.minRating = filter.minRating.toString();
+  if (sortType && sortType !== SearchSortType.BestMatch)
+    urlQuery.sort = sortType;
+  if (page && page >= 2) urlQuery.page = page.toString();
+
+  return urlQuery;
+}
+
 export const useSearch = () => useContext(SearchContext);
 
 type Props = PropsWithChildren<{ isAdmin?: boolean }>;
@@ -308,29 +333,25 @@ export const SearchProvider: FC<Props> = memo(
         },
       });
 
-      const urlQuery: { [key: string]: string } = {
-        q: query,
-      };
-      if (filter.categoryIds.length > 0)
-        urlQuery.categoryIds = filter.categoryIds.join(',');
-      if (filter.platforms.length > 0)
-        urlQuery.platforms = filter.platforms.join(',');
-      if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
-      if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
-      if (filter.minRating) urlQuery.minRating = filter.minRating.toString();
-      if (sortType !== SearchSortType.BestMatch) urlQuery.sort = sortType;
-      if (page && page >= 2) urlQuery.page = page.toString();
+      const urlQuery = buildSearchUrlQuery(
+        query,
+        filter,
+        searchFrom,
+        sortType,
+        page || undefined
+      );
+      const urlQueryWithoutSearchFrom = { ...urlQuery };
+      delete urlQueryWithoutSearchFrom.searchFrom;
 
       router.push(
         {
           pathname: router.pathname,
-          query: {
-            ...urlQuery,
-            searchFrom,
-          },
+          query: urlQuery,
         },
         // Exclude searchFrom to track actual searched from, since url can be shared.
-        `${router.pathname}?${new URLSearchParams(urlQuery).toString()}`,
+        `${router.pathname}?${new URLSearchParams(
+          urlQueryWithoutSearchFrom
+        ).toString()}`,
         {
           shallow: true,
           scroll: true,
