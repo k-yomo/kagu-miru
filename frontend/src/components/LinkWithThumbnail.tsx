@@ -26,7 +26,7 @@ export default function LinkWithThumbnail({
             />
           </div>
           <div className="ml-2 sm:ml-3 w-[70%]">
-            <div className="mb-2 line-clamp-3 sm:line-clamp-2 text-xl font-bold underline">
+            <div className="mb-2 line-clamp-3 sm:line-clamp-2 text-lg sm:text-xl font-bold underline">
               {title}
             </div>
             <div className="hidden sm:block">
