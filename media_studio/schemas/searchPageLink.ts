@@ -13,22 +13,14 @@ export default {
       validation: (Rule: Rule) => Rule.required(),
     },
     {
-      title: '検索クエリ',
-      name: 'query',
-      type: 'string',
-    },
-    {
-      title: 'カテゴリー',
-      name: 'category',
-      type: 'category',
+      title: 'URL',
+      name: 'url',
+      type: 'url',
     },
   ],
   preview: {
     select: {
       title: 'title',
-      query: 'query',
-      category: 'category',
     },
-    component: SearchPageLinkPreview,
   },
 };

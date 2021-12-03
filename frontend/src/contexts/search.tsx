@@ -340,6 +340,7 @@ export const SearchProvider: FC<Props> = memo(
         sortType,
         page || undefined
       );
+      // Exclude searchFrom to track actual searched from, since url can be shared.
       const urlQueryWithoutSearchFrom = { ...urlQuery };
       delete urlQueryWithoutSearchFrom.searchFrom;
 
@@ -348,7 +349,6 @@ export const SearchProvider: FC<Props> = memo(
           pathname: router.pathname,
           query: urlQuery,
         },
-        // Exclude searchFrom to track actual searched from, since url can be shared.
         `${router.pathname}?${new URLSearchParams(
           urlQueryWithoutSearchFrom
         ).toString()}`,

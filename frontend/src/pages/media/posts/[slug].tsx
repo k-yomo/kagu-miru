@@ -54,11 +54,7 @@ interface InternalLink {
 
 interface SearchPageLink {
   title: string;
-  query: string;
-  category?: {
-    id: string;
-    names: string[];
-  };
+  url: string;
 }
 
 const serializers = {
@@ -83,36 +79,16 @@ const serializers = {
       );
     },
     searchPageLink: ({ node }: { node: SearchPageLink }) => {
-      const filter = {
-        ...defaultSearchFilter,
-        categoryIds: node.category ? [node.category.id] : [],
-      };
-      const urlQuery = buildSearchUrlQuery(
-        node.query,
-        filter,
-        SearchFrom.Media
-      );
-      const urlQueryWithoutSearchFrom = { ...urlQuery };
-      delete urlQueryWithoutSearchFrom.searchFrom;
-      const url = `${routes.top()}?${new URLSearchParams(urlQuery).toString()}`;
-      // Exclude searchFrom to track actual searched from, since url can be shared.
-      const urlAs = `${routes.top()}?${new URLSearchParams(
-        urlQueryWithoutSearchFrom
-      ).toString()}`;
-
-      let subTitle = '';
-      if (node.query) {
-        subTitle += `「${node.query}」`;
-      }
-      if (node.category) {
-        subTitle += ` - ${node.category.names.join(' > ')}`;
-      }
+      const url = new URL(node.url);
+      url.searchParams.set('searchFrom', SearchFrom.Media);
+      const urlAs = new URL(node.url);
+      urlAs.searchParams.delete('searchFrom');
       return (
         <LinkWithThumbnail
-          url={url}
-          urlAs={urlAs}
+          url={url.toString()}
+          urlAs={urlAs.toString()}
           title={node.title}
-          subTitle={subTitle}
+          subTitle=""
           imgSrc={SearchPageScreenImg.src}
         />
       );
