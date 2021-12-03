@@ -13,7 +13,7 @@ export default {
       validation: (Rule: Rule) => Rule.required(),
     },
     {
-      title: 'URL',
+      title: '検索ページURL',
       name: 'url',
       type: 'url',
     },
