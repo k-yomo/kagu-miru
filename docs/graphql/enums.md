@@ -102,6 +102,10 @@
     <td></td>
   </tr>
   <tr>
+    <td><strong>MEDIA</strong></td>
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>QUERY_SUGGESTION</strong></td>
     <td></td>
   </tr>

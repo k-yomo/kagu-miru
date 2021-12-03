@@ -73,14 +73,17 @@ export default forwardRef<HTMLInputElement, Props>((props: Props, ref) => {
   }, []);
 
   const handleChange = React.useCallback(
-    // useCallback will help with performance
     (selectedId: string) => {
-      const category = {
-        _key: selectedId,
-        id: selectedId,
-        names: categories.find(({ id }) => id === selectedId)!.names,
-      };
-      props.onChange(PatchEvent.from(selectedId ? set(category) : unset()));
+      if (!selectedId) {
+        props.onChange(PatchEvent.from(unset()));
+      } else {
+        const category = {
+          _key: selectedId,
+          id: selectedId,
+          names: categories.find(({ id }) => id === selectedId)!.names,
+        };
+        props.onChange(PatchEvent.from(set(category)));
+      }
     },
     [props.onChange, categories]
   );
