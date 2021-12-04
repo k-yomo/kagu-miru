@@ -18,7 +18,6 @@ import LinkWithThumbnail from '@src/components/LinkWithThumbnail';
 import ItemDetailCard from '@src/components/ItemDetailCard';
 import PostTagBadge from '@src/components/PostTagBadge';
 import PostCategoryBadge from '@src/components/PostCategoryBadge';
-import { buildSearchUrlQuery, defaultSearchFilter } from '@src/contexts/search';
 import { SearchFrom } from '@src/generated/graphql';
 import SearchPageScreenImg from '@public/images/search_screen.jpeg';
 

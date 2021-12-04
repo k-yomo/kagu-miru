@@ -1,9 +1,10 @@
 import React, { memo } from 'react';
-import { buildSanityImageSrc } from '@src/lib/sanityClient';
+import Image from 'next/image';
 import Link from 'next/link';
 import { routes } from '@src/routes/routes';
 import PostCategoryBadge from '@src/components/PostCategoryBadge';
 import { truncate } from '@src/lib/string';
+import { buildSanityImageSrc } from '@src/lib/sanityClient';
 import { formatDistance, parseISO } from 'date-fns';
 import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
@@ -22,15 +23,25 @@ interface Props {
 
 export default memo(function PostCard({ postMeta }: Props) {
   const mainImageUrl = buildSanityImageSrc(postMeta.mainImage);
+  const blurImgUrl = buildSanityImageSrc(postMeta.mainImage).blur(10).url();
   return (
     <div className="mx-auto max-w-[400px] h-full shadow-md rounded-md">
       <Link href={routes.mediaPost(postMeta.slug)}>
         <a>
-          <img
-            src={mainImageUrl.url()}
-            alt={postMeta.title}
-            className="w-full h-[200px] object-cover object-center rounded-t-md"
-          />
+          <div className="relative w-full h-[200px] rounded-t-md">
+            <Image
+              src={mainImageUrl.url()}
+              alt={postMeta.title}
+              blurDataURL={blurImgUrl}
+              placeholder="blur"
+              layout="fill"
+              objectFit="cover"
+              objectPosition="center"
+              loading="lazy"
+              lazyBoundary="600px"
+              unoptimized
+            />
+          </div>
           <div className="p-2">
             {postMeta.categories && (
               <div className="mb-2">

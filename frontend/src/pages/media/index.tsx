@@ -1,10 +1,11 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import groq from 'groq';
-import { sanityClient } from '@src/lib/sanityClient';
+import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
 import MediaTopImg from '@public/images/media_top.jpg';
 import SEOMeta from '@src/components/SEOMeta';
 import PostCard, { PostMeta } from '@src/components/PostCard';
+import Image from 'next/image';
 
 const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"]{
   "slug": slug.current,
@@ -35,11 +36,17 @@ export default function MediaTopPage({ posts }: Props) {
         img={{ srcPath: MediaTopImg.src }}
       />
       <div className="max-w-[1000px] sm:mx-auto mb-8">
-        <img
-          src={MediaTopImg.src}
-          alt="トップ画像"
-          className="w-full h-[200px] sm:h-[300px] object-cover object-center"
-        />
+        <div className="relative w-full h-[200px] sm:h-[300px] rounded-t-md">
+          <Image
+            src={MediaTopImg.src}
+            alt="トップ画像"
+            layout="fill"
+            objectFit="cover"
+            objectPosition="center"
+            priority
+            unoptimized
+          />
+        </div>
         <div className="mx-4">
           <h2 className="text-3xl font-bold mt-8 mb-4">新着記事一覧</h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 sm:gap-4 gap-y-4 sm:gap-y-8">
