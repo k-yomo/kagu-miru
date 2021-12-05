@@ -53,7 +53,7 @@ func (c *Client) ApplicationIDNum() int {
 
 type Category struct {
 	ID       int         `xml:"Id"`
-	ParentID string      `xml:"ParentId"`
+	ParentID *int        `xml:"ParentId"`
 	URL      string      `xml:"Url"`
 	Title    string      `xml:"Title>Short"`
 	IsAdult  int         `xml:"IsAdult"`
@@ -102,6 +102,7 @@ func (c *Client) setChildCategories(ctx context.Context, category *Category) err
 	}
 	categories := make([]*Category, 0, len(category.Children))
 	for _, child := range res.Result.Categories.Children {
+		child.ParentID = &category.ID
 		if err := c.setChildCategories(ctx, child); err != nil {
 			return err
 		}

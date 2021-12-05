@@ -18,6 +18,17 @@ CREATE TABLE rakuten_item_genres (
     FOREIGN KEY (item_category_id) REFERENCES item_categories (id)
 ) PRIMARY KEY(id);
 
+CREATE TABLE yahoo_shopping_item_categories (
+    id INT64 NOT NULL,
+    name STRING(256) NOT NULL,
+    level INT64 NOT NULL,
+    parent_id INT64,
+    item_category_id STRING(256) NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (parent_id) REFERENCES yahoo_shopping_item_categories (id),
+    FOREIGN KEY (item_category_id) REFERENCES item_categories (id)
+) PRIMARY KEY(id);
+
 CREATE TABLE items (
     id STRING(256) NOT NULL,
     name STRING(256) NOT NULL,
