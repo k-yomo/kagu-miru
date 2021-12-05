@@ -9,6 +9,9 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"cloud.google.com/go/spanner"
+	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
+
 	"cloud.google.com/go/pubsub"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/pkg/jancode"
@@ -26,13 +29,14 @@ type genreItemsFetcher struct {
 	pool    chan<- *genreItemsFetcher
 	genreID chan int
 
-	genreMap map[string]*rakutenichiba.Genre
+	genreIDItemCategoryMap map[int]*xspanner.ItemCategoryWithParent
 
 	logger *zap.Logger
 }
 
 type worker struct {
 	rakutenIchibaAPIClient *rakutenichiba.Client
+	spannerClient          *spanner.Client
 	pool                   <-chan *genreItemsFetcher
 	workers                []*genreItemsFetcher
 	logger                 *zap.Logger
@@ -40,7 +44,7 @@ type worker struct {
 	wg *sync.WaitGroup
 }
 
-func newWorker(pubsubItemUpdateTopic *pubsub.Topic, rakutenIchibaAPIClient *rakutenichiba.Client, logger *zap.Logger) *worker {
+func newWorker(pubsubItemUpdateTopic *pubsub.Topic, spannerClient *spanner.Client, rakutenIchibaAPIClient *rakutenichiba.Client, logger *zap.Logger) *worker {
 	wg := &sync.WaitGroup{}
 	pool := make(chan *genreItemsFetcher, rakutenIchibaAPIClient.ApplicationIDNum())
 	workers := make([]*genreItemsFetcher, 0, cap(pool))
@@ -55,6 +59,7 @@ func newWorker(pubsubItemUpdateTopic *pubsub.Topic, rakutenIchibaAPIClient *raku
 		})
 	}
 	return &worker{
+		spannerClient:          spannerClient,
 		rakutenIchibaAPIClient: rakutenIchibaAPIClient,
 		wg:                     wg,
 		pool:                   pool,
@@ -68,20 +73,24 @@ type rakutenWorkerOption struct {
 }
 
 func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {
-	furnitureGenres, err := r.getFurnitureGenres(ctx)
+	genreIDItemCategoryMap, err := r.getGenreIDItemCategoryMap(ctx)
 	if err != nil {
-		return fmt.Errorf("getFurnitureGenre: %w", err)
+		return fmt.Errorf("getGenreIDItemCategoryMap: %w", err)
 	}
-
-	genreMap := buildGenreMapFromGenres(furnitureGenres)
 	for _, w := range r.workers {
-		w.genreMap = genreMap
+		w.genreIDItemCategoryMap = genreIDItemCategoryMap
 		w.start(ctx)
 	}
 
-	fetchGenreIDs := make([]int, 0, len(furnitureGenres))
-	for _, genre := range furnitureGenres {
-		fetchGenreIDs = append(fetchGenreIDs, genre.ID)
+	rakutenItemGenres, err := xspanner.GetAllRakutenItemGenres(ctx, r.spannerClient)
+	if err != nil {
+		return fmt.Errorf("xspanner.GetAllRakutenItemGenres: %w", err)
+	}
+	var fetchGenreIDs []int
+	for _, genre := range rakutenItemGenres {
+		if genre.Level == 0 {
+			fetchGenreIDs = append(fetchGenreIDs, int(genre.ID))
+		}
 	}
 	sort.Slice(fetchGenreIDs, func(i, j int) bool {
 		return fetchGenreIDs[i] < fetchGenreIDs[j]
@@ -109,35 +118,31 @@ func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {
 	return nil
 }
 
-// buildGenreMapFromGenre builds genreID => *Genre map by tracking
-func buildGenreMapFromGenres(genres []*rakutenichiba.Genre) map[string]*rakutenichiba.Genre {
-	queue := genres
-	genreMap := map[string]*rakutenichiba.Genre{}
-	for len(queue) != 0 {
-		g := queue[0]
-		queue = queue[1:]
-
-		genreMap[strconv.Itoa(g.ID)] = g
-
-		queue = append(queue, g.Children...)
-	}
-	return genreMap
-}
-
-func (r *worker) getFurnitureGenres(ctx context.Context) ([]*rakutenichiba.Genre, error) {
-	furnitureGenre, err := r.rakutenIchibaAPIClient.SearchGenre(ctx, rakutenichiba.GenreFurnitureID)
+func (r *worker) getGenreIDItemCategoryMap(ctx context.Context) (map[int]*xspanner.ItemCategoryWithParent, error) {
+	rakutenItemGenres, err := xspanner.GetAllRakutenItemGenres(ctx, r.spannerClient)
 	if err != nil {
-		return nil, fmt.Errorf("rakutenIchibaAPIClient.SearchGenre: %w", err)
+		return nil, fmt.Errorf("xspanner.GetAllRakutenItemGenres: %w", err)
 	}
-	var genres []*rakutenichiba.Genre
-	for _, child := range furnitureGenre.Children {
-		genre, err := r.rakutenIchibaAPIClient.GetGenreWithAllChildren(ctx, strconv.Itoa(child.Child.ID))
-		if err != nil {
-			return nil, fmt.Errorf("rakutenIchibaAPIClient.GetCategoryWithAllChildren: %w", err)
-		}
-		genres = append(genres, genre)
+	genreIDItemCategoryIDMap := make(map[int]string)
+	for _, genre := range rakutenItemGenres {
+		genreIDItemCategoryIDMap[int(genre.ID)] = genre.ItemCategoryID
 	}
-	return genres, nil
+
+	itemCategoriesWithParent, err := xspanner.GetAllItemCategoriesWithParent(ctx, r.spannerClient)
+	if err != nil {
+		return nil, fmt.Errorf("xspanner.GetAllItemCategoriesWithParent: %w", err)
+	}
+	itemCategoryMap := make(map[string]*xspanner.ItemCategoryWithParent)
+	for _, itemCategory := range itemCategoriesWithParent {
+		itemCategoryMap[itemCategory.ID] = itemCategory
+	}
+
+	genreIDItemCategoryMap := make(map[int]*xspanner.ItemCategoryWithParent)
+	for genreID, itemCategoryID := range genreIDItemCategoryIDMap {
+		genreIDItemCategoryMap[genreID] = itemCategoryMap[itemCategoryID]
+	}
+
+	return genreIDItemCategoryMap, nil
 }
 
 // We traverse all items in the given genre with following way
@@ -189,7 +194,7 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 					for _, item := range res.Items {
 						rakutenItems = append(rakutenItems, item.Item)
 					}
-					items, err := mapRakutenItemsToIndexItems(rakutenItems, w.genreMap)
+					items, err := mapRakutenItemsToIndexItems(rakutenItems, w.genreIDItemCategoryMap)
 					if err != nil {
 						w.logger.Error(
 							"mapRakutenItemsToIndexItems failed for some items",
@@ -203,20 +208,20 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 					var publishedCount int64
 					for _, item := range items {
 						item := item
+						itemJSON, err := json.Marshal(item)
+						if err != nil {
+							w.logger.Error(
+								"json.Marshal item failed",
+								zap.Error(err),
+								zap.Any("item", item),
+							)
+							continue
+						}
 
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
 
-							itemJSON, err := json.Marshal(item)
-							if err != nil {
-								w.logger.Error(
-									"json.Marshal item failed",
-									zap.Error(err),
-									zap.Any("item", item),
-								)
-								return
-							}
 							res := w.pubsubItemUpdateTopic.Publish(ctx, &pubsub.Message{
 								Data: itemJSON,
 							})
@@ -249,16 +254,21 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 	}()
 }
 
-func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap map[string]*rakutenichiba.Genre) ([]*xitem.Item, error) {
+func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreIDItemCategoryMap map[int]*xspanner.ItemCategoryWithParent) ([]*xitem.Item, error) {
 	items := make([]*xitem.Item, 0, len(rakutenItems))
 	var errors []error
 	for _, rakutenItem := range rakutenItems {
-		genre, ok := genreMap[rakutenItem.GenreID]
-		if !ok {
-			errors = append(errors, fmt.Errorf("failed to get genre, item id: %s", rakutenItem.ID()))
+		genreID, err := strconv.Atoi(rakutenItem.GenreID)
+		if err != nil {
+			errors = append(errors, fmt.Errorf("failed to convert genre id '%s': %w", rakutenItem.GenreID, err))
 			continue
 		}
-		item, err := mapRakutenItemToIndexItem(rakutenItem, genre)
+		itemCategory, ok := genreIDItemCategoryMap[genreID]
+		if !ok {
+			errors = append(errors, fmt.Errorf("failed to get itemCategory, item id: %s", rakutenItem.ID()))
+			continue
+		}
+		item, err := mapRakutenItemToIndexItem(rakutenItem, itemCategory)
 		if err != nil {
 			errors = append(errors, err)
 			continue
@@ -268,7 +278,7 @@ func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreMap ma
 	return items, multierr.Combine(errors...)
 }
 
-func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenichiba.Genre) (*xitem.Item, error) {
+func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, itemCategory *xspanner.ItemCategoryWithParent) (*xitem.Item, error) {
 	var status xitem.Status
 	switch rakutenItem.Availability {
 	case 0:
@@ -297,9 +307,9 @@ func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, genre *rakutenic
 		ImageURLs:     imageURLs,
 		AverageRating: rakutenItem.ReviewAverage,
 		ReviewCount:   rakutenItem.ReviewCount,
-		CategoryID:    rakutenItem.GenreID,
-		CategoryIDs:   genre.GenreIDs(),
-		CategoryNames: genre.GenreNames(),
+		CategoryID:    itemCategory.ID,
+		CategoryIDs:   itemCategory.CategoryIDs(),
+		CategoryNames: itemCategory.CategoryNames(),
 		TagIDs:        rakutenItem.TagIDs,
 		JANCode:       janCode,
 		Platform:      xitem.PlatformRakuten,
