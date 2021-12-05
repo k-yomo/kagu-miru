@@ -1,4 +1,4 @@
-import React, { forwardRef, ReactNode, useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import gql from 'graphql-tag';
 import { Autocomplete, Box, Card, Label, Stack, Text } from '@sanity/ui';
 import PatchEvent, { set, unset } from '@sanity/form-builder/PatchEvent';
