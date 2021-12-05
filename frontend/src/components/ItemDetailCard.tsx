@@ -21,7 +21,10 @@ export default function ItemDetailCard({ itemId }: Props) {
     );
   }
   return (
-    <a href={!!item.affiliateUrl ? item.affiliateUrl : item.url} className="no-underline">
+    <a
+      href={!!item.affiliateUrl ? item.affiliateUrl : item.url}
+      className="no-underline"
+    >
       <div className="flex items-center border-[1px] border-gray-200 dark:border-gray-800 rounded-md">
         <div className="w-[40%] sm:w-[30%] h-full overflow-hidden">
           <img

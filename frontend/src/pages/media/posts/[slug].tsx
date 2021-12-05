@@ -117,7 +117,11 @@ const serializers = {
       );
     },
     item: ({ node }: { node: { id: string } }) => {
-      return <div className="my-2"><ItemDetailCard itemId={node.id} /></div>
+      return (
+        <div className="my-2">
+          <ItemDetailCard itemId={node.id} />
+        </div>
+      );
     },
     customHtml: ({ node }: { node: { html: string } }) => {
       return <div dangerouslySetInnerHTML={{ __html: node.html }} />;
