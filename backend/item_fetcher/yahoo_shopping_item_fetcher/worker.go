@@ -9,7 +9,9 @@ import (
 	"sync/atomic"
 
 	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/spanner"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
+	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
 	"github.com/k-yomo/kagu-miru/backend/pkg/yahoo_shopping"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
@@ -24,11 +26,14 @@ type categoryItemsFetcher struct {
 	pool       chan<- *categoryItemsFetcher
 	categoryID chan int
 
+	ysCategoryIDItemCategoryMap map[int]*xspanner.ItemCategoryWithParent
+
 	logger *zap.Logger
 }
 
 type worker struct {
 	yahooShoppingAPIClient *yahoo_shopping.Client
+	spannerClient          *spanner.Client
 	pool                   <-chan *categoryItemsFetcher
 	workers                []*categoryItemsFetcher
 	logger                 *zap.Logger
@@ -36,7 +41,7 @@ type worker struct {
 	wg *sync.WaitGroup
 }
 
-func newWorker(pubsubItemUpdateTopic *pubsub.Topic, yahooShoppingAPIClient *yahoo_shopping.Client, logger *zap.Logger) *worker {
+func newWorker(pubsubItemUpdateTopic *pubsub.Topic, spannerClient *spanner.Client, yahooShoppingAPIClient *yahoo_shopping.Client, logger *zap.Logger) *worker {
 	wg := &sync.WaitGroup{}
 	pool := make(chan *categoryItemsFetcher, yahooShoppingAPIClient.ApplicationIDNum())
 	workers := make([]*categoryItemsFetcher, 0, cap(pool))
@@ -52,6 +57,7 @@ func newWorker(pubsubItemUpdateTopic *pubsub.Topic, yahooShoppingAPIClient *yaho
 	}
 	return &worker{
 		yahooShoppingAPIClient: yahooShoppingAPIClient,
+		spannerClient:          spannerClient,
 		wg:                     wg,
 		pool:                   pool,
 		workers:                workers,
@@ -65,18 +71,26 @@ type yahooShoppingWorkerOption struct {
 }
 
 func (r *worker) run(ctx context.Context, option *yahooShoppingWorkerOption) error {
-	furnitureCategories, err := r.getFurnitureCategories(ctx)
+	ysItemCategories, err := xspanner.GetAllYahooShoppingItemCategories(ctx, r.spannerClient)
+	if err != nil {
+		return fmt.Errorf("xspanner.GetAllYahooShoppingItemCategories: %w", err)
+	}
+
+	ysCategoryIDItemCategoryMap, err := r.getYSCategoryIDItemCategoryMap(ctx)
 	if err != nil {
 		return fmt.Errorf("getFurnitureGenre: %w", err)
 	}
 
 	for _, w := range r.workers {
+		w.ysCategoryIDItemCategoryMap = ysCategoryIDItemCategoryMap
 		w.start(ctx)
 	}
 
-	fetchCategoryIDs := make([]int, 0, len(furnitureCategories))
-	for _, category := range furnitureCategories {
-		fetchCategoryIDs = append(fetchCategoryIDs, category.ID)
+	fetchCategoryIDs := make([]int, 0, len(ysItemCategories))
+	for _, category := range ysItemCategories {
+		if category.Level == 0 {
+			fetchCategoryIDs = append(fetchCategoryIDs, int(category.ID))
+		}
 	}
 	sort.Slice(fetchCategoryIDs, func(i, j int) bool {
 		return fetchCategoryIDs[i] < fetchCategoryIDs[j]
@@ -104,12 +118,31 @@ func (r *worker) run(ctx context.Context, option *yahooShoppingWorkerOption) err
 	return nil
 }
 
-func (r *worker) getFurnitureCategories(ctx context.Context) ([]*yahoo_shopping.Category, error) {
-	category, err := r.yahooShoppingAPIClient.GetCategoryWithAllChildren(ctx, yahoo_shopping.CategoryFurnitureID)
+func (r *worker) getYSCategoryIDItemCategoryMap(ctx context.Context) (map[int]*xspanner.ItemCategoryWithParent, error) {
+	ysItemCategories, err := xspanner.GetAllYahooShoppingItemCategories(ctx, r.spannerClient)
 	if err != nil {
-		return nil, fmt.Errorf("yahooShoppingAPIClient.GetCategoryWithAllChildren: %w", err)
+		return nil, fmt.Errorf("xspanner.GetAllYahooShoppingItemCategories: %w", err)
 	}
-	return category.Children, nil
+	ysCategoryIDItemCategoryIDMap := make(map[int]string)
+	for _, genre := range ysItemCategories {
+		ysCategoryIDItemCategoryIDMap[int(genre.ID)] = genre.ItemCategoryID
+	}
+
+	itemCategoriesWithParent, err := xspanner.GetAllItemCategoriesWithParent(ctx, r.spannerClient)
+	if err != nil {
+		return nil, fmt.Errorf("xspanner.GetAllItemCategoriesWithParent: %w", err)
+	}
+	itemCategoryMap := make(map[string]*xspanner.ItemCategoryWithParent)
+	for _, itemCategory := range itemCategoriesWithParent {
+		itemCategoryMap[itemCategory.ID] = itemCategory
+	}
+
+	ysCategoryIDItemCategoryMap := make(map[int]*xspanner.ItemCategoryWithParent)
+	for ysCategoryID, itemCategoryID := range ysCategoryIDItemCategoryIDMap {
+		ysCategoryIDItemCategoryMap[ysCategoryID] = itemCategoryMap[itemCategoryID]
+	}
+
+	return ysCategoryIDItemCategoryMap, nil
 }
 
 // We traverse all items in the given category with following way
@@ -157,7 +190,7 @@ func (w *categoryItemsFetcher) start(ctx context.Context) {
 						break
 					}
 
-					items, err := mapYahooShoppingItemsToIndexItems(res.Hits)
+					items, err := mapYahooShoppingItemsToIndexItems(res.Hits, w.ysCategoryIDItemCategoryMap)
 					if err != nil {
 						w.logger.Error(
 							"mapYahooShoppingItemsToIndexItems failed for some items",
@@ -217,11 +250,16 @@ func (w *categoryItemsFetcher) start(ctx context.Context) {
 	}()
 }
 
-func mapYahooShoppingItemsToIndexItems(yahooShoppingItems []*yahoo_shopping.Item) ([]*xitem.Item, error) {
+func mapYahooShoppingItemsToIndexItems(yahooShoppingItems []*yahoo_shopping.Item, ysCategoryIDItemCategoryMap map[int]*xspanner.ItemCategoryWithParent) ([]*xitem.Item, error) {
 	items := make([]*xitem.Item, 0, len(yahooShoppingItems))
 	var errors []error
 	for _, yahooShoppingItem := range yahooShoppingItems {
-		item, err := mapYahooShoppingItemToIndexItem(yahooShoppingItem)
+		itemCategory, ok := ysCategoryIDItemCategoryMap[yahooShoppingItem.GenreCategory.Id]
+		// TODO: logging?
+		if !ok {
+			continue
+		}
+		item, err := mapYahooShoppingItemToIndexItem(yahooShoppingItem, itemCategory)
 		if err != nil {
 			errors = append(errors, err)
 			continue
@@ -231,16 +269,13 @@ func mapYahooShoppingItemsToIndexItems(yahooShoppingItems []*yahoo_shopping.Item
 	return items, multierr.Combine(errors...)
 }
 
-func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item) (*xitem.Item, error) {
+func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, itemCategory *xspanner.ItemCategoryWithParent) (*xitem.Item, error) {
 	var status xitem.Status
 	if yahooShoppingItem.InStock {
 		status = xitem.StatusActive
 	} else {
 		status = xitem.StatusInactive
 	}
-
-	// TODO: convert to kagu-miru category id
-	// categoryID := strconv.Itoa(yahooShoppingItem.GenreCategory.Id)
 
 	return &xitem.Item{
 		ID:            xitem.ItemUniqueID(xitem.PlatformYahooShopping, yahooShoppingItem.Code),
@@ -253,10 +288,9 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item) (*x
 		ImageURLs:     []string{yahooShoppingItem.Image.Medium, yahooShoppingItem.Image.Small},
 		AverageRating: yahooShoppingItem.Review.Rate,
 		ReviewCount:   yahooShoppingItem.Review.Count,
-		CategoryID:    "101859", // その他, TODO: Replace with appropriate category id
-		// CategoryID:    categoryID,
-		// CategoryIDs:
-		// CategoryNames:
+		CategoryID:    itemCategory.ID,
+		CategoryIDs:   itemCategory.CategoryIDs(),
+		CategoryNames: itemCategory.CategoryNames(),
 		// TagIDs:
 		JANCode:  yahooShoppingItem.JanCode,
 		Platform: xitem.PlatformYahooShopping,

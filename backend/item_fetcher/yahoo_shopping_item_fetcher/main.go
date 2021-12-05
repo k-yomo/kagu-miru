@@ -6,6 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"cloud.google.com/go/spanner"
+	"github.com/k-yomo/kagu-miru/backend/pkg/spannerutil"
+
 	"cloud.google.com/go/pubsub"
 	"github.com/blendle/zapdriver"
 	"github.com/k-yomo/kagu-miru/backend/pkg/yahoo_shopping"
@@ -29,8 +32,16 @@ func main() {
 	}
 	pubsubItemUpdateTopic := pubsubClient.Topic(cfg.PubsubItemUpdateTopicID)
 
+	spannerClient, err := spanner.NewClient(
+		context.Background(),
+		spannerutil.BuildSpannerDBPath(cfg.GCPProjectID, cfg.SpannerInstanceID, cfg.SpannerDatabaseID),
+	)
+	if err != nil {
+		logger.Fatal("failed to initialize spanner client", zap.Error(err))
+	}
+
 	yahooShoppingClient := yahoo_shopping.NewClient(cfg.YahooShoppingApplicationIDs)
-	yahooShoppingItemWorker := newWorker(pubsubItemUpdateTopic, yahooShoppingClient, logger)
+	yahooShoppingItemWorker := newWorker(pubsubItemUpdateTopic, spannerClient, yahooShoppingClient, logger)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
