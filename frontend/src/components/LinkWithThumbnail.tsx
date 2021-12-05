@@ -19,7 +19,7 @@ export default function LinkWithThumbnail({
   return (
     <Link href={url} as={urlAs}>
       <a>
-        <div className="flex items-center h-[100px] sm:h-[150px] shadow-md dark:shadow-none dark:border-[1px] dark:border-gray-800 rounded-md">
+        <div className="flex items-center h-[80px] sm:h-[150px] shadow-md dark:shadow-none dark:border-[1px] dark:border-gray-800 rounded-md">
           <div className="w-[30%] h-full overflow-hidden">
             <img
               src={imgSrc}
@@ -28,7 +28,7 @@ export default function LinkWithThumbnail({
             />
           </div>
           <div className="ml-2 sm:ml-3 w-[70%]">
-            <div className="mb-2 line-clamp-3 sm:line-clamp-2 text-lg sm:text-xl font-bold underline">
+            <div className="mb-2 line-clamp-3 sm:line-clamp-2 text-md sm:text-xl font-bold">
               {title}
             </div>
             <div className="hidden sm:block">

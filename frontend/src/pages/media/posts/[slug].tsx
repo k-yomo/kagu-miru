@@ -69,12 +69,14 @@ const serializers = {
   types: {
     internalLink: ({ node }: { node: InternalLink }) => {
       return (
-        <LinkWithThumbnail
-          url={routes.mediaPost(node.slug)}
-          title={node.title}
-          subTitle={node.description}
-          imgSrc={buildSanityImageSrc(node.mainImage).url()}
-        />
+        <div className="my-2">
+          <LinkWithThumbnail
+            url={routes.mediaPost(node.slug)}
+            title={node.title}
+            subTitle={node.description}
+            imgSrc={buildSanityImageSrc(node.mainImage).url()}
+          />
+        </div>
       );
     },
     searchPageLink: ({ node }: { node: SearchPageLink }) => {
@@ -83,13 +85,15 @@ const serializers = {
       const urlAs = new URL(node.url);
       urlAs.searchParams.delete('searchFrom');
       return (
-        <LinkWithThumbnail
-          url={url.toString()}
-          urlAs={urlAs.toString()}
-          title={node.title}
-          subTitle=""
-          imgSrc={SearchPageScreenImg.src}
-        />
+        <div className="my-2">
+          <LinkWithThumbnail
+            url={url.toString()}
+            urlAs={urlAs.toString()}
+            title={node.title}
+            subTitle=""
+            imgSrc={SearchPageScreenImg.src}
+          />
+        </div>
       );
     },
     image: ({ node }: { node: SanityImageObject }) => {
@@ -113,7 +117,7 @@ const serializers = {
       );
     },
     item: ({ node }: { node: { id: string } }) => {
-      return <ItemDetailCard itemId={node.id} />;
+      return <div className="my-2"><ItemDetailCard itemId={node.id} /></div>
     },
     customHtml: ({ node }: { node: { html: string } }) => {
       return <div dangerouslySetInnerHTML={{ __html: node.html }} />;
