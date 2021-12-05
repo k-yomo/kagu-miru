@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/pkg/spannerutil"
+
 	"cloud.google.com/go/spanner"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/db"
 
@@ -62,7 +64,7 @@ func main() {
 
 	spannerClient, err := spanner.NewClient(
 		context.Background(),
-		fmt.Sprintf("projects/%s/instances/%s/databases/%s", cfg.GCPProjectID, cfg.SpannerInstanceID, cfg.SpannerDatabaseID),
+		spannerutil.BuildSpannerDBPath(cfg.GCPProjectID, cfg.SpannerInstanceID, cfg.SpannerDatabaseID),
 	)
 	if err != nil {
 		logger.Fatal("failed to initialize spanner client", zap.Error(err))

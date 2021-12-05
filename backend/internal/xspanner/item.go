@@ -1,6 +1,7 @@
 package xspanner
 
 import (
+	"context"
 	"time"
 
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
@@ -26,4 +27,24 @@ type Item struct {
 	JANCode   spanner.NullString `spanner:"jan_code"`
 	Platform  xitem.Platform     `spanner:"platform"`
 	UpdatedAt time.Time          `spanner:"updated_at"`
+}
+
+func GetItem(ctx context.Context, spannerClient *spanner.Client, itemID string) (*Item, error) {
+	stmt := spanner.Statement{
+		SQL:    `SELECT * FROM items WHERE id = @item_id`,
+		Params: map[string]interface{}{"item_id": itemID},
+	}
+	iter := spannerClient.Single().Query(ctx, stmt)
+	defer iter.Stop()
+
+	row, err := iter.Next()
+	if err != nil {
+		return nil, err
+	}
+	var item Item
+	if err := row.ToStruct(&item); err != nil {
+		return nil, err
+	}
+
+	return &item, nil
 }
