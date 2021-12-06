@@ -28,7 +28,7 @@
     "graphql-tag": "^2.12.5",
     "groq": "^2.15.0",
     "isomorphic-unfetch": "^3.1.0",
-    "next": "12.0.4",
+    "next": "12.0.7",
     "next-themes": "^0.0.15",
     "react": "17.0.2",
     "react-dom": "17.0.2",
