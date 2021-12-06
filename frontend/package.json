@@ -21,7 +21,7 @@
     "@sanity/image-url": "^1.0.1",
     "@tailwindcss/line-clamp": "^0.2.2",
     "apollo-link-scalars": "^3.0.0",
-    "date-fns": "^2.26.0",
+    "date-fns": "^2.27.0",
     "graphql": "^15.7.2",
     "graphql-anywhere": "^4.2.7",
     "graphql-scalars": "^1.13.6",
