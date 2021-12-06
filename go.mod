@@ -9,7 +9,7 @@ require (
 	github.com/99designs/gqlgen v0.14.0
 	github.com/Code-Hex/gqldoc v0.0.4
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
-	github.com/alexedwards/scs/v2 v2.4.0
+	github.com/alexedwards/scs/v2 v2.5.0
 	github.com/aquasecurity/esquery v0.2.0
 	github.com/avct/uasurfer v0.0.0-20191028135549-26b5daa857f1
 	github.com/blendle/zapdriver v1.3.1
