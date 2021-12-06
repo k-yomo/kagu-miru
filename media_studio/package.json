@@ -43,6 +43,6 @@
     "@graphql-codegen/typescript": "^2.4.1",
     "@graphql-codegen/typescript-operations": "^2.2.1",
     "@graphql-codegen/typescript-react-apollo": "^3.2.2",
-    "prettier": "^2.5.0"
+    "prettier": "^2.5.1"
   }
 }
