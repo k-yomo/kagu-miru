@@ -41,6 +41,7 @@ const (
 	ItemFieldCategoryID    = "category_id"
 	ItemFieldCategoryIDs   = "category_ids"
 	ItemFieldCategoryNames = "category_names"
+	ItemFieldBrandName     = "brand_name"
 	ItemFieldTagIDs        = "tag_ids"
 	ItemFieldJANCode       = "jan_code"
 	ItemFieldPlatform      = "platform"
@@ -61,6 +62,7 @@ var AllItemFields = []string{
 	ItemFieldCategoryID,
 	ItemFieldCategoryIDs,
 	ItemFieldCategoryNames,
+	ItemFieldBrandName,
 	ItemFieldTagIDs,
 	ItemFieldJANCode,
 	ItemFieldPlatform,
