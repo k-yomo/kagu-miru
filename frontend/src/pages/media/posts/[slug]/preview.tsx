@@ -1,34 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Error from 'next/error';
-import { sanityPreviewClient } from '@src/lib/sanityClient';
 import { useRouter } from 'next/router';
-import Post, { Props } from '@src/pages/media/posts/[slug]';
 import groq from 'groq';
+import { sanityPreviewClient } from '@src/lib/sanityClient';
+import PostDetail, {
+  postFragmentForPostDetail,
+  PostFragment,
+} from '@src/components/PostDetail';
 
-// Copied from `@src/pages/media/posts/[slug]`
-export const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0]{
-  title,
-  description,
-  mainImage,
-  publishedAt,
-  categories,
-  tags,
-  "authorName": author->name,
-  "authorImage": author->image,
-  body[]{
-    ...,
-    _type == "internalLink" => {
-      "slug": @->slug.current,
-      "title": @->title,
-      "description": @->description,
-      "mainImage": @->mainImage,
-    } 
-  }
+const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0]{
+  ${postFragmentForPostDetail}
 }`;
 
 export default function PostPreview() {
-  const [data, setData] = useState<Props | undefined>(undefined);
+  const [data, setData] = useState<PostFragment | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -58,7 +44,7 @@ export default function PostPreview() {
       <Head>
         <meta name="robots" content="noindex,nofollow,noarchive" />
       </Head>
-      <Post {...data} />
+      <PostDetail {...data} />
     </>
   );
 }
