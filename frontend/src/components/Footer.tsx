@@ -30,6 +30,12 @@ export default function Footer() {
           >
             Instagram
           </a>
+          <a
+            href="https://twitter.com/kagu_miru"
+            className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700"
+          >
+            Twitter
+          </a>
         </div>
       </div>
 
