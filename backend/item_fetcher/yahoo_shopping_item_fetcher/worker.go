@@ -291,6 +291,7 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, ite
 		CategoryID:    itemCategory.ID,
 		CategoryIDs:   itemCategory.CategoryIDs(),
 		CategoryNames: itemCategory.CategoryNames(),
+		BrandName:     yahooShoppingItem.Brand.Name,
 		// TagIDs:
 		JANCode:  yahooShoppingItem.JanCode,
 		Platform: xitem.PlatformYahooShopping,
