@@ -16,6 +16,7 @@ type Item struct {
 	CategoryID    string         `json:"category_id"`
 	CategoryIDs   []string       `json:"category_ids"`
 	CategoryNames []string       `json:"category_names"`
+	BrandName     string         `json:"brand_name,omitempty"`
 	TagIDs        []int          `json:"tag_ids"`
 	JANCode       string         `json:"jan_code,omitempty"`
 	Platform      xitem.Platform `json:"platform"`

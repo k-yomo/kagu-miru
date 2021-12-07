@@ -64,6 +64,7 @@ func mapItemToSpannerItem(item *xitem.Item) *xspanner.Item {
 		AverageRating: item.AverageRating,
 		ReviewCount:   int64(item.ReviewCount),
 		CategoryID:    item.CategoryID,
+		BrandName:     spanner.NullString{StringVal: item.BrandName, Valid: item.BrandName != ""},
 		JANCode:       spanner.NullString{StringVal: item.JANCode, Valid: item.JANCode != ""},
 		Platform:      item.Platform,
 		UpdatedAt:     time.Now(),
