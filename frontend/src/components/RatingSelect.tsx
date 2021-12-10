@@ -2,12 +2,12 @@ import React, { memo } from 'react';
 import Rating from '@src/components/Rating';
 
 interface Props {
-  minRating?: number;
+  curMinRating?: number;
   onChangeRating: (rating?: number) => void;
 }
 
 export default memo(function RatingSelect({
-  minRating,
+  curMinRating,
   onChangeRating,
 }: Props) {
   return (
@@ -15,29 +15,44 @@ export default memo(function RatingSelect({
       <div className="space-y-3 text-xs">
         <div
           className={`cursor-pointer flex items-center hover:font-bold ${
-            minRating === 5 ? 'font-bold' : ''
+            curMinRating === 5 ? 'font-bold' : ''
           }`}
           onClick={() => onChangeRating(5)}
         >
-          <Rating size={20} rating={5} maxRating={5} />
+          <Rating
+            size={20}
+            rating={5}
+            maxRating={5}
+            grayOut={!!(curMinRating && curMinRating !== 5)}
+          />
           以上
         </div>
         <div
           className={`cursor-pointer flex items-center hover:font-bold ${
-            minRating === 4 ? 'font-bold' : ''
+            curMinRating === 4 ? 'font-bold' : ''
           }`}
           onClick={() => onChangeRating(4)}
         >
-          <Rating size={20} rating={4} maxRating={5} />
+          <Rating
+            size={20}
+            rating={4}
+            maxRating={5}
+            grayOut={!!(curMinRating && curMinRating !== 4)}
+          />
           以上
         </div>
         <div
           className={`cursor-pointer flex items-center hover:font-bold ${
-            minRating === 3 ? 'font-bold' : ''
+            curMinRating === 3 ? 'font-bold' : ''
           }`}
           onClick={() => onChangeRating(3)}
         >
-          <Rating size={20} rating={3} maxRating={5} />
+          <Rating
+            size={20}
+            rating={3}
+            maxRating={5}
+            grayOut={!!(curMinRating && curMinRating !== 3)}
+          />
           以上
         </div>
       </div>

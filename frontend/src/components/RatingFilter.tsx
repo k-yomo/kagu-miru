@@ -12,7 +12,7 @@ export default memo(function RatingFilter() {
 
   return (
     <RatingSelect
-      minRating={minRating || undefined}
+      curMinRating={minRating || undefined}
       onChangeRating={onChangeRating}
     />
   );

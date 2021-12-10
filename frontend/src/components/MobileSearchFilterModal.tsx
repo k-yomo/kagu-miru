@@ -165,7 +165,7 @@ export default function MobileSearchFilterModal() {
                   <hr className="my-3 border-gray-100 dark:border-gray-800" />
                   <h3 className="my-2 text-md font-bold">レビュー評価</h3>
                   <RatingSelect
-                    minRating={searchFilter.minRating || undefined}
+                    curMinRating={searchFilter.minRating || undefined}
                     onChangeRating={setMinRating}
                   />
                   <div className="mb-2" />

@@ -5,9 +5,15 @@ interface Props {
   size?: number;
   rating: number;
   maxRating: number;
+  grayOut: boolean;
 }
 
-export default memo(function Rating({ size, rating, maxRating }: Props) {
+export default memo(function Rating({
+  size,
+  rating,
+  maxRating,
+  grayOut,
+}: Props) {
   let fullStarCount = Math.floor(rating);
   let halfStarCount = 0;
   if (rating % 1 !== 0) {
@@ -20,7 +26,11 @@ export default memo(function Rating({ size, rating, maxRating }: Props) {
   const emptyStarCount = maxRating - fullStarCount - halfStarCount;
 
   return (
-    <span className="flex sm:space-x-[0.05rem] text-amber-400">
+    <span
+      className={`flex sm:space-x-[0.05rem] ${
+        grayOut ? 'text-gray-300' : 'text-amber-400'
+      }`}
+    >
       {Array(fullStarCount)
         .fill(null)
         .map((_, i) => (
