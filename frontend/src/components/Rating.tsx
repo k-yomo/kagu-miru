@@ -5,7 +5,7 @@ interface Props {
   size?: number;
   rating: number;
   maxRating: number;
-  grayOut: boolean;
+  grayOut?: boolean;
 }
 
 export default memo(function Rating({

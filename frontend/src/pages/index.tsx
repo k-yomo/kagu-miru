@@ -137,7 +137,7 @@ export const TopPageInner = memo(function TopPageInner({
           </div>
         )}
         <div className="flex flex-col items-center">
-          <div className="relative grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
+          <div className="relative grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
             {items && (
               <ItemList
                 isAdmin={isAdmin!!}
