@@ -9,6 +9,8 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/k-yomo/kagu-miru/backend/item_fetcher"
+
 	"cloud.google.com/go/spanner"
 	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
 
@@ -165,7 +167,7 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 			case genreID := <-w.genreID:
 
 				totalPublishedCount := 0
-				cursor := w.rakutenIchibaAPIClient.NewGenreItemCursor(genreID)
+				cursor := w.rakutenIchibaAPIClient.NewGenreItemCursor(genreID, item_fetcher.MinFetchItemPrice, item_fetcher.MaxFetchItemPrice)
 				for {
 					if err := rateLimiter.Wait(ctx); err != nil {
 						w.logger.Error("rateLimiter.Wait failed", zap.Error(err))

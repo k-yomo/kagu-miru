@@ -8,6 +8,8 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/k-yomo/kagu-miru/backend/item_fetcher"
+
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/spanner"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
@@ -165,7 +167,7 @@ func (w *categoryItemsFetcher) start(ctx context.Context) {
 			case categoryID := <-w.categoryID:
 
 				totalPublishedCount := 0
-				cursor := w.yahooShoppingAPIClient.NewCategoryItemCursor(categoryID)
+				cursor := w.yahooShoppingAPIClient.NewCategoryItemCursor(categoryID, item_fetcher.MinFetchItemPrice, item_fetcher.MaxFetchItemPrice)
 				for {
 					if err := rateLimiter.Wait(ctx); err != nil {
 						w.logger.Error("rateLimiter.Wait failed", zap.Error(err))

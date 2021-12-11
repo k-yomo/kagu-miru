@@ -11,19 +11,22 @@ var Done = errors.New("DONE")
 
 type GenreItemCursor struct {
 	ichibaClient *Client
-	genreID      int
-	curPage      int
-	curMinPrice  int
+
+	genreID     int
+	curPage     int
+	curMinPrice int
+	maxPrice    int
 
 	isDone bool
 }
 
-func (c *Client) NewGenreItemCursor(genreID int) *GenreItemCursor {
+func (c *Client) NewGenreItemCursor(genreID int, minPrice int, maxPrice int) *GenreItemCursor {
 	return &GenreItemCursor{
 		ichibaClient: c,
 		genreID:      genreID,
 		curPage:      1,
-		curMinPrice:  0,
+		curMinPrice:  minPrice,
+		maxPrice:     maxPrice,
 	}
 }
 
@@ -54,6 +57,14 @@ func (g *GenreItemCursor) Next(ctx context.Context) (*SearchItemResponse, error)
 	}, b)
 	if err != nil {
 		return nil, err
+	}
+
+	for i, item := range searchItemRes.Items {
+		if item.Item.ItemPrice > g.maxPrice {
+			searchItemRes.Items = searchItemRes.Items[:i]
+			g.isDone = true
+			return searchItemRes, nil
+		}
 	}
 
 	if g.curPage == searchItemRes.PageCount {
