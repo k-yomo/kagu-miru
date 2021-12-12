@@ -11,11 +11,14 @@ import (
 )
 
 type Genre struct {
-	ID       int    `json:"genreId"`
-	Name     string `json:"genreName"`
-	Level    int    `json:"genreLevel"`
-	Parent   *Genre
-	Children []*Genre
+	ID        int    `json:"genreId"`
+	Name      string `json:"genreName"`
+	Level     int    `json:"genreLevel"`
+	Parent    *Genre
+	Children  []*Genre
+	TagGroups []*struct {
+		TagGroup *TagGroup `json:"tagGroup"`
+	} `json:"tagGroups"`
 }
 
 func (g *Genre) GenreIDs() []string {
@@ -50,6 +53,9 @@ type SearchGenreResponse struct {
 			Level int    `json:"genreLevel"`
 		} `json:"child"`
 	} `json:"children"`
+	TagGroups []*struct {
+		TagGroup *TagGroup `json:"tagGroup"`
+	} `json:"tagGroups"`
 }
 
 // SearchGenre searches parent, current and children genre of given ID
@@ -60,21 +66,22 @@ func (c *Client) SearchGenre(ctx context.Context, genreID string) (*SearchGenreR
 	if err := httputil.GetAndUnmarshal(ctx, c.httpClient, u, &resp); err != nil {
 		return nil, fmt.Errorf("httputil.GetAndUnmarshal: %w", err)
 	}
+	resp.Current.TagGroups = resp.TagGroups
 	return &resp, nil
 }
 
 // GetGenreWithAllChildren gets genre with all lower hierarchy genre
 func (c *Client) GetGenreWithAllChildren(ctx context.Context, genreID string) (*Genre, error) {
-	u := urlutil.CopyWithQueries(c.genreSearchAPIURL, c.buildParams(map[string]string{"genreId": genreID}))
-	var resp SearchGenreResponse
-	if err := httputil.GetAndUnmarshal(ctx, c.httpClient, u, &resp); err != nil {
+	resp, err := c.SearchGenre(ctx, genreID)
+	if err != nil {
 		return nil, fmt.Errorf("httputil.GetAndUnmarshal: %w", err)
 	}
 
 	genre := &Genre{
-		ID:    resp.Current.ID,
-		Name:  resp.Current.Name,
-		Level: resp.Current.Level,
+		ID:        resp.Current.ID,
+		Name:      resp.Current.Name,
+		Level:     resp.Current.Level,
+		TagGroups: resp.TagGroups,
 	}
 	if err := c.setChildGenres(ctx, genre); err != nil {
 		return nil, fmt.Errorf("c.setChildGenres: %w", err)
@@ -103,6 +110,9 @@ func (c *Client) setChildGenres(ctx context.Context, genre *Genre) error {
 		}
 		genres = append(genres, g)
 	}
+
+	genre.TagGroups = rakutenGenre.TagGroups
 	genre.Children = genres
+
 	return nil
 }

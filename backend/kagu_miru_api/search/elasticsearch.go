@@ -127,7 +127,6 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 	}
 
 	boolQuery := esquery.Bool().Must(mustQueries...)
-	boolQuery.Filter()
 
 	if len(input.Filter.CategoryIds) > 0 {
 		var categoryIDs []interface{}

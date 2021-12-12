@@ -8,12 +8,11 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/k-yomo/kagu-miru/backend/item_fetcher"
-
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/spanner"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
+	"github.com/k-yomo/kagu-miru/backend/item_fetcher"
 	"github.com/k-yomo/kagu-miru/backend/pkg/yahoo_shopping"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"

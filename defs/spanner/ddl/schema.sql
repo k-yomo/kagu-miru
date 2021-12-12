@@ -29,6 +29,20 @@ CREATE TABLE yahoo_shopping_item_categories (
     FOREIGN KEY (item_category_id) REFERENCES item_categories (id)
 ) PRIMARY KEY(id);
 
+CREATE TABLE rakuten_tag_groups (
+    id INT64 NOT NULL,
+    name STRING(256) NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+) PRIMARY KEY(id);
+
+CREATE TABLE rakuten_tags (
+    id INT64 NOT NULL,
+    name STRING(256) NOT NULL,
+    tag_group_id INT64 NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (tag_group_id) REFERENCES rakuten_tag_groups (id)
+) PRIMARY KEY(id);
+
 CREATE TABLE items (
     id STRING(256) NOT NULL,
     name STRING(256) NOT NULL,
