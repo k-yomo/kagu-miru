@@ -24,7 +24,7 @@
     "date-fns": "^2.27.0",
     "graphql": "^15.7.2",
     "graphql-anywhere": "^4.2.7",
-    "graphql-scalars": "^1.13.6",
+    "graphql-scalars": "^1.14.1",
     "graphql-tag": "^2.12.5",
     "groq": "^2.15.0",
     "isomorphic-unfetch": "^3.1.0",
