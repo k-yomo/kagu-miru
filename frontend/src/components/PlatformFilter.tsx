@@ -17,6 +17,7 @@ export default memo(function RatingFilter() {
     <PlatformSelect
       platforms={searchState.searchInput.filter.platforms}
       onChangePlatforms={onChangePlatforms}
+      htmlIdPrefix="desktop"
     />
   );
 });

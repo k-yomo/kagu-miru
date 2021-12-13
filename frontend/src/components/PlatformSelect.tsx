@@ -5,11 +5,15 @@ import { allPlatforms, platFormText } from '@src/conv/platform';
 interface Props {
   platforms: ItemSellingPlatform[];
   onChangePlatforms: (platforms: ItemSellingPlatform[]) => void;
+  // TODO: Use unstable_useOpaqueIdentifier
+  // https://www.dkrk-blog.net/react/useopaqueidentifier
+  htmlIdPrefix: string;
 }
 
 export default memo(function PlatformSelect({
   platforms,
   onChangePlatforms,
+  htmlIdPrefix,
 }: Props) {
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const platform = e.target.name as ItemSellingPlatform;
@@ -28,7 +32,7 @@ export default memo(function PlatformSelect({
         {allPlatforms.map((platform) => (
           <div key={platform} className="flex items-center">
             <input
-              id={`platformCheckBox_${platform}`}
+              id={`${htmlIdPrefix}_platformCheckBox_${platform}`}
               type="checkbox"
               name={platform}
               checked={platforms.includes(platform)}
@@ -36,7 +40,7 @@ export default memo(function PlatformSelect({
               onChange={onChange}
             />
             <label
-              htmlFor={`platformCheckBox_${platform}`}
+              htmlFor={`${htmlIdPrefix}_platformCheckBox_${platform}`}
               className="ml-2 cursor-pointer text-sm"
             >
               {platFormText(platform)}

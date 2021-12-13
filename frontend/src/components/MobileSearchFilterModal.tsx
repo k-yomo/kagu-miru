@@ -136,6 +136,7 @@ export default function MobileSearchFilterModal() {
                   <PlatformSelect
                     platforms={searchFilter.platforms}
                     onChangePlatforms={setPlatforms}
+                    htmlIdPrefix="mobile"
                   />
                   <hr className="my-3 border-gray-100 dark:border-gray-800" />
                   <h3 className="my-2 text-md font-bold">価格</h3>
