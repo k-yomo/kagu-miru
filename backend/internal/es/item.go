@@ -17,6 +17,7 @@ type Item struct {
 	CategoryIDs   []string       `json:"category_ids"`
 	CategoryNames []string       `json:"category_names"`
 	BrandName     string         `json:"brand_name,omitempty"`
+	Colors        []string       `json:"colors"`
 	TagIDs        []int          `json:"tag_ids"`
 	JANCode       string         `json:"jan_code,omitempty"`
 	Platform      xitem.Platform `json:"platform"`
@@ -42,6 +43,7 @@ const (
 	ItemFieldCategoryIDs   = "category_ids"
 	ItemFieldCategoryNames = "category_names"
 	ItemFieldBrandName     = "brand_name"
+	ItemFieldColors        = "colors"
 	ItemFieldTagIDs        = "tag_ids"
 	ItemFieldJANCode       = "jan_code"
 	ItemFieldPlatform      = "platform"
@@ -63,6 +65,7 @@ var AllItemFields = []string{
 	ItemFieldCategoryIDs,
 	ItemFieldCategoryNames,
 	ItemFieldBrandName,
+	ItemFieldColors,
 	ItemFieldTagIDs,
 	ItemFieldJANCode,
 	ItemFieldPlatform,

@@ -56,6 +56,7 @@ CREATE TABLE items (
     review_count INT64 NOT NULL,
     category_id STRING(256) NOT NULL,
     brand_name STRING(256),
+    colors ARRAY<STRING(256)>,
     jan_code STRING(256),
     platform STRING(256) NOT NULL,
     updated_at TIMESTAMP NOT NULL,

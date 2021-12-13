@@ -32,6 +32,7 @@ type genreItemsFetcher struct {
 	genreID chan int
 
 	genreIDItemCategoryMap map[int]*xspanner.ItemCategoryWithParent
+	tagMap                 map[int]*xspanner.RakutenTag
 
 	logger *zap.Logger
 }
@@ -79,8 +80,13 @@ func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {
 	if err != nil {
 		return fmt.Errorf("getGenreIDItemCategoryMap: %w", err)
 	}
+	tagMap, err := r.getTagMap(ctx)
+	if err != nil {
+		return fmt.Errorf("getTagMap: %w", err)
+	}
 	for _, w := range r.workers {
 		w.genreIDItemCategoryMap = genreIDItemCategoryMap
+		w.tagMap = tagMap
 		w.start(ctx)
 	}
 
@@ -118,6 +124,20 @@ func (r *worker) run(ctx context.Context, option *rakutenWorkerOption) error {
 
 	r.logger.Info(fmt.Sprintf("[end] fetching %d genre", len(fetchGenreIDs[startGenreIdx:])))
 	return nil
+}
+
+func (r *worker) getTagMap(ctx context.Context) (map[int]*xspanner.RakutenTag, error) {
+	tags, err := xspanner.GetAllRakutenTags(ctx, r.spannerClient)
+	if err != nil {
+		return nil, fmt.Errorf("xspanner.GetAllRakutenTags: %w", err)
+	}
+
+	tagMap := make(map[int]*xspanner.RakutenTag, len(tags))
+	for _, tag := range tags {
+		tagMap[int(tag.ID)] = tag
+	}
+
+	return tagMap, nil
 }
 
 func (r *worker) getGenreIDItemCategoryMap(ctx context.Context) (map[int]*xspanner.ItemCategoryWithParent, error) {
@@ -196,7 +216,7 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 					for _, item := range res.Items {
 						rakutenItems = append(rakutenItems, item.Item)
 					}
-					items, err := mapRakutenItemsToIndexItems(rakutenItems, w.genreIDItemCategoryMap)
+					items, err := mapRakutenItemsToIndexItems(rakutenItems, w.genreIDItemCategoryMap, w.tagMap)
 					if err != nil {
 						w.logger.Error(
 							"mapRakutenItemsToIndexItems failed for some items",
@@ -256,7 +276,11 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 	}()
 }
 
-func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreIDItemCategoryMap map[int]*xspanner.ItemCategoryWithParent) ([]*xitem.Item, error) {
+func mapRakutenItemsToIndexItems(
+	rakutenItems []*rakutenichiba.Item,
+	genreIDItemCategoryMap map[int]*xspanner.ItemCategoryWithParent,
+	tagMap map[int]*xspanner.RakutenTag,
+) ([]*xitem.Item, error) {
 	items := make([]*xitem.Item, 0, len(rakutenItems))
 	var errors []error
 	for _, rakutenItem := range rakutenItems {
@@ -270,7 +294,7 @@ func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreIDItem
 			errors = append(errors, fmt.Errorf("failed to get itemCategory, item id: %s", rakutenItem.ID()))
 			continue
 		}
-		item, err := mapRakutenItemToIndexItem(rakutenItem, itemCategory)
+		item, err := mapRakutenItemToIndexItem(rakutenItem, itemCategory, tagMap)
 		if err != nil {
 			errors = append(errors, err)
 			continue
@@ -280,7 +304,11 @@ func mapRakutenItemsToIndexItems(rakutenItems []*rakutenichiba.Item, genreIDItem
 	return items, multierr.Combine(errors...)
 }
 
-func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, itemCategory *xspanner.ItemCategoryWithParent) (*xitem.Item, error) {
+func mapRakutenItemToIndexItem(
+	rakutenItem *rakutenichiba.Item,
+	itemCategory *xspanner.ItemCategoryWithParent,
+	tagMap map[int]*xspanner.RakutenTag,
+) (*xitem.Item, error) {
 	var status xitem.Status
 	switch rakutenItem.Availability {
 	case 0:
@@ -298,6 +326,8 @@ func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, itemCategory *xs
 
 	janCode := jancode.ExtractJANCode(rakutenItem.ItemCaption)
 
+	metadata := extractMetadataFromTags(rakutenItem.TagIDs, tagMap)
+
 	return &xitem.Item{
 		ID:            xitem.ItemUniqueID(xitem.PlatformRakuten, rakutenItem.ID()),
 		Name:          rakutenItem.ItemName,
@@ -312,8 +342,34 @@ func mapRakutenItemToIndexItem(rakutenItem *rakutenichiba.Item, itemCategory *xs
 		CategoryID:    itemCategory.ID,
 		CategoryIDs:   itemCategory.CategoryIDs(),
 		CategoryNames: itemCategory.CategoryNames(),
+		BrandName:     metadata.brandName,
+		Colors:        metadata.colors,
 		TagIDs:        rakutenItem.TagIDs,
 		JANCode:       janCode,
 		Platform:      xitem.PlatformRakuten,
 	}, nil
+}
+
+type itemMetadata struct {
+	brandName string
+	colors    []string
+}
+
+func extractMetadataFromTags(tagIDs []int, tagMap map[int]*xspanner.RakutenTag) *itemMetadata {
+	metadata := itemMetadata{}
+	for _, tagID := range tagIDs {
+		tag, ok := tagMap[tagID]
+		if !ok {
+			continue
+		}
+
+		if tag.TagGroupID == xspanner.BrandTagGroupID {
+			metadata.brandName = tag.Name
+		}
+		if tag.TagGroupID == xspanner.ColorTagGroupID {
+			metadata.colors = append(metadata.colors, tag.Name)
+		}
+	}
+
+	return &metadata
 }

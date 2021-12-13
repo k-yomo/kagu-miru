@@ -58,6 +58,10 @@
         "type": "text",
         "analyzer": "kuromoji_analyzer"
       },
+      "colors": {
+        "type": "text",
+        "analyzer": "kuromoji_analyzer"
+      },
       "tag_ids": {
         "type": "long"
       },

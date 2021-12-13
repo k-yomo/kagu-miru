@@ -4,9 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
-
 	"cloud.google.com/go/spanner"
+	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 )
 
 const ItemsTableName = "items"
@@ -24,6 +23,7 @@ type Item struct {
 	ReviewCount   int64              `spanner:"review_count"`
 	CategoryID    string             `spanner:"category_id"`
 	BrandName     spanner.NullString `spanner:"brand_name"`
+	Colors        []string           `spanner:"colors"`
 	// TagIDs        []int    `spanner:"tag_ids"`
 	JANCode   spanner.NullString `spanner:"jan_code"`
 	Platform  xitem.Platform     `spanner:"platform"`

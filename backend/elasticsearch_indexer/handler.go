@@ -58,6 +58,7 @@ func mapItemFetcherItemToElasticsearchItem(item *xitem.Item) *es.Item {
 		CategoryIDs:   item.CategoryIDs,
 		CategoryNames: item.CategoryNames,
 		BrandName:     item.BrandName,
+		Colors:        item.Colors,
 		TagIDs:        item.TagIDs,
 		JANCode:       item.JANCode,
 		Platform:      item.Platform,
