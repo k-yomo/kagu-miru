@@ -1,4 +1,4 @@
-name: Item Spanner Inserteer Deploy Workflow
+name: Item Spanner Inserter Deploy Workflow
 on:
   workflow_dispatch:
 
