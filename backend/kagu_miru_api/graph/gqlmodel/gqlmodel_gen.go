@@ -28,6 +28,7 @@ type Item struct {
 	AverageRating float64             `json:"averageRating"`
 	ReviewCount   int                 `json:"reviewCount"`
 	CategoryID    string              `json:"categoryId"`
+	Colors        []ItemColor         `json:"colors"`
 	Platform      ItemSellingPlatform `json:"platform"`
 }
 
@@ -76,6 +77,7 @@ type SearchDisplayItemsActionParams struct {
 type SearchFilter struct {
 	CategoryIds []string              `json:"categoryIds"`
 	Platforms   []ItemSellingPlatform `json:"platforms"`
+	Colors      []ItemColor           `json:"colors"`
 	MinPrice    *int                  `json:"minPrice"`
 	MaxPrice    *int                  `json:"maxPrice"`
 	MinRating   *int                  `json:"minRating"`
@@ -173,6 +175,79 @@ func (e *EventID) UnmarshalGQL(v interface{}) error {
 }
 
 func (e EventID) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ItemColor string
+
+const (
+	ItemColorWhite       ItemColor = "WHITE"
+	ItemColorYellow      ItemColor = "YELLOW"
+	ItemColorOrange      ItemColor = "ORANGE"
+	ItemColorPink        ItemColor = "PINK"
+	ItemColorRed         ItemColor = "RED"
+	ItemColorBeige       ItemColor = "BEIGE"
+	ItemColorSilver      ItemColor = "SILVER"
+	ItemColorGold        ItemColor = "GOLD"
+	ItemColorGray        ItemColor = "GRAY"
+	ItemColorPurple      ItemColor = "PURPLE"
+	ItemColorBrown       ItemColor = "BROWN"
+	ItemColorGreen       ItemColor = "GREEN"
+	ItemColorBlue        ItemColor = "BLUE"
+	ItemColorBlack       ItemColor = "BLACK"
+	ItemColorNavy        ItemColor = "NAVY"
+	ItemColorKhaki       ItemColor = "KHAKI"
+	ItemColorWineRed     ItemColor = "WINE_RED"
+	ItemColorTransparent ItemColor = "TRANSPARENT"
+)
+
+var AllItemColor = []ItemColor{
+	ItemColorWhite,
+	ItemColorYellow,
+	ItemColorOrange,
+	ItemColorPink,
+	ItemColorRed,
+	ItemColorBeige,
+	ItemColorSilver,
+	ItemColorGold,
+	ItemColorGray,
+	ItemColorPurple,
+	ItemColorBrown,
+	ItemColorGreen,
+	ItemColorBlue,
+	ItemColorBlack,
+	ItemColorNavy,
+	ItemColorKhaki,
+	ItemColorWineRed,
+	ItemColorTransparent,
+}
+
+func (e ItemColor) IsValid() bool {
+	switch e {
+	case ItemColorWhite, ItemColorYellow, ItemColorOrange, ItemColorPink, ItemColorRed, ItemColorBeige, ItemColorSilver, ItemColorGold, ItemColorGray, ItemColorPurple, ItemColorBrown, ItemColorGreen, ItemColorBlue, ItemColorBlack, ItemColorNavy, ItemColorKhaki, ItemColorWineRed, ItemColorTransparent:
+		return true
+	}
+	return false
+}
+
+func (e ItemColor) String() string {
+	return string(e)
+}
+
+func (e *ItemColor) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ItemColor(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ItemColor", str)
+	}
+	return nil
+}
+
+func (e ItemColor) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

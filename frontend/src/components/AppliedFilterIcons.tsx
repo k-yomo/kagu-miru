@@ -3,6 +3,7 @@ import { XIcon } from '@heroicons/react/solid';
 import { SearchActionType, useSearch } from '@src/contexts/search';
 import { itemCategoryIdNameMap } from '@src/lib/itemCategories';
 import { platFormText } from '@src/conv/platform';
+import { colorText } from '@src/conv/color';
 
 export default function AppliedFilterIcons() {
   const { searchState, dispatch } = useSearch();
@@ -39,6 +40,22 @@ export default function AppliedFilterIcons() {
       />
     ));
     filterIcons.push(platformFilterIcons);
+  }
+
+  if (filter.colors.length > 0) {
+    const colorFilterIcons = filter.colors.map((color) => (
+      <FilterIcon
+        key={`colorFilter:${color}`}
+        name={colorText(color)}
+        onClear={() =>
+          dispatch({
+            type: SearchActionType.SET_COLOR_FILTER,
+            payload: filter.colors.filter((c) => c !== color),
+          })
+        }
+      />
+    ));
+    filterIcons.push(colorFilterIcons);
   }
 
   if (filter.minPrice || filter.maxPrice) {

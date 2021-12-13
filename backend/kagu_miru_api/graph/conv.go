@@ -48,6 +48,14 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 		return nil, fmt.Errorf("unknown platform %s, item: %v", item.Platform, item)
 	}
 
+	colors := make([]gqlmodel.ItemColor, 0, len(item.Colors))
+	for _, color := range item.Colors {
+		gqlColor := mapSearchItemColorToGraphqlItemColor(color)
+		if gqlColor.IsValid() {
+			colors = append(colors, gqlColor)
+		}
+	}
+
 	return &gqlmodel.Item{
 		ID:            item.ID,
 		Name:          item.Name,
@@ -60,6 +68,7 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 		AverageRating: item.AverageRating,
 		ReviewCount:   item.ReviewCount,
 		CategoryID:    item.CategoryID,
+		Colors:        colors,
 		Platform:      platform,
 	}, nil
 }
@@ -74,6 +83,49 @@ func mapSearchToGraphqlItems(items []*es.Item) ([]*gqlmodel.Item, error) {
 		gqlItems = append(gqlItems, gqlItem)
 	}
 	return gqlItems, nil
+}
+
+func mapSearchItemColorToGraphqlItemColor(color string) gqlmodel.ItemColor {
+	switch color {
+	case "ホワイト":
+		return gqlmodel.ItemColorWhite
+	case "イエロー":
+		return gqlmodel.ItemColorYellow
+	case "オレンジ":
+		return gqlmodel.ItemColorOrange
+	case "ピンク":
+		return gqlmodel.ItemColorPink
+	case "レッド":
+		return gqlmodel.ItemColorRed
+	case "ベージュ":
+		return gqlmodel.ItemColorBeige
+	case "シルバー":
+		return gqlmodel.ItemColorSilver
+	case "ゴールド":
+		return gqlmodel.ItemColorGold
+	case "グレー":
+		return gqlmodel.ItemColorGray
+	case "パープル":
+		return gqlmodel.ItemColorPurple
+	case "ブラウン":
+		return gqlmodel.ItemColorBrown
+	case "グリーン":
+		return gqlmodel.ItemColorGreen
+	case "ブルー":
+		return gqlmodel.ItemColorBlue
+	case "ブラック":
+		return gqlmodel.ItemColorBlack
+	case "ネイビー":
+		return gqlmodel.ItemColorNavy
+	case "カーキ":
+		return gqlmodel.ItemColorKhaki
+	case "ワインレッド":
+		return gqlmodel.ItemColorWineRed
+	case "透明":
+		return gqlmodel.ItemColorTransparent
+	default:
+		return ""
+	}
 }
 
 func mapSearchResponseToGraphqlSearchResponse(res *search.Response, searchID string) (*gqlmodel.SearchResponse, error) {

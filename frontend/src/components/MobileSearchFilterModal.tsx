@@ -2,7 +2,11 @@ import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { AdjustmentsIcon, XIcon } from '@heroicons/react/outline';
 import CategoryList from '@src/components/CategoryList';
-import { ItemSellingPlatform, SearchFilter } from '@src/generated/graphql';
+import {
+  ItemColor,
+  ItemSellingPlatform,
+  SearchFilter,
+} from '@src/generated/graphql';
 import RatingSelect from '@src/components/RatingSelect';
 import {
   defaultSearchFilter,
@@ -10,6 +14,7 @@ import {
   useSearch,
 } from '@src/contexts/search';
 import PlatformSelect from '@src/components/PlatformSelect';
+import ColorSelect from '@src/components/ColorSelect';
 
 export default function MobileSearchFilterModal() {
   const { searchState, dispatch } = useSearch();
@@ -30,6 +35,9 @@ export default function MobileSearchFilterModal() {
     setSearchFilter((prevState: SearchFilter) => ({ ...prevState, platforms }));
   };
 
+  const setColors = (colors: ItemColor[]) => {
+    setSearchFilter((prevState: SearchFilter) => ({ ...prevState, colors }));
+  };
   const setMinPrice = (price: number) => {
     const minPrice = price && !isNaN(price) ? price : undefined;
     setSearchFilter((prevState: SearchFilter) => ({ ...prevState, minPrice }));
@@ -137,6 +145,12 @@ export default function MobileSearchFilterModal() {
                     platforms={searchFilter.platforms}
                     onChangePlatforms={setPlatforms}
                     htmlIdPrefix="mobile"
+                  />
+                  <hr className="my-3 border-gray-100 dark:border-gray-800" />
+                  <h3 className="my-2 text-md font-bold">カラー</h3>
+                  <ColorSelect
+                    colors={searchFilter.colors}
+                    onChangeColors={setColors}
                   />
                   <hr className="my-3 border-gray-100 dark:border-gray-800" />
                   <h3 className="my-2 text-md font-bold">価格</h3>

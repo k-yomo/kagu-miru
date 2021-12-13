@@ -52,6 +52,7 @@ type Item {
     averageRating: Float!
     reviewCount: Int!
     categoryId: ID!
+    colors: [ItemColor!]!
     platform: ItemSellingPlatform!
 }
 
@@ -86,9 +87,31 @@ input SearchInput {
     pageSize: Int
 }
 
+enum ItemColor {
+    WHITE
+    YELLOW
+    ORANGE
+    PINK
+    RED
+    BEIGE
+    SILVER
+    GOLD
+    GRAY
+    PURPLE
+    BROWN
+    GREEN
+    BLUE
+    BLACK
+    NAVY
+    KHAKI
+    WINE_RED
+    TRANSPARENT
+}
+
 input SearchFilter {
     categoryIds: [ID!]!
     platforms: [ItemSellingPlatform!]!
+    colors: [ItemColor!]!
     minPrice: Int
     maxPrice: Int
     minRating: Int

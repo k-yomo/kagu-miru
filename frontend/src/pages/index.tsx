@@ -17,6 +17,7 @@ import Pagination from '@src/components/Pagination';
 import Rating from '@src/components/Rating';
 import SearchBar from '@src/components/SearchBar';
 import CategoryFilter from '@src/components/CategoryFilter';
+import ColorFilter from '@src/components/ColorFilter';
 import PriceFilter from '@src/components/PriceFilter';
 import RatingFilter from '@src/components/RatingFilter';
 import SortTypeSelectBox from '@src/components/SortTypeSelectBox';
@@ -98,6 +99,16 @@ export const TopPageInner = memo(function TopPageInner({
         >
           <h3 className="mb-2 text-md font-bold">ECサイト</h3>
           <PlatformFilter />
+        </div>
+        <div
+          className={`mt-6 p-3 ${
+            searchState.searchInput.filter.colors.length > 0
+              ? 'bg-gray-100 dark:bg-gray-800'
+              : ''
+          }`}
+        >
+          <h3 className="mb-2 text-md font-bold">カラー</h3>
+          <ColorFilter />
         </div>
         <div
           className={`mt-6 p-3 ${

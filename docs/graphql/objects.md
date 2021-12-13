@@ -28,6 +28,10 @@
     <td></td>
   </tr>
   <tr>
+    <td><strong>colors</strong> (<a href="enums.md#itemcolor">[ItemColor!]!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>description</strong> (<a href="scalars.md#string">String!</a>)</td> 
     <td></td>
   </tr>

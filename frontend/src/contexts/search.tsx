@@ -12,6 +12,7 @@ import {
 import {
   Action,
   EventId,
+  ItemColor,
   ItemSellingPlatform,
   SearchDisplayItemsActionParams,
   SearchFilter,
@@ -26,7 +27,6 @@ import { ParsedUrlQuery } from 'querystring';
 import { useNextQueryParams } from '@src/lib/nextqueryparams';
 import { useRouter } from 'next/router';
 import gql from 'graphql-tag';
-import { allPlatforms } from '@src/conv/platform';
 
 gql`
   query search($input: SearchInput!) {
@@ -68,6 +68,7 @@ export enum SearchActionType {
   SET_FILTER,
   SET_CATEGORY_FILTER,
   SET_PLATFORM_FILTER,
+  SET_COLOR_FILTER,
   SET_PRICE_FILTER,
   SET_RATING_FILTER,
 }
@@ -84,6 +85,10 @@ type SearchAction =
   | {
       type: SearchActionType.SET_PLATFORM_FILTER;
       payload: ItemSellingPlatform[];
+    }
+  | {
+      type: SearchActionType.SET_COLOR_FILTER;
+      payload: ItemColor[];
     }
   | {
       type: SearchActionType.SET_PRICE_FILTER;
@@ -150,6 +155,15 @@ const searchReducer = (
         },
         searchFrom: SearchFrom.Filter,
       };
+    case SearchActionType.SET_COLOR_FILTER:
+      return {
+        searchInput: {
+          ...searchInput,
+          filter: { ...searchInput.filter, colors: action.payload },
+          page: 0,
+        },
+        searchFrom: SearchFrom.Filter,
+      };
     case SearchActionType.SET_PRICE_FILTER:
       const { minPrice, maxPrice } = action.payload;
       return {
@@ -177,6 +191,7 @@ const searchReducer = (
 export const defaultSearchFilter: SearchFilter = {
   categoryIds: [],
   platforms: [],
+  colors: [],
 };
 
 const SearchContext = createContext<{
@@ -226,6 +241,15 @@ export function queryParamsToSearchParams(
               return [];
             }
           }),
+        colors: ((queryParams.colors as string) || '')
+          .split(',')
+          .flatMap((s: string) => {
+            if (Object.values<string>(ItemColor).includes(s)) {
+              return s as ItemColor;
+            } else {
+              return [];
+            }
+          }),
         minPrice: parseInt(queryParams.minPrice as string) || undefined,
         maxPrice: parseInt(queryParams.maxPrice as string) || undefined,
         minRating: parseInt(queryParams.minRating as string) || undefined,
@@ -253,6 +277,7 @@ export function buildSearchUrlQuery(
     urlQuery.categoryIds = filter.categoryIds.join(',');
   if (filter.platforms.length > 0)
     urlQuery.platforms = filter.platforms.join(',');
+  if (filter.colors.length > 0) urlQuery.colors = filter.colors.join(',');
   if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
   if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
   if (filter.minRating) urlQuery.minRating = filter.minRating.toString();

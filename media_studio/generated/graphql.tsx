@@ -44,6 +44,7 @@ export type Item = {
   affiliateUrl: Scalars['String'];
   averageRating: Scalars['Float'];
   categoryId: Scalars['ID'];
+  colors: Array<ItemColor>;
   description: Scalars['String'];
   id: Scalars['ID'];
   imageUrls: Array<Scalars['String']>;
@@ -63,6 +64,27 @@ export type ItemCategory = {
   name: Scalars['String'];
   parentId?: Maybe<Scalars['ID']>;
 };
+
+export enum ItemColor {
+  Beige = 'BEIGE',
+  Black = 'BLACK',
+  Blue = 'BLUE',
+  Brown = 'BROWN',
+  Gold = 'GOLD',
+  Gray = 'GRAY',
+  Green = 'GREEN',
+  Khaki = 'KHAKI',
+  Navy = 'NAVY',
+  Orange = 'ORANGE',
+  Pink = 'PINK',
+  Purple = 'PURPLE',
+  Red = 'RED',
+  Silver = 'SILVER',
+  Transparent = 'TRANSPARENT',
+  White = 'WHITE',
+  WineRed = 'WINE_RED',
+  Yellow = 'YELLOW',
+}
 
 export type ItemConnection = {
   nodes: Array<Item>;
@@ -137,6 +159,7 @@ export type SearchDisplayItemsActionParams = {
 
 export type SearchFilter = {
   categoryIds: Array<Scalars['ID']>;
+  colors: Array<ItemColor>;
   maxPrice?: InputMaybe<Scalars['Int']>;
   minPrice?: InputMaybe<Scalars['Int']>;
   minRating?: InputMaybe<Scalars['Int']>;

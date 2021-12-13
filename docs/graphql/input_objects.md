@@ -133,6 +133,10 @@
     <td></td>
   </tr>
   <tr>
+    <td><strong>colors</strong> (<a href="enums.md#itemcolor">[ItemColor!]!</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>maxPrice</strong> (<a href="scalars.md#int">Int</a>)</td>
     <td></td>
   </tr>

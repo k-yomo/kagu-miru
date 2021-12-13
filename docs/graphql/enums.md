@@ -46,6 +46,91 @@
 
 ---
 
+### ItemColor
+
+
+
+<table>
+  <tr>
+    <th>Value</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>BEIGE</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>BLACK</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>BLUE</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>BROWN</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>GOLD</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>GRAY</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>GREEN</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>KHAKI</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>NAVY</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>ORANGE</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>PINK</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>PURPLE</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>RED</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>SILVER</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>TRANSPARENT</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>WHITE</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>WINE_RED</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>YELLOW</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### ItemSellingPlatform
 
 

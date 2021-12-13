@@ -10,11 +10,10 @@ import (
 	"math"
 	"time"
 
-	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
-
 	"github.com/aquasecurity/esquery"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
+	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	"github.com/k-yomo/kagu-miru/backend/pkg/xesquery"
@@ -120,6 +119,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 				xesquery.Boost(es.ItemFieldName, 20),
 				xesquery.Boost(es.ItemFieldBrandName, 10),
 				xesquery.Boost(es.ItemFieldCategoryNames, 5),
+				xesquery.Boost(es.ItemFieldColors, 5),
 				es.ItemFieldDescription,
 			))
 	} else {
@@ -146,6 +146,16 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 			platforms = append(platforms, platform)
 		}
 		boolQuery.Filter(esquery.Terms(es.ItemFieldPlatform, platforms...))
+	}
+
+	if len(input.Filter.Colors) > 0 {
+		var colors []interface{}
+		for _, gqlColor := range input.Filter.Colors {
+			if color := mapGraphqlItemColorToSearchItemColor(gqlColor); color != "" {
+				colors = append(colors, color)
+			}
+		}
+		boolQuery.Filter(esquery.Terms(fmt.Sprintf("%s.keyword", es.ItemFieldColors), colors...))
 	}
 
 	if input.Filter.MinPrice != nil && input.Filter.MaxPrice != nil {
@@ -339,5 +349,48 @@ func mapGraphqlPlatformToPlatform(platform gqlmodel.ItemSellingPlatform) (xitem.
 		return xitem.PlatformPayPayMall, nil
 	default:
 		return "", fmt.Errorf("unknown platform %s", platform.String())
+	}
+}
+
+func mapGraphqlItemColorToSearchItemColor(color gqlmodel.ItemColor) string {
+	switch color {
+	case gqlmodel.ItemColorWhite:
+		return "ホワイト"
+	case gqlmodel.ItemColorYellow:
+		return "イエロー"
+	case gqlmodel.ItemColorOrange:
+		return "オレンジ"
+	case gqlmodel.ItemColorPink:
+		return "ピンク"
+	case gqlmodel.ItemColorRed:
+		return "レッド"
+	case gqlmodel.ItemColorBeige:
+		return "ベージュ"
+	case gqlmodel.ItemColorSilver:
+		return "シルバー"
+	case gqlmodel.ItemColorGold:
+		return "ゴールド"
+	case gqlmodel.ItemColorGray:
+		return "グレー"
+	case gqlmodel.ItemColorPurple:
+		return "パープル"
+	case gqlmodel.ItemColorBrown:
+		return "ブラウン"
+	case gqlmodel.ItemColorGreen:
+		return "グリーン"
+	case gqlmodel.ItemColorBlue:
+		return "ブルー"
+	case gqlmodel.ItemColorBlack:
+		return "ブラック"
+	case gqlmodel.ItemColorNavy:
+		return "ネイビー"
+	case gqlmodel.ItemColorKhaki:
+		return "カーキ"
+	case gqlmodel.ItemColorWineRed:
+		return "ワインレッド"
+	case gqlmodel.ItemColorTransparent:
+		return "透明"
+	default:
+		return ""
 	}
 }

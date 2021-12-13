@@ -48,6 +48,7 @@ type ComplexityRoot struct {
 		AffiliateURL  func(childComplexity int) int
 		AverageRating func(childComplexity int) int
 		CategoryID    func(childComplexity int) int
+		Colors        func(childComplexity int) int
 		Description   func(childComplexity int) int
 		ID            func(childComplexity int) int
 		ImageUrls     func(childComplexity int) int
@@ -146,6 +147,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.CategoryID(childComplexity), true
+
+	case "Item.colors":
+		if e.complexity.Item.Colors == nil {
+			break
+		}
+
+		return e.complexity.Item.Colors(childComplexity), true
 
 	case "Item.description":
 		if e.complexity.Item.Description == nil {
@@ -488,6 +496,7 @@ type Item {
     averageRating: Float!
     reviewCount: Int!
     categoryId: ID!
+    colors: [ItemColor!]!
     platform: ItemSellingPlatform!
 }
 
@@ -522,9 +531,31 @@ input SearchInput {
     pageSize: Int
 }
 
+enum ItemColor {
+    WHITE
+    YELLOW
+    ORANGE
+    PINK
+    RED
+    BEIGE
+    SILVER
+    GOLD
+    GRAY
+    PURPLE
+    BROWN
+    GREEN
+    BLUE
+    BLACK
+    NAVY
+    KHAKI
+    WINE_RED
+    TRANSPARENT
+}
+
 input SearchFilter {
     categoryIds: [ID!]!
     platforms: [ItemSellingPlatform!]!
+    colors: [ItemColor!]!
     minPrice: Int
     maxPrice: Int
     minRating: Int
@@ -1077,6 +1108,41 @@ func (ec *executionContext) _Item_categoryId(ctx context.Context, field graphql.
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Item_colors(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Colors, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]gqlmodel.ItemColor)
+	fc.Result = res
+	return ec.marshalNItemColor2ᚕgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemColorᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Item_platform(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
@@ -3210,6 +3276,14 @@ func (ec *executionContext) unmarshalInputSearchFilter(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "colors":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("colors"))
+			it.Colors, err = ec.unmarshalNItemColor2ᚕgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemColorᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "minPrice":
 			var err error
 
@@ -3366,6 +3440,11 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "categoryId":
 			out.Values[i] = ec._Item_categoryId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "colors":
+			out.Values[i] = ec._Item_colors(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4162,6 +4241,81 @@ func (ec *executionContext) marshalNItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋka
 		return graphql.Null
 	}
 	return ec._ItemCategory(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNItemColor2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemColor(ctx context.Context, v interface{}) (gqlmodel.ItemColor, error) {
+	var res gqlmodel.ItemColor
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNItemColor2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemColor(ctx context.Context, sel ast.SelectionSet, v gqlmodel.ItemColor) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNItemColor2ᚕgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemColorᚄ(ctx context.Context, v interface{}) ([]gqlmodel.ItemColor, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]gqlmodel.ItemColor, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNItemColor2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemColor(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNItemColor2ᚕgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemColorᚄ(ctx context.Context, sel ast.SelectionSet, v []gqlmodel.ItemColor) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNItemColor2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemColor(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemConnection(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.ItemConnection) graphql.Marshaler {
