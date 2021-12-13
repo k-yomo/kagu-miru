@@ -26,6 +26,7 @@ import { ParsedUrlQuery } from 'querystring';
 import { useNextQueryParams } from '@src/lib/nextqueryparams';
 import { useRouter } from 'next/router';
 import gql from 'graphql-tag';
+import { allPlatforms } from '@src/conv/platform';
 
 gql`
   query search($input: SearchInput!) {
@@ -219,13 +220,10 @@ export function queryParamsToSearchParams(
         platforms: ((queryParams.platforms as string) || '')
           .split(',')
           .flatMap((s: string) => {
-            switch (s) {
-              case ItemSellingPlatform.Rakuten:
-                return ItemSellingPlatform.Rakuten;
-              case ItemSellingPlatform.YahooShopping:
-                return ItemSellingPlatform.YahooShopping;
-              default:
-                return [];
+            if (Object.values<string>(ItemSellingPlatform).includes(s)) {
+              return s as ItemSellingPlatform;
+            } else {
+              return [];
             }
           }),
         minPrice: parseInt(queryParams.minPrice as string) || undefined,

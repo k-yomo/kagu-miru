@@ -39,6 +39,9 @@ export default memo(function SearchBar() {
       fetchPolicy: 'no-cache',
       nextFetchPolicy: 'no-cache',
       onCompleted: (data) => {
+        if (!data) {
+          return;
+        }
         const params: QuerySuggestionsDisplayActionParams = {
           query: data.getQuerySuggestions.query,
           suggestedQueries: data.getQuerySuggestions.suggestedQueries,
