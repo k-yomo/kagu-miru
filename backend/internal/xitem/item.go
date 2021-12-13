@@ -9,6 +9,7 @@ type Platform string
 const (
 	PlatformRakuten       Platform = "rakuten"
 	PlatformYahooShopping Platform = "yahoo_shopping"
+	PlatformPayPayMall    Platform = "paypay_mall"
 )
 
 type Status int

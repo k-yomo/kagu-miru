@@ -335,6 +335,8 @@ func mapGraphqlPlatformToPlatform(platform gqlmodel.ItemSellingPlatform) (xitem.
 		return xitem.PlatformRakuten, nil
 	case gqlmodel.ItemSellingPlatformYahooShopping:
 		return xitem.PlatformYahooShopping, nil
+	case gqlmodel.ItemSellingPlatformPaypayMall:
+		return xitem.PlatformPayPayMall, nil
 	default:
 		return "", fmt.Errorf("unknown platform %s", platform.String())
 	}

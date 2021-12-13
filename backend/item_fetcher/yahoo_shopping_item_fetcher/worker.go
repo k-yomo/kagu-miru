@@ -278,8 +278,12 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, ite
 		status = xitem.StatusInactive
 	}
 
+	platform := xitem.PlatformYahooShopping
+	if yahooShoppingItem.Seller.IsPMallSeller {
+		platform = xitem.PlatformPayPayMall
+	}
 	return &xitem.Item{
-		ID:            xitem.ItemUniqueID(xitem.PlatformYahooShopping, yahooShoppingItem.Code),
+		ID:            xitem.ItemUniqueID(platform, yahooShoppingItem.Code),
 		Name:          yahooShoppingItem.Name,
 		Description:   yahooShoppingItem.Description,
 		Status:        status,
@@ -295,6 +299,6 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, ite
 		BrandName:     yahooShoppingItem.Brand.Name,
 		// TagIDs:
 		JANCode:  yahooShoppingItem.JanCode,
-		Platform: xitem.PlatformYahooShopping,
+		Platform: platform,
 	}, nil
 }

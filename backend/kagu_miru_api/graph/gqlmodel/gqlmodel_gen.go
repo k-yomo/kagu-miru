@@ -181,16 +181,18 @@ type ItemSellingPlatform string
 const (
 	ItemSellingPlatformRakuten       ItemSellingPlatform = "RAKUTEN"
 	ItemSellingPlatformYahooShopping ItemSellingPlatform = "YAHOO_SHOPPING"
+	ItemSellingPlatformPaypayMall    ItemSellingPlatform = "PAYPAY_MALL"
 )
 
 var AllItemSellingPlatform = []ItemSellingPlatform{
 	ItemSellingPlatformRakuten,
 	ItemSellingPlatformYahooShopping,
+	ItemSellingPlatformPaypayMall,
 }
 
 func (e ItemSellingPlatform) IsValid() bool {
 	switch e {
-	case ItemSellingPlatformRakuten, ItemSellingPlatformYahooShopping:
+	case ItemSellingPlatformRakuten, ItemSellingPlatformYahooShopping, ItemSellingPlatformPaypayMall:
 		return true
 	}
 	return false

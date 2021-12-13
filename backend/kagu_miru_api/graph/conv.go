@@ -42,6 +42,8 @@ func mapSearchItemToGraphqlItem(item *es.Item) (*gqlmodel.Item, error) {
 		platform = gqlmodel.ItemSellingPlatformRakuten
 	case xitem.PlatformYahooShopping:
 		platform = gqlmodel.ItemSellingPlatformYahooShopping
+	case xitem.PlatformPayPayMall:
+		platform = gqlmodel.ItemSellingPlatformPaypayMall
 	default:
 		return nil, fmt.Errorf("unknown platform %s, item: %v", item.Platform, item)
 	}
@@ -109,6 +111,8 @@ func mapSpannerItemToGraphqlItem(item *xspanner.Item) (*gqlmodel.Item, error) {
 		platform = gqlmodel.ItemSellingPlatformRakuten
 	case xitem.PlatformYahooShopping:
 		platform = gqlmodel.ItemSellingPlatformYahooShopping
+	case xitem.PlatformPayPayMall:
+		platform = gqlmodel.ItemSellingPlatformPaypayMall
 	default:
 		return nil, fmt.Errorf("unknown platform %s, item: %v", item.Platform, item)
 	}

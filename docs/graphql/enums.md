@@ -56,6 +56,10 @@
     <th>Description</th>
   </tr>
   <tr>
+    <td><strong>PAYPAY_MALL</strong></td>
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>RAKUTEN</strong></td>
     <td></td>
   </tr>

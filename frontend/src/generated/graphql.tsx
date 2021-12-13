@@ -70,6 +70,7 @@ export type ItemConnection = {
 };
 
 export enum ItemSellingPlatform {
+  PaypayMall = 'PAYPAY_MALL',
   Rakuten = 'RAKUTEN',
   YahooShopping = 'YAHOO_SHOPPING',
 }

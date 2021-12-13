@@ -547,6 +547,12 @@
         "interfaces": null,
         "enumValues": [
           {
+            "name": "PAYPAY_MALL",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "RAKUTEN",
             "description": null,
             "isDeprecated": false,

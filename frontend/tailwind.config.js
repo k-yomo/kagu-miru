@@ -15,6 +15,7 @@ module.exports = {
         'text-secondary-dark': colors.gray['300'],
         rakuten: '#BF0000',
         'yahoo-shopping': '#FF0132',
+        'paypay-mall': '#977a20',
       },
       fontFamily: {
         sans: [

@@ -1,6 +1,6 @@
 import React, { ChangeEvent, memo } from 'react';
 import { ItemSellingPlatform } from '@src/generated/graphql';
-import { platFormText } from '@src/conv/platform';
+import { allPlatforms, platFormText } from '@src/conv/platform';
 
 interface Props {
   platforms: ItemSellingPlatform[];
@@ -25,38 +25,24 @@ export default memo(function PlatformSelect({
   return (
     <div>
       <div className="space-y-2">
-        <div className="flex items-center">
-          <input
-            id="platformCheckBoxRakuten"
-            type="checkbox"
-            name={ItemSellingPlatform.Rakuten}
-            checked={platforms.includes(ItemSellingPlatform.Rakuten)}
-            className="h-4 w-4 rounded cursor-pointer"
-            onChange={onChange}
-          />
-          <label
-            htmlFor="platformCheckBoxRakuten"
-            className="ml-2 cursor-pointer text-sm"
-          >
-            {platFormText(ItemSellingPlatform.Rakuten)}
-          </label>
-        </div>
-        <div className="flex items-center">
-          <input
-            id="platformCheckBoxYahooShopping"
-            type="checkbox"
-            name={ItemSellingPlatform.YahooShopping}
-            checked={platforms.includes(ItemSellingPlatform.YahooShopping)}
-            className="h-4 w-4 rounded cursor-pointer"
-            onChange={onChange}
-          />
-          <label
-            htmlFor="platformCheckBoxYahooShopping"
-            className="ml-2 cursor-pointer text-sm"
-          >
-            {platFormText(ItemSellingPlatform.YahooShopping)}
-          </label>
-        </div>
+        {allPlatforms.map((platform) => (
+          <div key={platform} className="flex items-center">
+            <input
+              id={`platformCheckBox_${platform}`}
+              type="checkbox"
+              name={platform}
+              checked={platforms.includes(platform)}
+              className="h-4 w-4 rounded cursor-pointer"
+              onChange={onChange}
+            />
+            <label
+              htmlFor={`platformCheckBox_${platform}`}
+              className="ml-2 cursor-pointer text-sm"
+            >
+              {platFormText(platform)}
+            </label>
+          </div>
+        ))}
       </div>
     </div>
   );

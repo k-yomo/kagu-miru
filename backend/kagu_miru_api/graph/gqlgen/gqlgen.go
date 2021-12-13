@@ -473,6 +473,7 @@ enum ItemStatus {
 enum ItemSellingPlatform {
     RAKUTEN
     YAHOO_SHOPPING
+    PAYPAY_MALL
 }
 
 type Item {
