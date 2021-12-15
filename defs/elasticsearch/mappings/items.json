@@ -4,7 +4,25 @@
       "analyzer": {
         "kuromoji_analyzer": {
           "type": "custom",
-          "tokenizer": "kuromoji_tokenizer"
+          "tokenizer": "kuromoji_tokenizer",
+          "char_filter": [
+            "normalize",
+            "kuromoji_iteration_mark"
+          ],
+          "filter": [
+            "kuromoji_baseform",
+            "kuromoji_part_of_speech",
+            "ja_stop",
+            "kuromoji_number",
+            "kuromoji_stemmer"
+          ]
+        }
+      },
+      "char_filter": {
+        "normalize": {
+          "type": "icu_normalizer",
+          "name": "nfkc",
+          "mode": "compose"
         }
       }
     }
