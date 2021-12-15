@@ -21,6 +21,19 @@ export default function Footer() {
 
         <div className="p-5 w-1/2 sm:w-4/12 md:w-3/12">
           <div className="text-xs uppercase text-gray-400 font-medium mb-6">
+            プライバシーと利用規約
+          </div>
+
+          <a
+            href={routes.privacyPolicy()}
+            className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700"
+          >
+            プライバシーポリシー
+          </a>
+        </div>
+
+        <div className="p-5 w-1/2 sm:w-4/12 md:w-3/12">
+          <div className="text-xs uppercase text-gray-400 font-medium mb-6">
             SNS
           </div>
 

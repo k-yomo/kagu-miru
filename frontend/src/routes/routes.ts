@@ -6,4 +6,5 @@ export const routes = {
   mediaTag: (tag: string) => `/media/tags/${tag}`,
 
   contact: () => '/contact',
+  privacyPolicy: () => '/privacy-policy',
 };

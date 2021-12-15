@@ -10,7 +10,7 @@ export default function ContactPage() {
       />
       <div className="mx-auto max-w-[1000px] rounded-lg">
         <div className="my-8">
-          <h1 className="my-6 sm:my-8 text-3xl text-center">
+          <h1 className="my-6 sm:my-8 text-3xl text-center font-bold">
             お問い合わせフォーム
           </h1>
           <div className="mx-auto bg-white">
