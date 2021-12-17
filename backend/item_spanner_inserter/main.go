@@ -13,7 +13,6 @@ import (
 	"cloud.google.com/go/spanner"
 	"github.com/blendle/zapdriver"
 	"github.com/k-yomo/pm"
-	"github.com/k-yomo/pm/middleware/logging/pm_zap"
 	"github.com/k-yomo/pm/middleware/pm_autoack"
 	"github.com/k-yomo/pm/middleware/pm_recovery"
 	"go.uber.org/zap"
@@ -45,7 +44,6 @@ func main() {
 	pubsubSubscriber := pm.NewSubscriber(
 		pubsubClient,
 		pm.WithSubscriptionInterceptor(
-			pm_zap.SubscriptionInterceptor(logger),
 			pm_autoack.SubscriptionInterceptor(),
 			pm_recovery.SubscriptionInterceptor(),
 		),

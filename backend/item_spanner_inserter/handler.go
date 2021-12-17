@@ -44,6 +44,7 @@ func newItemUpdateHandler(spannerClient *spanner.Client, logger *zap.Logger) pm.
 
 		_, err := spannerClient.Apply(context.Background(), mutations)
 		if err != nil {
+			logger.Error("spannerClient.Apply failed", zap.Error(err))
 			return fmt.Errorf("spannerClient.Apply: %w", err)
 		}
 		logger.Info(fmt.Sprintf("bluk inserted / updated %d items", len(mutations)))

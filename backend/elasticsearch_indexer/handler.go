@@ -35,6 +35,11 @@ func newItemUpdateHandler(itemIndexer *ItemIndexer, logger *zap.Logger) pm.Messa
 		}
 
 		if err := itemIndexer.BulkIndex(context.Background(), items); err != nil {
+			logger.Error(
+				"itemIndexer.BulkIndex failed",
+				zap.Error(err),
+				zap.Any("items", items),
+			)
 			return fmt.Errorf("itemIndexer.BulkIndex: %w", err)
 		}
 		logger.Info(fmt.Sprintf("bluk indexed %d items", len(items)))
