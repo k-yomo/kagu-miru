@@ -146,6 +146,24 @@ func mapSearchResponseToGraphqlSearchResponse(res *search.Response, searchID str
 	}, nil
 }
 
+func mapSearchResponseToGraphqlGetSimilarItemsResponse(res *search.Response, searchID string) (*gqlmodel.GetSimilarItemsResponse, error) {
+	graphqlItems, err := mapSearchToGraphqlItems(res.Items)
+	if err != nil {
+		return nil, err
+	}
+	return &gqlmodel.GetSimilarItemsResponse{
+		SearchID: searchID,
+		ItemConnection: &gqlmodel.ItemConnection{
+			PageInfo: &gqlmodel.PageInfo{
+				Page:       int(res.Page),
+				TotalPage:  int(res.TotalPage),
+				TotalCount: int(res.TotalCount),
+			},
+			Nodes: graphqlItems,
+		},
+	}, nil
+}
+
 func mapSpannerItemToGraphqlItem(item *xspanner.Item) (*gqlmodel.Item, error) {
 	var status gqlmodel.ItemStatus
 	switch xitem.Status(item.Status) {

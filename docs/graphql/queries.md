@@ -40,6 +40,20 @@
 
 ---
 
+### getSimilarItems
+
+#### Type: [GetSimilarItemsResponse!](objects.md#getsimilaritemsresponse)
+
+ 
+
+#### Arguments
+
+| Name | Description |
+|------|-------------|
+| input ([GetSimilarItemsInput!](input_objects.md#getsimilaritemsinput)) |  |
+
+---
+
 ### search
 
 #### Type: [SearchResponse!](objects.md#searchresponse)
@@ -50,6 +64,6 @@
 
 | Name | Description |
 |------|-------------|
-| input ([SearchInput](input_objects.md#searchinput)) |  |
+| input ([SearchInput!](input_objects.md#searchinput)) |  |
 
 ---

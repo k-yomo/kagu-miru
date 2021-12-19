@@ -91,19 +91,8 @@ func (c *elasticsearchClient) SearchItems(ctx context.Context, input *gqlmodel.S
 		return nil, fmt.Errorf("elasticsearchClient.search: %w", err)
 	}
 
-	var items []*es.Item
-	for _, hit := range searchResult.Hits.Hits {
-		var item es.Item
-		if err := json.Unmarshal(hit.Source, &item); err != nil {
-			logging.Logger(ctx).Error("Failed to unmarshal hit.Source into es.Item", zap.String("source", string(hit.Source)))
-			continue
-		}
-
-		items = append(items, &item)
-	}
-
 	return &Response{
-		Items:      items,
+		Items:      mapElasticsearchHitsToItems(ctx, searchResult.Hits.Hits),
 		Page:       calcElasticSearchPage(input.Page) + 1,
 		TotalPage:  calcTotalPage(uint64(searchResult.Hits.TotalHits.Value), 100),
 		TotalCount: uint64(searchResult.Hits.TotalHits.Value),
@@ -226,6 +215,63 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 	}
 
 	return bytes.NewReader(esQueryJSON), nil
+}
+
+func (c *elasticsearchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput) (*Response, error) {
+	esQuery := esquery.Search().Query(esquery.CustomQuery(map[string]interface{}{
+		"function_score": map[string]interface{}{
+			"query": map[string]interface{}{
+				"more_like_this": map[string]interface{}{
+					"fields": []string{
+						xesquery.Boost(es.ItemFieldName, 30),
+						xesquery.Boost(es.ItemFieldBrandName, 10),
+						xesquery.Boost(es.ItemFieldCategoryNames, 5),
+						xesquery.Boost(es.ItemFieldColors, 5),
+						es.ItemFieldDescription,
+					},
+					"like": map[string]interface{}{
+						"_index": c.itemsIndexName,
+						"_id":    input.ItemID,
+					},
+				},
+			},
+			"functions": []map[string]interface{}{
+				{
+					"gauss": map[string]interface{}{
+						es.ItemFieldAverageRating: map[string]interface{}{
+							"origin": 5,
+							"offset": 1,
+							"scale":  1,
+							"decay":  0.4,
+						},
+					},
+				},
+				{
+					"field_value_factor": map[string]string{
+						"field": es.ItemFieldReviewCount,
+					},
+				},
+			},
+			"max_boost": 1,
+		},
+	}))
+
+	esQueryJSON, err := esQuery.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("esQuery.MarshalJSON(): %w", err)
+	}
+
+	searchResult, err := c.search(ctx, c.itemsIndexName, bytes.NewReader(esQueryJSON))
+	if err != nil {
+		return nil, fmt.Errorf("elasticsearchClient.search: %w", err)
+	}
+
+	return &Response{
+		Items:      mapElasticsearchHitsToItems(ctx, searchResult.Hits.Hits),
+		Page:       calcElasticSearchPage(input.Page) + 1,
+		TotalPage:  calcTotalPage(uint64(searchResult.Hits.TotalHits.Value), 100),
+		TotalCount: uint64(searchResult.Hits.TotalHits.Value),
+	}, nil
 }
 
 func (c *elasticsearchClient) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
@@ -393,4 +439,19 @@ func mapGraphqlItemColorToSearchItemColor(color gqlmodel.ItemColor) string {
 	default:
 		return ""
 	}
+}
+
+func mapElasticsearchHitsToItems(ctx context.Context, hits []*elastic.SearchHit) []*es.Item {
+	items := make([]*es.Item, 0, len(hits))
+	for _, hit := range hits {
+		var item es.Item
+		if err := json.Unmarshal(hit.Source, &item); err != nil {
+			logging.Logger(ctx).Error("Failed to unmarshal hit.Source into es.Item", zap.String("source", string(hit.Source)))
+			continue
+		}
+
+		items = append(items, &item)
+	}
+
+	return items
 }

@@ -16,6 +16,17 @@ type Event struct {
 	Params    map[string]interface{} `json:"params"`
 }
 
+type GetSimilarItemsInput struct {
+	ItemID   string `json:"itemId"`
+	Page     *int   `json:"page"`
+	PageSize *int   `json:"pageSize"`
+}
+
+type GetSimilarItemsResponse struct {
+	SearchID       string          `json:"searchId"`
+	ItemConnection *ItemConnection `json:"itemConnection"`
+}
+
 type Item struct {
 	ID            string              `json:"id"`
 	Name          string              `json:"name"`
@@ -96,6 +107,12 @@ type SearchResponse struct {
 	ItemConnection *ItemConnection `json:"itemConnection"`
 }
 
+type SimilarItemsDisplayItemsActionParams struct {
+	SearchID             string                `json:"searchId"`
+	GetSimilarItemsInput *GetSimilarItemsInput `json:"getSimilarItemsInput"`
+	ItemIds              []string              `json:"itemIds"`
+}
+
 type Action string
 
 const (
@@ -142,16 +159,18 @@ type EventID string
 const (
 	EventIDSearch           EventID = "SEARCH"
 	EventIDQuerySuggestions EventID = "QUERY_SUGGESTIONS"
+	EventIDSimilarItems     EventID = "SIMILAR_ITEMS"
 )
 
 var AllEventID = []EventID{
 	EventIDSearch,
 	EventIDQuerySuggestions,
+	EventIDSimilarItems,
 }
 
 func (e EventID) IsValid() bool {
 	switch e {
-	case EventIDSearch, EventIDQuerySuggestions:
+	case EventIDSearch, EventIDQuerySuggestions, EventIDSimilarItems:
 		return true
 	}
 	return false

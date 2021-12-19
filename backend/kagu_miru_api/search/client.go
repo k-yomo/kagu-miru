@@ -11,6 +11,7 @@ import (
 type Client interface {
 	GetItem(ctx context.Context, id string) (*es.Item, error)
 	SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error)
+	GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput) (*Response, error)
 	GetQuerySuggestions(ctx context.Context, query string) ([]string, error)
 }
 

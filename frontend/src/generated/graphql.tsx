@@ -38,7 +38,19 @@ export type Event = {
 export enum EventId {
   QuerySuggestions = 'QUERY_SUGGESTIONS',
   Search = 'SEARCH',
+  SimilarItems = 'SIMILAR_ITEMS',
 }
+
+export type GetSimilarItemsInput = {
+  itemId: Scalars['ID'];
+  page?: InputMaybe<Scalars['Int']>;
+  pageSize?: InputMaybe<Scalars['Int']>;
+};
+
+export type GetSimilarItemsResponse = {
+  itemConnection: ItemConnection;
+  searchId: Scalars['String'];
+};
 
 export type Item = {
   affiliateUrl: Scalars['String'];
@@ -120,6 +132,7 @@ export type Query = {
   getAllItemCategories: Array<ItemCategory>;
   getItem: Item;
   getQuerySuggestions: QuerySuggestionsResponse;
+  getSimilarItems: GetSimilarItemsResponse;
   search: SearchResponse;
 };
 
@@ -131,8 +144,12 @@ export type QueryGetQuerySuggestionsArgs = {
   query: Scalars['String'];
 };
 
+export type QueryGetSimilarItemsArgs = {
+  input: GetSimilarItemsInput;
+};
+
 export type QuerySearchArgs = {
-  input?: InputMaybe<SearchInput>;
+  input: SearchInput;
 };
 
 export type QuerySuggestionsDisplayActionParams = {
@@ -194,6 +211,27 @@ export enum SearchSortType {
   Rating = 'RATING',
   ReviewCount = 'REVIEW_COUNT',
 }
+
+export type SimilarItemsDisplayItemsActionParams = {
+  getSimilarItemsInput: GetSimilarItemsInput;
+  itemIds: Array<Scalars['ID']>;
+  searchId: Scalars['String'];
+};
+
+export type ItemListItemFragmentFragment = {
+  id: string;
+  name: string;
+  description: string;
+  status: ItemStatus;
+  url: string;
+  affiliateUrl: string;
+  price: number;
+  imageUrls: Array<string>;
+  averageRating: number;
+  reviewCount: number;
+  categoryId: string;
+  platform: ItemSellingPlatform;
+};
 
 export type GetQuerySuggestionsQueryVariables = Exact<{
   query: Scalars['String'];
@@ -257,6 +295,49 @@ export type ItemDetailPageGetItemQuery = {
   };
 };
 
+export type ItemDetailPageGetSimilarItemsQueryVariables = Exact<{
+  input: GetSimilarItemsInput;
+}>;
+
+export type ItemDetailPageGetSimilarItemsQuery = {
+  getSimilarItems: {
+    searchId: string;
+    itemConnection: {
+      pageInfo: { page: number; totalPage: number; totalCount: number };
+      nodes: Array<{
+        id: string;
+        name: string;
+        description: string;
+        status: ItemStatus;
+        url: string;
+        affiliateUrl: string;
+        price: number;
+        imageUrls: Array<string>;
+        averageRating: number;
+        reviewCount: number;
+        categoryId: string;
+        platform: ItemSellingPlatform;
+      }>;
+    };
+  };
+};
+
+export const ItemListItemFragmentFragmentDoc = gql`
+  fragment itemListItemFragment on Item {
+    id
+    name
+    description
+    status
+    url
+    affiliateUrl
+    price
+    imageUrls
+    averageRating
+    reviewCount
+    categoryId
+    platform
+  }
+`;
 export const GetQuerySuggestionsDocument = gql`
   query getQuerySuggestions($query: String!) {
     getQuerySuggestions(query: $query) {
@@ -327,22 +408,12 @@ export const SearchDocument = gql`
           totalCount
         }
         nodes {
-          id
-          name
-          description
-          status
-          url
-          affiliateUrl
-          price
-          imageUrls
-          averageRating
-          reviewCount
-          categoryId
-          platform
+          ...itemListItemFragment
         }
       }
     }
   }
+  ${ItemListItemFragmentFragmentDoc}
 `;
 
 /**
@@ -501,4 +572,73 @@ export type ItemDetailPageGetItemLazyQueryHookResult = ReturnType<
 export type ItemDetailPageGetItemQueryResult = Apollo.QueryResult<
   ItemDetailPageGetItemQuery,
   ItemDetailPageGetItemQueryVariables
+>;
+export const ItemDetailPageGetSimilarItemsDocument = gql`
+  query itemDetailPageGetSimilarItems($input: GetSimilarItemsInput!) {
+    getSimilarItems(input: $input) {
+      searchId
+      itemConnection {
+        pageInfo {
+          page
+          totalPage
+          totalCount
+        }
+        nodes {
+          ...itemListItemFragment
+        }
+      }
+    }
+  }
+  ${ItemListItemFragmentFragmentDoc}
+`;
+
+/**
+ * __useItemDetailPageGetSimilarItemsQuery__
+ *
+ * To run a query within a React component, call `useItemDetailPageGetSimilarItemsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useItemDetailPageGetSimilarItemsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useItemDetailPageGetSimilarItemsQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useItemDetailPageGetSimilarItemsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ItemDetailPageGetSimilarItemsQuery,
+    ItemDetailPageGetSimilarItemsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ItemDetailPageGetSimilarItemsQuery,
+    ItemDetailPageGetSimilarItemsQueryVariables
+  >(ItemDetailPageGetSimilarItemsDocument, options);
+}
+export function useItemDetailPageGetSimilarItemsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ItemDetailPageGetSimilarItemsQuery,
+    ItemDetailPageGetSimilarItemsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ItemDetailPageGetSimilarItemsQuery,
+    ItemDetailPageGetSimilarItemsQueryVariables
+  >(ItemDetailPageGetSimilarItemsDocument, options);
+}
+export type ItemDetailPageGetSimilarItemsQueryHookResult = ReturnType<
+  typeof useItemDetailPageGetSimilarItemsQuery
+>;
+export type ItemDetailPageGetSimilarItemsLazyQueryHookResult = ReturnType<
+  typeof useItemDetailPageGetSimilarItemsLazyQuery
+>;
+export type ItemDetailPageGetSimilarItemsQueryResult = Apollo.QueryResult<
+  ItemDetailPageGetSimilarItemsQuery,
+  ItemDetailPageGetSimilarItemsQueryVariables
 >;

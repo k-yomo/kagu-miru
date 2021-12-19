@@ -36,6 +36,34 @@
 
 ---
 
+### GetSimilarItemsInput
+
+
+
+
+#### Input fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>itemId</strong> (<a href="scalars.md#id">ID!</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>page</strong> (<a href="scalars.md#int">Int</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>pageSize</strong> (<a href="scalars.md#int">Int</a>)</td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### QuerySuggestionsDisplayActionParams
 
 
@@ -186,6 +214,34 @@
   </tr>
   <tr>
     <td><strong>sortType</strong> (<a href="enums.md#searchsorttype">SearchSortType!</a>)</td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### SimilarItemsDisplayItemsActionParams
+
+
+
+
+#### Input fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>getSimilarItemsInput</strong> (<a href="input_objects.md#getsimilaritemsinput">GetSimilarItemsInput!</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>itemIds</strong> (<a href="scalars.md#id">[ID!]!</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>searchId</strong> (<a href="scalars.md#string">String!</a>)</td>
     <td></td>
   </tr>
 </table>
