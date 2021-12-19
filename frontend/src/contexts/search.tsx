@@ -39,18 +39,7 @@ gql`
           totalCount
         }
         nodes {
-          id
-          name
-          description
-          status
-          url
-          affiliateUrl
-          price
-          imageUrls
-          averageRating
-          reviewCount
-          categoryId
-          platform
+          ...itemListItemFragment
         }
       }
     }
@@ -292,111 +281,112 @@ export const useSearch = () => useContext(SearchContext);
 
 type Props = PropsWithChildren<{ isAdmin?: boolean }>;
 
-export const SearchProvider: FC<Props> = memo(
-  ({ isAdmin, children }: Props) => {
-    const router = useRouter();
-    const queryParams = useNextQueryParams();
-    const [searchId, setSearchId] = useState<string>('');
-    const [items, setItems] = useState<
-      SearchQuery['search']['itemConnection']['nodes']
-    >([]);
-    const [pageInfo, setPageInfo] = useState<
-      SearchQuery['search']['itemConnection']['pageInfo'] | undefined
-    >();
-    const [searchState, dispatch] = useReducer(
-      searchReducer,
-      queryParamsToSearchParams(queryParams)
-    );
+export const SearchProvider: FC<Props> = memo(function SearchProvider({
+  isAdmin,
+  children,
+}: Props) {
+  const router = useRouter();
+  const queryParams = useNextQueryParams();
+  const [searchId, setSearchId] = useState<string>('');
+  const [items, setItems] = useState<
+    SearchQuery['search']['itemConnection']['nodes']
+  >([]);
+  const [pageInfo, setPageInfo] = useState<
+    SearchQuery['search']['itemConnection']['pageInfo'] | undefined
+  >();
+  const [searchState, dispatch] = useReducer(
+    searchReducer,
+    queryParamsToSearchParams(queryParams)
+  );
 
-    const [trackEvent] = useTrackEventMutation();
-    const [search, { loading }] = useSearchLazyQuery({
-      fetchPolicy: 'no-cache',
-      nextFetchPolicy: 'no-cache',
-      onCompleted: (data) => {
-        setSearchId(data.search.searchId);
-        setItems(data.search.itemConnection.nodes);
-        setPageInfo(data.search.itemConnection.pageInfo);
+  const [trackEvent] = useTrackEventMutation();
+  const [search, { loading }] = useSearchLazyQuery({
+    fetchPolicy: 'no-cache',
+    nextFetchPolicy: 'no-cache',
+    onCompleted: (data) => {
+      setSearchId(data.search.searchId);
+      setItems(data.search.itemConnection.nodes);
+      setPageInfo(data.search.itemConnection.pageInfo);
 
-        if (isAdmin) {
-          return;
-        }
-        const params: SearchDisplayItemsActionParams = {
-          searchId: data.search.searchId,
-          searchInput: searchState.searchInput,
-          searchFrom: searchState.searchFrom,
-          itemIds: data.search.itemConnection.nodes.map((item) => item.id),
-        };
-        trackEvent({
-          variables: {
-            event: {
-              id: EventId.Search,
-              action: Action.Display,
-              createdAt: new Date(),
-              params,
-            },
+      if (isAdmin) {
+        return;
+      }
+      const params: SearchDisplayItemsActionParams = {
+        searchId: data.search.searchId,
+        searchInput: searchState.searchInput,
+        searchFrom: searchState.searchFrom,
+        itemIds: data.search.itemConnection.nodes.map((item) => item.id),
+      };
+      trackEvent({
+        variables: {
+          event: {
+            id: EventId.Search,
+            action: Action.Display,
+            createdAt: new Date(),
+            params,
           },
-        }).catch(() => {
-          // do nothing
-        });
+        },
+      }).catch(() => {
+        // do nothing
+      });
+    },
+  });
+
+  useEffect(() => {
+    setItems([]);
+    setPageInfo(undefined);
+
+    const { searchInput, searchFrom } = searchState;
+    const { query, filter, sortType, page } = searchInput;
+    search({
+      variables: {
+        input: {
+          ...searchInput,
+          query: query.trim(),
+        },
       },
     });
 
-    useEffect(() => {
-      setItems([]);
-      setPageInfo(undefined);
-
-      const { searchInput, searchFrom } = searchState;
-      const { query, filter, sortType, page } = searchInput;
-      search({
-        variables: {
-          input: {
-            ...searchInput,
-            query: query.trim(),
-          },
-        },
-      });
-
-      const urlQuery = buildSearchUrlQuery(
-        query,
-        filter,
-        searchFrom,
-        sortType,
-        page || undefined
-      );
-      // Exclude searchFrom to track actual searched from, since url can be shared.
-      const urlQueryWithoutSearchFrom = { ...urlQuery };
-      delete urlQueryWithoutSearchFrom.searchFrom;
-
-      router.push(
-        {
-          pathname: router.pathname,
-          query: urlQuery,
-        },
-        `${router.pathname}?${new URLSearchParams(
-          urlQueryWithoutSearchFrom
-        ).toString()}`,
-        {
-          shallow: true,
-          scroll: true,
-        }
-      );
-    }, [searchState]);
-
-    return (
-      <>
-        <SearchContext.Provider
-          value={{
-            searchState,
-            searchId,
-            items,
-            pageInfo,
-            dispatch,
-            loading,
-          }}
-        >
-          {children}
-        </SearchContext.Provider>
-      </>
+    const urlQuery = buildSearchUrlQuery(
+      query,
+      filter,
+      searchFrom,
+      sortType,
+      page || undefined
     );
-  }
-);
+    // Exclude searchFrom to track actual searched from, since url can be shared.
+    const urlQueryWithoutSearchFrom = { ...urlQuery };
+    delete urlQueryWithoutSearchFrom.searchFrom;
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query: urlQuery,
+      },
+      `${router.pathname}?${new URLSearchParams(
+        urlQueryWithoutSearchFrom
+      ).toString()}`,
+      {
+        shallow: true,
+        scroll: true,
+      }
+    );
+  }, [searchState]);
+
+  return (
+    <>
+      <SearchContext.Provider
+        value={{
+          searchState,
+          searchId,
+          items,
+          pageInfo,
+          dispatch,
+          loading,
+        }}
+      >
+        {children}
+      </SearchContext.Provider>
+    </>
+  );
+});

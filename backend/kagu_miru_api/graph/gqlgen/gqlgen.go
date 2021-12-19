@@ -44,6 +44,11 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	GetSimilarItemsResponse struct {
+		ItemConnection func(childComplexity int) int
+		SearchID       func(childComplexity int) int
+	}
+
 	Item struct {
 		AffiliateURL  func(childComplexity int) int
 		AverageRating func(childComplexity int) int
@@ -88,7 +93,8 @@ type ComplexityRoot struct {
 		GetAllItemCategories func(childComplexity int) int
 		GetItem              func(childComplexity int, id string) int
 		GetQuerySuggestions  func(childComplexity int, query string) int
-		Search               func(childComplexity int, input *gqlmodel.SearchInput) int
+		GetSimilarItems      func(childComplexity int, input gqlmodel.GetSimilarItemsInput) int
+		Search               func(childComplexity int, input gqlmodel.SearchInput) int
 	}
 
 	QuerySuggestionsResponse struct {
@@ -106,7 +112,8 @@ type MutationResolver interface {
 	TrackEvent(ctx context.Context, event gqlmodel.Event) (bool, error)
 }
 type QueryResolver interface {
-	Search(ctx context.Context, input *gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error)
+	Search(ctx context.Context, input gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error)
+	GetSimilarItems(ctx context.Context, input gqlmodel.GetSimilarItemsInput) (*gqlmodel.GetSimilarItemsResponse, error)
 	GetQuerySuggestions(ctx context.Context, query string) (*gqlmodel.QuerySuggestionsResponse, error)
 	GetItem(ctx context.Context, id string) (*gqlmodel.Item, error)
 	GetAllItemCategories(ctx context.Context) ([]*gqlmodel.ItemCategory, error)
@@ -126,6 +133,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "GetSimilarItemsResponse.itemConnection":
+		if e.complexity.GetSimilarItemsResponse.ItemConnection == nil {
+			break
+		}
+
+		return e.complexity.GetSimilarItemsResponse.ItemConnection(childComplexity), true
+
+	case "GetSimilarItemsResponse.searchId":
+		if e.complexity.GetSimilarItemsResponse.SearchID == nil {
+			break
+		}
+
+		return e.complexity.GetSimilarItemsResponse.SearchID(childComplexity), true
 
 	case "Item.affiliateUrl":
 		if e.complexity.Item.AffiliateURL == nil {
@@ -338,6 +359,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetQuerySuggestions(childComplexity, args["query"].(string)), true
 
+	case "Query.getSimilarItems":
+		if e.complexity.Query.GetSimilarItems == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getSimilarItems_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetSimilarItems(childComplexity, args["input"].(gqlmodel.GetSimilarItemsInput)), true
+
 	case "Query.search":
 		if e.complexity.Query.Search == nil {
 			break
@@ -348,7 +381,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Search(childComplexity, args["input"].(*gqlmodel.SearchInput)), true
+		return e.complexity.Query.Search(childComplexity, args["input"].(gqlmodel.SearchInput)), true
 
 	case "QuerySuggestionsResponse.query":
 		if e.complexity.QuerySuggestionsResponse.Query == nil {
@@ -446,7 +479,8 @@ var sources = []*ast.Source{
 scalar Time
 
 type Query {
-    search(input: SearchInput): SearchResponse!
+    search(input: SearchInput!): SearchResponse!
+    getSimilarItems(input: GetSimilarItemsInput!): GetSimilarItemsResponse!
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
     getItem(id: ID!): Item!
     # getAllItemCategories return item categories in a hierarchical data structure
@@ -510,6 +544,11 @@ type SearchResponse {
     itemConnection: ItemConnection!
 }
 
+type GetSimilarItemsResponse {
+    searchId: String!
+    itemConnection: ItemConnection!
+}
+
 type QuerySuggestionsResponse {
     query: String!
     suggestedQueries: [String!]!
@@ -527,6 +566,12 @@ input SearchInput {
     query: String!
     filter: SearchFilter!
     sortType: SearchSortType!
+    page: Int
+    pageSize: Int
+}
+
+input GetSimilarItemsInput {
+    itemId: ID!
     page: Int
     pageSize: Int
 }
@@ -564,6 +609,7 @@ input SearchFilter {
 enum EventID {
     SEARCH
     QUERY_SUGGESTIONS
+    SIMILAR_ITEMS
 }
 
 enum Action {
@@ -603,6 +649,12 @@ input SearchClickItemActionParams {
 input QuerySuggestionsDisplayActionParams {
     query: String!
     suggestedQueries: [String!]! # Must be ranking's descending order
+}
+
+input SimilarItemsDisplayItemsActionParams {
+    searchId: String!
+    getSimilarItemsInput: GetSimilarItemsInput!
+    itemIds: [ID!]! # Must be ranking's descending order
 }
 `, BuiltIn: false},
 }
@@ -672,13 +724,28 @@ func (ec *executionContext) field_Query_getQuerySuggestions_args(ctx context.Con
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_getSimilarItems_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 gqlmodel.GetSimilarItemsInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNGetSimilarItemsInput2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐGetSimilarItemsInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_search_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *gqlmodel.SearchInput
+	var arg0 gqlmodel.SearchInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx, tmp)
+		arg0, err = ec.unmarshalNSearchInput2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -724,6 +791,76 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _GetSimilarItemsResponse_searchId(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.GetSimilarItemsResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "GetSimilarItemsResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SearchID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _GetSimilarItemsResponse_itemConnection(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.GetSimilarItemsResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "GetSimilarItemsResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ItemConnection, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*gqlmodel.ItemConnection)
+	fc.Result = res
+	return ec.marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemConnection(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Item_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
 	defer func() {
@@ -1626,7 +1763,7 @@ func (ec *executionContext) _Query_search(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Search(rctx, args["input"].(*gqlmodel.SearchInput))
+		return ec.resolvers.Query().Search(rctx, args["input"].(gqlmodel.SearchInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1641,6 +1778,48 @@ func (ec *executionContext) _Query_search(ctx context.Context, field graphql.Col
 	res := resTmp.(*gqlmodel.SearchResponse)
 	fc.Result = res
 	return ec.marshalNSearchResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getSimilarItems(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getSimilarItems_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetSimilarItems(rctx, args["input"].(gqlmodel.GetSimilarItemsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*gqlmodel.GetSimilarItemsResponse)
+	fc.Result = res
+	return ec.marshalNGetSimilarItemsResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐGetSimilarItemsResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getQuerySuggestions(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3142,6 +3321,45 @@ func (ec *executionContext) unmarshalInputEvent(ctx context.Context, obj interfa
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGetSimilarItemsInput(ctx context.Context, obj interface{}) (gqlmodel.GetSimilarItemsInput, error) {
+	var it gqlmodel.GetSimilarItemsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "itemId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemId"))
+			it.ItemID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "page":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+			it.Page, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pageSize":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageSize"))
+			it.PageSize, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputQuerySuggestionsDisplayActionParams(ctx context.Context, obj interface{}) (gqlmodel.QuerySuggestionsDisplayActionParams, error) {
 	var it gqlmodel.QuerySuggestionsDisplayActionParams
 	asMap := map[string]interface{}{}
@@ -3369,6 +3587,45 @@ func (ec *executionContext) unmarshalInputSearchInput(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSimilarItemsDisplayItemsActionParams(ctx context.Context, obj interface{}) (gqlmodel.SimilarItemsDisplayItemsActionParams, error) {
+	var it gqlmodel.SimilarItemsDisplayItemsActionParams
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "searchId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("searchId"))
+			it.SearchID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "getSimilarItemsInput":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("getSimilarItemsInput"))
+			it.GetSimilarItemsInput, err = ec.unmarshalNGetSimilarItemsInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐGetSimilarItemsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "itemIds":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemIds"))
+			it.ItemIds, err = ec.unmarshalNID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3376,6 +3633,38 @@ func (ec *executionContext) unmarshalInputSearchInput(ctx context.Context, obj i
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var getSimilarItemsResponseImplementors = []string{"GetSimilarItemsResponse"}
+
+func (ec *executionContext) _GetSimilarItemsResponse(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.GetSimilarItemsResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getSimilarItemsResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GetSimilarItemsResponse")
+		case "searchId":
+			out.Values[i] = ec._GetSimilarItemsResponse_searchId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "itemConnection":
+			out.Values[i] = ec._GetSimilarItemsResponse_itemConnection(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
 
 var itemImplementors = []string{"Item"}
 
@@ -3634,6 +3923,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_search(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getSimilarItems":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getSimilarItems(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -4065,6 +4368,30 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNGetSimilarItemsInput2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐGetSimilarItemsInput(ctx context.Context, v interface{}) (gqlmodel.GetSimilarItemsInput, error) {
+	res, err := ec.unmarshalInputGetSimilarItemsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNGetSimilarItemsInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐGetSimilarItemsInput(ctx context.Context, v interface{}) (*gqlmodel.GetSimilarItemsInput, error) {
+	res, err := ec.unmarshalInputGetSimilarItemsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGetSimilarItemsResponse2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐGetSimilarItemsResponse(ctx context.Context, sel ast.SelectionSet, v gqlmodel.GetSimilarItemsResponse) graphql.Marshaler {
+	return ec._GetSimilarItemsResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGetSimilarItemsResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐGetSimilarItemsResponse(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.GetSimilarItemsResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._GetSimilarItemsResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4471,6 +4798,11 @@ func (ec *executionContext) unmarshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkagu�
 
 func (ec *executionContext) marshalNSearchFrom2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchFrom(ctx context.Context, sel ast.SelectionSet, v gqlmodel.SearchFrom) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNSearchInput2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx context.Context, v interface{}) (gqlmodel.SearchInput, error) {
+	res, err := ec.unmarshalInputSearchInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx context.Context, v interface{}) (*gqlmodel.SearchInput, error) {
@@ -4884,14 +5216,6 @@ func (ec *executionContext) marshalOItemCategory2ᚖgithubᚗcomᚋkᚑyomoᚋka
 		return graphql.Null
 	}
 	return ec._ItemCategory(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOSearchInput2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐSearchInput(ctx context.Context, v interface{}) (*gqlmodel.SearchInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputSearchInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

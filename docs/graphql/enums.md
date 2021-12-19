@@ -42,6 +42,10 @@
     <td><strong>SEARCH</strong></td>
     <td></td>
   </tr>
+  <tr>
+    <td><strong>SIMILAR_ITEMS</strong></td>
+    <td></td>
+  </tr>
 </table>
 
 ---

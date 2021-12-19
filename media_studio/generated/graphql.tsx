@@ -38,7 +38,19 @@ export type Event = {
 export enum EventId {
   QuerySuggestions = 'QUERY_SUGGESTIONS',
   Search = 'SEARCH',
+  SimilarItems = 'SIMILAR_ITEMS',
 }
+
+export type GetSimilarItemsInput = {
+  itemId: Scalars['ID'];
+  page?: InputMaybe<Scalars['Int']>;
+  pageSize?: InputMaybe<Scalars['Int']>;
+};
+
+export type GetSimilarItemsResponse = {
+  itemConnection: ItemConnection;
+  searchId: Scalars['String'];
+};
 
 export type Item = {
   affiliateUrl: Scalars['String'];
@@ -120,6 +132,7 @@ export type Query = {
   getAllItemCategories: Array<ItemCategory>;
   getItem: Item;
   getQuerySuggestions: QuerySuggestionsResponse;
+  getSimilarItems: GetSimilarItemsResponse;
   search: SearchResponse;
 };
 
@@ -131,8 +144,12 @@ export type QueryGetQuerySuggestionsArgs = {
   query: Scalars['String'];
 };
 
+export type QueryGetSimilarItemsArgs = {
+  input: GetSimilarItemsInput;
+};
+
 export type QuerySearchArgs = {
-  input?: InputMaybe<SearchInput>;
+  input: SearchInput;
 };
 
 export type QuerySuggestionsDisplayActionParams = {
@@ -194,6 +211,12 @@ export enum SearchSortType {
   Rating = 'RATING',
   ReviewCount = 'REVIEW_COUNT',
 }
+
+export type SimilarItemsDisplayItemsActionParams = {
+  getSimilarItemsInput: GetSimilarItemsInput;
+  itemIds: Array<Scalars['ID']>;
+  searchId: Scalars['String'];
+};
 
 export type SubItemCategoryFragment = {
   id: string;

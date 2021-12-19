@@ -18,13 +18,23 @@ func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodel.Event)
 	return true, nil
 }
 
-func (r *queryResolver) Search(ctx context.Context, input *gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error) {
-	searchResponse, err := r.SearchClient.SearchItems(ctx, input)
+func (r *queryResolver) Search(ctx context.Context, input gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error) {
+	resp, err := r.SearchClient.SearchItems(ctx, &input)
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
 	}
 
-	return mapSearchResponseToGraphqlSearchResponse(searchResponse, r.SearchIDManager.GetSearchID(ctx))
+	return mapSearchResponseToGraphqlSearchResponse(resp, r.SearchIDManager.GetSearchID(ctx))
+}
+
+func (r *queryResolver) GetSimilarItems(ctx context.Context, input gqlmodel.GetSimilarItemsInput) (*gqlmodel.GetSimilarItemsResponse, error) {
+	resp, err := r.SearchClient.GetSimilarItems(ctx, &input)
+	if err != nil {
+		fmt.Println(err)
+		return nil, fmt.Errorf("SearchClient.GetSimilarItems: %w", err)
+	}
+
+	return mapSearchResponseToGraphqlGetSimilarItemsResponse(resp, r.SearchIDManager.GetSearchID(ctx))
 }
 
 func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (*gqlmodel.QuerySuggestionsResponse, error) {

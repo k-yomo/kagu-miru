@@ -2,7 +2,8 @@ scalar Map
 scalar Time
 
 type Query {
-    search(input: SearchInput): SearchResponse!
+    search(input: SearchInput!): SearchResponse!
+    getSimilarItems(input: GetSimilarItemsInput!): GetSimilarItemsResponse!
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
     getItem(id: ID!): Item!
     # getAllItemCategories return item categories in a hierarchical data structure
@@ -66,6 +67,11 @@ type SearchResponse {
     itemConnection: ItemConnection!
 }
 
+type GetSimilarItemsResponse {
+    searchId: String!
+    itemConnection: ItemConnection!
+}
+
 type QuerySuggestionsResponse {
     query: String!
     suggestedQueries: [String!]!
@@ -83,6 +89,12 @@ input SearchInput {
     query: String!
     filter: SearchFilter!
     sortType: SearchSortType!
+    page: Int
+    pageSize: Int
+}
+
+input GetSimilarItemsInput {
+    itemId: ID!
     page: Int
     pageSize: Int
 }
@@ -120,6 +132,7 @@ input SearchFilter {
 enum EventID {
     SEARCH
     QUERY_SUGGESTIONS
+    SIMILAR_ITEMS
 }
 
 enum Action {
@@ -159,4 +172,10 @@ input SearchClickItemActionParams {
 input QuerySuggestionsDisplayActionParams {
     query: String!
     suggestedQueries: [String!]! # Must be ranking's descending order
+}
+
+input SimilarItemsDisplayItemsActionParams {
+    searchId: String!
+    getSimilarItemsInput: GetSimilarItemsInput!
+    itemIds: [ID!]! # Must be ranking's descending order
 }
