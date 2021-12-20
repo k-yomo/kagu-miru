@@ -184,6 +184,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 				},
 			},
 			"max_boost": 3,
+			"min_score": 1,
 		},
 	}))
 
