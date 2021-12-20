@@ -20,6 +20,7 @@ import { changeItemImageSize } from '@src/lib/platformImage';
 import PlatformBadge from '@src/components/PlatformBadge';
 import Rating from '@src/components/Rating';
 import SEOMeta from '@src/components/SEOMeta';
+import { useRouter } from 'next/router';
 
 gql`
   query itemDetailPageGetItem($id: ID!) {
@@ -76,6 +77,7 @@ interface Props {
 
 // TODO: complete the page
 export default function ItemDetailPage({ item }: Props) {
+  const router = useRouter();
   const [getSimilarItems, { data, loading }] =
     useItemDetailPageGetSimilarItemsLazyQuery({
       fetchPolicy: 'no-cache',
@@ -141,6 +143,7 @@ export default function ItemDetailPage({ item }: Props) {
           title={item.name}
           description={`${item.name}の詳細ページです。最安値のECサイトや関連商品の表示あり！`}
           img={{ src: mainImgUrl }}
+          path={router.asPath}
         />
       </Head>
       <div className="max-w-[1200px] mx-auto mb-6">

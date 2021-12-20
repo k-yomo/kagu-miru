@@ -1,20 +1,17 @@
-import React, { memo, PropsWithChildren } from 'react';
-import Image from 'next/image';
+import React, { memo } from 'react';
+import { useRouter } from 'next/router';
 import { useClipboard } from 'use-clipboard-copy';
 import {
   Action,
   EventId,
   SearchClickItemActionParams,
-  SearchQuery,
   useTrackEventMutation,
 } from '@src/generated/graphql';
 import { SearchProvider, useSearch } from '@src/contexts/search';
 import { useToast } from '@src/contexts/toast';
 import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
-import PlatformBadge from '@src/components/PlatformBadge';
 import Pagination from '@src/components/Pagination';
-import Rating from '@src/components/Rating';
 import SearchBar from '@src/components/SearchBar';
 import CategoryFilter from '@src/components/CategoryFilter';
 import ColorFilter from '@src/components/ColorFilter';
@@ -28,6 +25,7 @@ import SearchPageScreenImg from '@public/images/search_screen.jpeg';
 import ItemList from '@src/components/ItemList';
 
 export default function TopPage() {
+  const router = useRouter();
   return (
     <>
       <SEOMeta
@@ -35,6 +33,7 @@ export default function TopPage() {
         excludeSiteTitle
         description="カグミルはオンラインで買える家具を横断で一括検索・比較出来るサービスです。"
         img={{ srcPath: SearchPageScreenImg.src }}
+        path={router.asPath}
       />
       <SearchProvider>
         <TopPageInner />

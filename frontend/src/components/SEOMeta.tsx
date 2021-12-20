@@ -13,6 +13,7 @@ interface Props {
   description: string;
   ogpDescription?: string;
   img?: { srcPath: string; src?: string } | { srcPath?: string; src: string };
+  path: string;
 }
 
 export default function SEOMeta({
@@ -21,8 +22,8 @@ export default function SEOMeta({
   description,
   ogpDescription,
   img,
+  path,
 }: Props) {
-  const router = useRouter();
   return (
     <Head>
       <title>
@@ -34,7 +35,7 @@ export default function SEOMeta({
       <meta name="twitter:card" content={'summary_large_image'} />
       <meta property="og:type" content="article" />
       <meta property="og:site_name" content={SITE_TITLE} />
-      <meta property="og:url" content={SITE_ROOT_URL + router.asPath} />
+      <meta property="og:url" content={SITE_ROOT_URL + path} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={ogpDescription || description} />
       {img && (

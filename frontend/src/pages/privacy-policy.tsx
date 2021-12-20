@@ -1,13 +1,16 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import SEOMeta from '@src/components/SEOMeta';
 import { routes } from '@src/routes/routes';
 
 export default function ContactPage() {
+  const router = useRouter();
   return (
     <>
       <SEOMeta
         title="プライべシーポリシー"
         description="カグミルのプライべシーポリシーページです。"
+        path={router.asPath}
       />
       <div className="mx-auto p-3 max-w-[1000px] rounded-lg">
         <h1 className="my-6 sm:my-8 text-3xl text-center font-bold">

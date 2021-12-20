@@ -1,7 +1,8 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import groq from 'groq';
-import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
+import { sanityClient } from '@src/lib/sanityClient';
 import MediaTopImg from '@public/images/media_top.jpg';
 import SEOMeta from '@src/components/SEOMeta';
 import PostCard, { PostMeta } from '@src/components/PostCard';
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export default function MediaTopPage({ posts }: Props) {
+  const router = useRouter();
   return (
     <>
       <SEOMeta
@@ -34,6 +36,7 @@ export default function MediaTopPage({ posts }: Props) {
         excludeSiteTitle
         description="おすすめのインテリアから家具の選び方・比較まで、日々の生活を彩る家具・インテリア情報を発信します。"
         img={{ srcPath: MediaTopImg.src }}
+        path={router.asPath}
       />
       <div className="max-w-[1000px] sm:mx-auto mb-8">
         <div className="relative w-full h-[200px] sm:h-[300px] rounded-t-md">

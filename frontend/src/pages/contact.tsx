@@ -1,12 +1,15 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import SEOMeta from '@src/components/SEOMeta';
 
 export default function ContactPage() {
+  const router = useRouter();
   return (
     <>
       <SEOMeta
         title="お問い合わせ"
         description="カグミルのお問い合わせページです。"
+        path={router.asPath}
       />
       <div className="mx-auto max-w-[1000px] rounded-lg">
         <div className="my-8">
