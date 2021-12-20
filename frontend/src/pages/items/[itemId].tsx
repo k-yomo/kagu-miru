@@ -19,6 +19,7 @@ import Image from 'next/image';
 import { changeItemImageSize } from '@src/lib/platformImage';
 import PlatformBadge from '@src/components/PlatformBadge';
 import Rating from '@src/components/Rating';
+import SEOMeta from '@src/components/SEOMeta';
 
 gql`
   query itemDetailPageGetItem($id: ID!) {
@@ -136,8 +137,11 @@ export default function ItemDetailPage({ item }: Props) {
   return (
     <>
       <Head>
-        {/* TODO: remove no index when the page is ready */}
-        <meta name="robots" content="noindex,nofollow,noarchive" />
+        <SEOMeta
+          title={item.name}
+          description={`${item.name}の詳細ページです。最安値のECサイトや関連商品の表示あり！`}
+          img={{ src: mainImgUrl }}
+        />
       </Head>
       <div className="max-w-[1200px] mx-auto mb-6">
         <div className="relative w-full h-[300px] sm:h-[600px]">
