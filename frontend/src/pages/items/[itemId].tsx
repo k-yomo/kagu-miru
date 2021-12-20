@@ -132,7 +132,7 @@ export default function ItemDetailPage({ item }: Props) {
     }).catch((e) => {
       console.log(e);
     });
-  }, [getSimilarItems]);
+  }, [getSimilarItems, item.id]);
 
   return (
     <>
