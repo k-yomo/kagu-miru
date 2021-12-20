@@ -15,7 +15,10 @@ import {
 } from '@src/generated/graphql';
 import ItemList from '@src/components/ItemList';
 import Loading from '@src/components/Loading';
-import Pagination from '@src/components/Pagination';
+import Image from 'next/image';
+import { changeItemImageSize } from '@src/lib/platformImage';
+import PlatformBadge from '@src/components/PlatformBadge';
+import Rating from '@src/components/Rating';
 
 gql`
   query itemDetailPageGetItem($id: ID!) {
@@ -101,6 +104,8 @@ export default function ItemDetailPage({ item }: Props) {
   const [trackEvent] = useTrackEventMutation();
   const similarItems = data?.getSimilarItems?.itemConnection.nodes;
 
+  const mainImgUrl = changeItemImageSize(item.imageUrls[0], item.platform, 512);
+
   const onClickItem = (itemId: string) => {
     const params: SearchClickItemActionParams = {
       searchId: data!.getSimilarItems.searchId,
@@ -134,8 +139,47 @@ export default function ItemDetailPage({ item }: Props) {
         {/* TODO: remove no index when the page is ready */}
         <meta name="robots" content="noindex,nofollow,noarchive" />
       </Head>
-      <div className="max-w-[1200px] mx-auto mt-3 mb-6">
-        <h1>{item.name}</h1>
+      <div className="max-w-[1200px] mx-auto mb-6">
+        <div className="relative w-full h-[300px] sm:h-[600px]">
+          <Image
+            src={mainImgUrl}
+            alt={item.name}
+            layout="fill"
+            objectFit="cover"
+            objectPosition="center"
+            priority
+            unoptimized
+          />
+        </div>
+        <div className="mx-3">
+          <h1 className="my-2 text-lg font-bold">{item.name}</h1>
+          <div className="my-2">
+            <PlatformBadge platform={item.platform} size="md" />
+            <div className="flex items-center">
+              <Rating rating={item.averageRating} maxRating={5} />
+              <div className="ml-1 text-gray-600 dark:text-gray-300">
+                {item.reviewCount}件
+              </div>
+            </div>
+          </div>
+          <div className="my-4 text-xl font-bold">
+            価格:{' '}
+            <span className="text-3xl text-rose-600">
+              {item.price.toLocaleString()}円
+            </span>
+          </div>
+          <hr className="border-gray-100 dark:border-gray-800" />
+          <p className="my-4">{item.description}</p>
+        </div>
+        <a href={item.affiliateUrl}>
+          <button
+            type="button"
+            className="block mx-auto my-4 px-2.5 py-3 w-[95%] rounded  bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-center text-white focus:outline-none"
+          >
+            商品購入ページへ
+          </button>
+        </a>
+        <hr className="border-gray-100 dark:border-gray-800" />
         <div className="mx-3">
           <h2 className="my-2 text-2xl">関連商品</h2>
           {loading ? <Loading /> : <></>}

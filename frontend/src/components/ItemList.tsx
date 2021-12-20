@@ -1,12 +1,11 @@
-import {
-  ItemListItemFragmentFragment,
-  SearchQuery,
-} from '@src/generated/graphql';
+import { ItemListItemFragmentFragment } from '@src/generated/graphql';
 import React, { memo, PropsWithChildren } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
+import gql from 'graphql-tag';
 import PlatformBadge from '@src/components/PlatformBadge';
 import Rating from '@src/components/Rating';
-import gql from 'graphql-tag';
+import { routes } from '@src/routes/routes';
 
 gql`
   fragment itemListItemFragment on Item {
@@ -41,9 +40,11 @@ export default memo(function ItemList({ items, onClickItem, isAdmin }: Props) {
       return <button onClick={() => onClickItem(id)}>{children}</button>;
     } else {
       return (
-        <a href={url} onClick={() => onClickItem(id)}>
-          {children}
-        </a>
+        <Link href={routes.itemDetail(id)}>
+          <a href={url} onClick={() => onClickItem(id)}>
+            {children}
+          </a>
+        </Link>
       );
     }
   };

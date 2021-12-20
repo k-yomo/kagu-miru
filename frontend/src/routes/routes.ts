@@ -1,5 +1,8 @@
 export const routes = {
   top: () => '/',
+
+  itemDetail: (itemId: string) => `/items/${itemId}`,
+
   media: () => '/media',
   mediaPost: (slug: string) => `/media/posts/${slug}`,
   mediaCategory: (categoryId: string) => `/media/categories/${categoryId}`,
