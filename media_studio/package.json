@@ -24,7 +24,7 @@
     "@sanity/core": "^2.23.0",
     "@sanity/default-layout": "^2.23.2",
     "@sanity/default-login": "^2.23.2",
-    "@sanity/desk-tool": "^2.23.0",
+    "@sanity/desk-tool": "^2.23.2",
     "@sanity/production-preview": "^2.15.0",
     "@sanity/vision": "^2.23.2",
     "apollo-link-scalars": "^3.0.0",
