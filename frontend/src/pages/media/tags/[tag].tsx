@@ -5,7 +5,7 @@ import { sanityClient } from '@src/lib/sanityClient';
 import MediaTopImg from '@public/images/media_top.jpg';
 import SEOMeta from '@src/components/SEOMeta';
 import PostCard, { PostMeta } from '@src/components/PostCard';
-import { useRouter } from "next/router"
+import { useRouter } from 'next/router';
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const tag = ctx.query.tag as string;

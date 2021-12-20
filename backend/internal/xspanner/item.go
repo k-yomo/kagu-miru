@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"go.opentelemetry.io/otel"
+
 	"cloud.google.com/go/spanner"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 )
@@ -31,6 +33,9 @@ type Item struct {
 }
 
 func GetItem(ctx context.Context, spannerClient *spanner.Client, itemID string) (*Item, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetItem")
+	defer span.End()
+
 	stmt := spanner.Statement{
 		SQL:    `SELECT * FROM items WHERE id = @item_id`,
 		Params: map[string]interface{}{"item_id": itemID},

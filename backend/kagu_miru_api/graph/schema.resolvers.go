@@ -11,6 +11,8 @@ import (
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodel.Event) (bool, error) {
@@ -19,18 +21,28 @@ func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodel.Event)
 }
 
 func (r *queryResolver) Search(ctx context.Context, input gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error) {
+	if input.Query != "" && len(input.Filter.CategoryIds) == 0 {
+		categoryIDs, err := r.QueryClassifierClient.CategorizeQuery(ctx, input.Query)
+		if err != nil {
+			logging.Logger(ctx).Error("failed to predict query's category", zap.Error(err))
+		}
+		input.Filter.CategoryIds = categoryIDs
+	}
+
 	resp, err := r.SearchClient.SearchItems(ctx, &input)
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
 	}
-
 	return mapSearchResponseToGraphqlSearchResponse(resp, r.SearchIDManager.GetSearchID(ctx))
 }
 
 func (r *queryResolver) GetSimilarItems(ctx context.Context, input gqlmodel.GetSimilarItemsInput) (*gqlmodel.GetSimilarItemsResponse, error) {
-	resp, err := r.SearchClient.GetSimilarItems(ctx, &input)
+	item, err := r.DBClient.GetItem(ctx, input.ItemID)
 	if err != nil {
-		fmt.Println(err)
+		return nil, fmt.Errorf("DBClient.GetItem: %w", err)
+	}
+	resp, err := r.SearchClient.GetSimilarItems(ctx, &input, item.CategoryID)
+	if err != nil {
 		return nil, fmt.Errorf("SearchClient.GetSimilarItems: %w", err)
 	}
 

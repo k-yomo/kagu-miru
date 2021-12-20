@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"go.opentelemetry.io/otel"
+
 	"google.golang.org/api/iterator"
 
 	"cloud.google.com/go/spanner"
@@ -22,6 +24,9 @@ type RakutenItemGenre struct {
 }
 
 func GetAllRakutenItemGenres(ctx context.Context, spannerClient *spanner.Client) ([]*RakutenItemGenre, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllRakutenItemGenres")
+	defer span.End()
+
 	stmt := spanner.NewStatement(`SELECT * FROM rakuten_item_genres`)
 	iter := spannerClient.Single().Query(ctx, stmt)
 	defer iter.Stop()

@@ -5,6 +5,8 @@ import (
 	"sort"
 	"time"
 
+	"go.opentelemetry.io/otel"
+
 	"google.golang.org/api/iterator"
 
 	"cloud.google.com/go/spanner"
@@ -48,6 +50,9 @@ func (i *ItemCategoryWithParent) CategoryNames() []string {
 }
 
 func GetAllItemCategoriesWithParent(ctx context.Context, spannerClient *spanner.Client) ([]*ItemCategoryWithParent, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllItemCategoriesWithParent")
+	defer span.End()
+
 	allItemCategories, err := GetAllItemCategories(ctx, spannerClient)
 	if err != nil {
 		return nil, err
@@ -78,6 +83,9 @@ func GetAllItemCategoriesWithParent(ctx context.Context, spannerClient *spanner.
 }
 
 func GetAllItemCategories(ctx context.Context, spannerClient *spanner.Client) ([]*ItemCategory, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllItemCategories")
+	defer span.End()
+
 	stmt := spanner.NewStatement(`SELECT * FROM item_categories`)
 	iter := spannerClient.Single().Query(ctx, stmt)
 	defer iter.Stop()

@@ -9,30 +9,33 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/k-yomo/kagu-miru/backend/pkg/spannerutil"
-
-	"cloud.google.com/go/spanner"
-	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/db"
-
+	automl "cloud.google.com/go/automl/apiv1"
 	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/spanner"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/config"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/db"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/queryclassifier"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/request"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/search"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
 	"github.com/k-yomo/kagu-miru/backend/pkg/csrf"
 	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
+	"github.com/k-yomo/kagu-miru/backend/pkg/spannerutil"
 	"github.com/k-yomo/kagu-miru/backend/pkg/tracing"
 	"github.com/rs/cors"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
+	"google.golang.org/api/option"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -86,6 +89,15 @@ func main() {
 	}
 	searchClient := search.NewElasticsearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient)
 
+	predictionClient, err := automl.NewPredictionClient(
+		context.Background(),
+		option.WithGRPCDialOption(grpc.WithChainUnaryInterceptor(otelgrpc.UnaryClientInterceptor())),
+	)
+	if err != nil {
+		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
+	}
+	queryClassifierClient := queryclassifier.NewQueryClassifierClient(predictionClient, cfg.GCPProjectID, cfg.AutoMLCategoryClassificationModelID)
+
 	var eventLoader tracking.EventLoader
 	if cfg.Env.IsDeployed() {
 		pubsubClient, err := pubsub.NewClient(ctx, cfg.GCPProjectID)
@@ -100,7 +112,7 @@ func main() {
 	searchIDManager := tracking.NewSearchIDManager(cfg.Env.IsDeployed())
 
 	gqlConfig := gqlgen.Config{
-		Resolvers: graph.NewResolver(dbClient, searchClient, searchIDManager, eventLoader),
+		Resolvers: graph.NewResolver(dbClient, searchClient, queryClassifierClient, searchIDManager, eventLoader),
 	}
 	gqlServer := handler.NewDefaultServer(gqlgen.NewExecutableSchema(gqlConfig))
 	gqlServer.Use(tracing.GraphqlExtension{})

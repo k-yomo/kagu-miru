@@ -47,7 +47,7 @@ type Response struct {
 }
 
 func (c *elasticsearchClient) GetItem(ctx context.Context, id string) (*es.Item, error) {
-	ctx, span := otel.Tracer("search").Start(ctx, "search.GetItem")
+	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetItem")
 	defer span.End()
 
 	response, err := c.esClient.Get(c.itemsIndexName, id, c.esClient.Get.WithContext(ctx))
@@ -73,7 +73,7 @@ func (c *elasticsearchClient) GetItem(ctx context.Context, id string) (*es.Item,
 }
 
 func (c *elasticsearchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error) {
-	ctx, span := otel.Tracer("search").Start(ctx, "search.Client_SearchItems")
+	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_SearchItems")
 	defer span.End()
 
 	go func() {
@@ -217,24 +217,30 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 	return bytes.NewReader(esQueryJSON), nil
 }
 
-func (c *elasticsearchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput) (*Response, error) {
+func (c *elasticsearchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput, itemCategoryID string) (*Response, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetSimilarItems")
+	defer span.End()
+
+	mustQueries := []esquery.Mappable{esquery.CustomQuery(map[string]interface{}{
+		"more_like_this": map[string]interface{}{
+			"fields": []string{
+				xesquery.Boost(es.ItemFieldName, 30),
+				xesquery.Boost(es.ItemFieldBrandName, 10),
+				xesquery.Boost(es.ItemFieldCategoryNames, 5),
+				xesquery.Boost(es.ItemFieldColors, 5),
+				es.ItemFieldDescription,
+			},
+			"like": map[string]interface{}{
+				"_index": c.itemsIndexName,
+				"_id":    input.ItemID,
+			},
+		},
+	})}
+	boolQuery := esquery.Bool().Must(mustQueries...)
+	boolQuery.Filter(esquery.Terms(es.ItemFieldCategoryIDs, itemCategoryID))
 	esQuery := esquery.Search().Query(esquery.CustomQuery(map[string]interface{}{
 		"function_score": map[string]interface{}{
-			"query": map[string]interface{}{
-				"more_like_this": map[string]interface{}{
-					"fields": []string{
-						xesquery.Boost(es.ItemFieldName, 30),
-						xesquery.Boost(es.ItemFieldBrandName, 10),
-						xesquery.Boost(es.ItemFieldCategoryNames, 5),
-						xesquery.Boost(es.ItemFieldColors, 5),
-						es.ItemFieldDescription,
-					},
-					"like": map[string]interface{}{
-						"_index": c.itemsIndexName,
-						"_id":    input.ItemID,
-					},
-				},
-			},
+			"query": boolQuery.Map(),
 			"functions": []map[string]interface{}{
 				{
 					"gauss": map[string]interface{}{
@@ -275,6 +281,9 @@ func (c *elasticsearchClient) GetSimilarItems(ctx context.Context, input *gqlmod
 }
 
 func (c *elasticsearchClient) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetQuerySuggestions")
+	defer span.End()
+
 	const aggregationTerm = "queries"
 	esQuery, err := esquery.Search().
 		Query(
