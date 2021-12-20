@@ -30,7 +30,6 @@ function changeYahooShoppingImageSize(
   // TODO: Adjust size depending on the given size
   //  Yahoo shopping item image is a (smallest) ~ z (biggest)
   if (size >= 500) {
-    console.log(size);
     return yahooImgUrl.replace('/g/', '/n/');
   }
   return yahooImgUrl;
