@@ -163,13 +163,18 @@ export default function ItemDetailPage({ item }: Props) {
             </div>
           </div>
           <div className="my-4 text-xl font-bold">
-            価格:{' '}
-            <span className="text-3xl text-rose-600">
+            <span className="text-text-secondary dark:text-text-secondary-dark">
+              価格:
+            </span>{' '}
+            <span className="text-3xl text-rose-600 dark:text-rose-500">
               {item.price.toLocaleString()}円
             </span>
           </div>
           <hr className="border-gray-100 dark:border-gray-800" />
-          <p className="my-4">{item.description}</p>
+          <p
+            dangerouslySetInnerHTML={{ __html: item.description }}
+            className="my-4 text-text-secondary dark:text-text-secondary-dark"
+          />
         </div>
         <a href={item.affiliateUrl}>
           <button
