@@ -5,6 +5,7 @@ import { sanityClient } from '@src/lib/sanityClient';
 import MediaTopImg from '@public/images/media_top.jpg';
 import SEOMeta from '@src/components/SEOMeta';
 import PostCard, { PostMeta } from '@src/components/PostCard';
+import { useRouter } from "next/router"
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const tag = ctx.query.tag as string;
@@ -28,12 +29,14 @@ interface Props {
 }
 
 export default function MediaTopPage({ tag, posts }: Props) {
+  const router = useRouter();
   return (
     <>
       <SEOMeta
         title={`#${tag} 記事一覧`}
         description={`${tag}に関する記事の一覧ページです`}
         img={{ srcPath: MediaTopImg.src }}
+        path={router.asPath}
       />
       <div className="max-w-[1000px] sm:mx-auto mb-8">
         <div className="mx-4">
