@@ -10,9 +10,9 @@ module.exports = {
       colors: {
         primary: colors.rose,
         'text-primary': colors.gray['800'],
-        'text-primary-dark': colors.gray['100'],
+        'text-primary-dark': colors.gray['300'],
         'text-secondary': colors.gray['500'],
-        'text-secondary-dark': colors.gray['300'],
+        'text-secondary-dark': colors.gray['400'],
         rakuten: '#BF0000',
         'yahoo-shopping': '#FF0132',
         'paypay-mall': '#977a20',

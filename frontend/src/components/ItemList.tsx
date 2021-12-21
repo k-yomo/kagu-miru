@@ -71,14 +71,14 @@ export default memo(function ItemList({ items, onClickItem, isAdmin }: Props) {
               <PlatformBadge platform={item.platform} size="xs" />
               <div className="flex items-center">
                 <Rating rating={item.averageRating} maxRating={5} />
-                <div className="ml-1 text-xs text-gray-600 dark:text-gray-300">
+                <div className="ml-1 text-xs">
                   {item.reviewCount}件
                 </div>
               </div>
               <h4 className="mt-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
               </h4>
-              <div className="text-lg font-bold">
+              <div className="text-lg font-bold text-black dark:text-white">
                 {item.price.toLocaleString()}円
               </div>
             </div>
