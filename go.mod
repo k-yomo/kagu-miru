@@ -3,7 +3,7 @@ module github.com/k-yomo/kagu-miru
 go 1.17
 
 require (
-	cloud.google.com/go/automl v1.0.0
+	cloud.google.com/go/aiplatform v1.1.1
 	cloud.google.com/go/profiler v0.1.1
 	cloud.google.com/go/pubsub v1.17.1
 	cloud.google.com/go/spanner v1.28.0
@@ -25,6 +25,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.8.0
 	github.com/vektah/gqlparser/v2 v2.2.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.28.0
 	go.opentelemetry.io/otel v1.3.0
 	go.opentelemetry.io/otel/sdk v1.3.0
@@ -33,6 +34,8 @@ require (
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
 	google.golang.org/api v0.63.0
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
+	google.golang.org/grpc v1.43.0
+	google.golang.org/protobuf v1.27.1
 	gotest.tools/gotestsum v1.7.0
 )
 
@@ -76,7 +79,6 @@ require (
 	github.com/urfave/cli/v2 v2.3.0 // indirect
 	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0 // indirect
 	go.opentelemetry.io/otel/internal/metric v0.26.0 // indirect
 	go.opentelemetry.io/otel/metric v0.26.0 // indirect
 	go.opentelemetry.io/otel/trace v1.3.0 // indirect
@@ -91,7 +93,5 @@ require (
 	golang.org/x/tools v0.1.5 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/grpc v1.43.0 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

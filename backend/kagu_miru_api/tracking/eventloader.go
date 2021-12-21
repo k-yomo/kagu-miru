@@ -57,8 +57,9 @@ func (l *eventLoader) Load(ctx context.Context, event *Event) {
 
 // NoopEventLoader can be used for local env / test
 type NoopEventLoader struct {
+	LoadedEvents []*Event
 }
 
 func (l *NoopEventLoader) Load(ctx context.Context, event *Event) {
-	logging.Logger(ctx).Info("tracking event", zap.Any("event", event))
+	l.LoadedEvents = append(l.LoadedEvents, event)
 }

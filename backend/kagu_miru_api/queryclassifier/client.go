@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	automl "cloud.google.com/go/automl/apiv1"
+	aiplatform "cloud.google.com/go/aiplatform/apiv1"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	automlpb "google.golang.org/genproto/googleapis/cloud/automl/v1"
+	aiplatformpb "google.golang.org/genproto/googleapis/cloud/aiplatform/v1"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 const scoreThreshold = 0.6
@@ -17,18 +18,18 @@ type QueryClassifier interface {
 }
 
 type queryClassifierClient struct {
-	predictionClient                *automl.PredictionClient
-	categoryClassificationModelPath string
+	predictionClient               *aiplatform.PredictionClient
+	categoryClassificationEndpoint string
 }
 
 func NewQueryClassifierClient(
-	predictionClient *automl.PredictionClient,
+	predictionClient *aiplatform.PredictionClient,
 	gcpProjectName string,
-	categoryClassificationModelName string,
+	categoryClassificationEndpointID string,
 ) *queryClassifierClient {
 	return &queryClassifierClient{
-		predictionClient:                predictionClient,
-		categoryClassificationModelPath: fmt.Sprintf("projects/%s/locations/us-central1/models/%s", gcpProjectName, categoryClassificationModelName),
+		predictionClient:               predictionClient,
+		categoryClassificationEndpoint: fmt.Sprintf("projects/%s/locations/us-central1/endpoints/%s", gcpProjectName, categoryClassificationEndpointID),
 	}
 }
 
@@ -37,26 +38,35 @@ func (q *queryClassifierClient) CategorizeQuery(ctx context.Context, query strin
 	ctx, span := otel.Tracer("").Start(ctx, "queryclassifier.queryClassifierClient_CategorizeQuery")
 	defer span.End()
 
-	resp, err := q.predictionClient.Predict(ctx, &automlpb.PredictRequest{
-		Name: q.categoryClassificationModelPath,
-		Payload: &automlpb.ExamplePayload{
-			Payload: &automlpb.ExamplePayload_TextSnippet{
-				TextSnippet: &automlpb.TextSnippet{
-					Content:  query,
-					MimeType: "text/plain",
-				}},
+	predictionInstance, err := structpb.NewStruct(map[string]interface{}{
+		"content":  query,
+		"mimeType": "text/plain",
+	})
+	resp, err := q.predictionClient.Predict(ctx, &aiplatformpb.PredictRequest{
+		Endpoint: q.categoryClassificationEndpoint,
+		Instances: []*structpb.Value{
+			structpb.NewStructValue(predictionInstance),
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	predictions := resp.GetPredictions()
+	if len(predictions) == 0 {
+		return nil, nil
+	}
+
 	var categoryIDs []string
-	for _, payload := range resp.Payload {
-		detail, ok := payload.Detail.(*automlpb.AnnotationPayload_Classification)
-		if ok && detail.Classification.Score >= scoreThreshold {
-			categoryIDs = append(categoryIDs, payload.DisplayName)
+	fields := predictions[0].GetStructValue().GetFields()
+	displayNameValues := fields["displayNames"].GetListValue().Values
+	confidenceValues := fields["confidences"].GetListValue().Values
+	for i, categoryIDValue := range displayNameValues {
+		categoryID := categoryIDValue.GetStringValue()
+		if confidenceValues[i].GetNumberValue() >= scoreThreshold {
+			categoryIDs = append(categoryIDs, categoryID)
 		}
+
 	}
 
 	span.SetAttributes(attribute.StringSlice("categoryIds", categoryIDs))

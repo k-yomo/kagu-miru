@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	automl "cloud.google.com/go/automl/apiv1"
+	aiplatform "cloud.google.com/go/aiplatform/apiv1"
 	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/spanner"
@@ -89,14 +89,15 @@ func main() {
 	}
 	searchClient := search.NewElasticsearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient)
 
-	predictionClient, err := automl.NewPredictionClient(
+	predictionClient, err := aiplatform.NewPredictionClient(
 		context.Background(),
+		option.WithEndpoint("us-central1-aiplatform.googleapis.com:443"),
 		option.WithGRPCDialOption(grpc.WithChainUnaryInterceptor(otelgrpc.UnaryClientInterceptor())),
 	)
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}
-	queryClassifierClient := queryclassifier.NewQueryClassifierClient(predictionClient, cfg.GCPProjectID, cfg.AutoMLCategoryClassificationModelID)
+	queryClassifierClient := queryclassifier.NewQueryClassifierClient(predictionClient, cfg.GCPProjectID, cfg.VertexAICategoryClassificationEndpointID)
 
 	var eventLoader tracking.EventLoader
 	if cfg.Env.IsDeployed() {

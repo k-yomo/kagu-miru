@@ -26,7 +26,7 @@ type Config struct {
 	SpannerInstanceID string `envconfig:"SPANNER_INSTANCE_ID"`
 	SpannerDatabaseID string `envconfig:"SPANNER_DATABASE_ID"`
 
-	AutoMLCategoryClassificationModelID string `envconfig:"AUTOML_CATEGORY_CLASSIFICATION_MODEL_ID"`
+	VertexAICategoryClassificationEndpointID string `envconfig:"VERTEX_AI_CATEGORY_CLASSIFICATION_ENDPOINT_ID"`
 
 	ElasticSearchUsername          string `envconfig:"ELASTICSEARCH_USERNAME"`
 	ElasticSearchPassword          string `envconfig:"ELASTICSEARCH_PASSWORD"`
