@@ -77,8 +77,7 @@
         "analyzer": "kuromoji_analyzer"
       },
       "colors": {
-        "type": "text",
-        "analyzer": "kuromoji_analyzer"
+        "type": "keyword"
       },
       "tag_ids": {
         "type": "long"
