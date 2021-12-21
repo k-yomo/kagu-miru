@@ -2,11 +2,8 @@ import React, { memo } from 'react';
 import Link from 'next/link';
 import { routes } from '@src/routes/routes';
 import { SearchIcon } from '@heroicons/react/outline';
-import { useTheme } from 'next-themes';
 
 export default memo(function Header() {
-  const theme = useTheme();
-  theme.setTheme('dark');
   return (
     <header>
       <div className="relative bg-white dark:bg-black mx-auto px-4 sm:px-6 border-b-[1px] border-gray-200 dark:border-gray-800">
