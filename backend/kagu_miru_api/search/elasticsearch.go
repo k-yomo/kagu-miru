@@ -144,7 +144,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 				colors = append(colors, color)
 			}
 		}
-		boolQuery.Filter(esquery.Terms(fmt.Sprintf("%s.keyword", es.ItemFieldColors), colors...))
+		boolQuery.Filter(esquery.Terms(es.ItemFieldColors, colors...))
 	}
 
 	if input.Filter.MinPrice != nil && input.Filter.MaxPrice != nil {
@@ -184,7 +184,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 				},
 			},
 			"max_boost": 3,
-			"min_score": 1,
+			// "min_score": 0,
 		},
 	}))
 
