@@ -106,7 +106,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 			Type(esquery.MatchTypeMostFields).
 			Fields(
 				xesquery.Boost(es.ItemFieldName, 20),
-				xesquery.Boost(es.ItemFieldBrandName, 10),
+				xesquery.Boost(es.ItemFieldBrandName, 5),
 				xesquery.Boost(es.ItemFieldCategoryNames, 5),
 				xesquery.Boost(es.ItemFieldColors, 5),
 				es.ItemFieldDescription,
