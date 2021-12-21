@@ -1,14 +1,25 @@
 import React, { memo } from 'react';
 import { XIcon } from '@heroicons/react/solid';
-import { SearchActionType, useSearch } from '@src/contexts/search';
+import {
+  defaultSearchFilter,
+  SearchActionType,
+  useSearch,
+} from '@src/contexts/search';
 import { itemCategoryIdNameMap } from '@src/lib/itemCategories';
 import { platFormText } from '@src/conv/platform';
 import { colorText } from '@src/conv/color';
 
 export default function AppliedFilterIcons() {
   const { searchState, dispatch } = useSearch();
-  const filter = searchState.searchInput.filter;
 
+  const onClickClear = () => {
+    dispatch({
+      type: SearchActionType.SET_FILTER,
+      payload: defaultSearchFilter,
+    });
+  };
+
+  const filter = searchState.searchInput.filter;
   const filterIcons = [];
   if (filter.categoryIds.length > 0) {
     const categoryFilterIcons = filter.categoryIds.map((categoryId) => (
@@ -93,7 +104,19 @@ export default function AppliedFilterIcons() {
     );
   }
 
-  return <div className="space-x-2">{filterIcons}</div>;
+  return (
+    <div className="space-x-2">
+      {filterIcons}
+      {filterIcons.length >= 1 && (
+        <span
+          className="text-sm text-rose-500 font-bold"
+          onClick={onClickClear}
+        >
+          クリア
+        </span>
+      )}
+    </div>
+  );
 }
 
 interface FilterIconProps {
@@ -106,7 +129,7 @@ const FilterIcon = memo(function FilterIcon({
   onClear,
 }: FilterIconProps) {
   return (
-    <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-white text-xs focus:outline-none">
+    <span className="inline-flex items-center my-0.5 px-2.5 py-1.5 rounded bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-white text-xs focus:outline-none">
       {name}
       <XIcon className="w-3 h-3 ml-2 cursor-pointer" onClick={onClear} />
     </span>
