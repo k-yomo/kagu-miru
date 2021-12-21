@@ -42,6 +42,9 @@ func (q *queryClassifierClient) CategorizeQuery(ctx context.Context, query strin
 		"content":  query,
 		"mimeType": "text/plain",
 	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize prediction instance: %w", err)
+	}
 	resp, err := q.predictionClient.Predict(ctx, &aiplatformpb.PredictRequest{
 		Endpoint: q.categoryClassificationEndpoint,
 		Instances: []*structpb.Value{
@@ -49,7 +52,7 @@ func (q *queryClassifierClient) CategorizeQuery(ctx context.Context, query strin
 		},
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to predict: %w", err)
 	}
 
 	predictions := resp.GetPredictions()
