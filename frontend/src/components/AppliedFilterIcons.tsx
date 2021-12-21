@@ -109,7 +109,7 @@ export default function AppliedFilterIcons() {
       {filterIcons}
       {filterIcons.length >= 1 && (
         <span
-          className="text-sm text-rose-500 font-bold"
+          className="cursor-pointer text-sm text-rose-500 font-bold"
           onClick={onClickClear}
         >
           クリア
@@ -129,7 +129,7 @@ const FilterIcon = memo(function FilterIcon({
   onClear,
 }: FilterIconProps) {
   return (
-    <span className="inline-flex items-center my-0.5 px-2.5 py-1.5 rounded bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-white text-xs focus:outline-none">
+    <span className="inline-flex items-center my-0.5 px-2.5 py-1.5 rounded bg-gradient-to-r from-pink-500 dark:from-pink-600 to-rose-500 dark:to-rose-600 text-white text-xs focus:outline-none">
       {name}
       <XIcon className="w-3 h-3 ml-2 cursor-pointer" onClick={onClear} />
     </span>

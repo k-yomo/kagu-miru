@@ -15,7 +15,7 @@ export default memo(function PostCategoryBadge({
 }: Props) {
   const Badge = () => {
     return (
-      <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-white text-xs focus:outline-none">
+      <span className="inline-flex items-center px-2.5 py-1.5 rounded bg-gradient-to-r from-pink-500 dark:from-pink-600 to-rose-500 dark:to-rose-600 text-white text-xs focus:outline-none">
         {name}
       </span>
     );

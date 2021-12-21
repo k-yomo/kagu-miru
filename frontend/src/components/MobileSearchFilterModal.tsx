@@ -196,7 +196,7 @@ export default function MobileSearchFilterModal() {
                   </button>
                   <button
                     type="button"
-                    className="w-full px-4 py-2  bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-white focus:outline-none"
+                    className="w-full px-4 py-2  bg-gradient-to-r from-pink-500 dark:from-pink-600 to-rose-500 dark:to-rose-600 text-white focus:outline-none"
                     onClick={onClickApply}
                   >
                     適用

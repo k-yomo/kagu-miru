@@ -186,7 +186,7 @@ export default function ItemDetailPage({ item }: Props) {
         <a href={item.affiliateUrl}>
           <button
             type="button"
-            className="block mx-auto my-4 px-2.5 py-3 w-[95%] rounded  bg-gradient-to-r from-primary-500 dark:from-primary-600 to-rose-500 dark:to-rose-600 text-center text-white focus:outline-none"
+            className="block mx-auto my-4 px-2.5 py-3 w-[95%] rounded  bg-gradient-to-r from-pink-500 dark:from-pink-600 to-rose-500 dark:to-rose-600 text-center text-white focus:outline-none"
           >
             商品購入ページへ
           </button>
