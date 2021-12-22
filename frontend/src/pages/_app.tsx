@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { ThemeProvider } from 'next-themes';
+import NextNProgress from 'nextjs-progressbar';
 import { ApolloProvider } from '@apollo/client';
 import { usePageView } from '@src/lib/googleAnalytics';
 import apolloClient from '@src/lib/apolloClient';
@@ -18,6 +19,12 @@ function MyApp({ Component, pageProps }: AppProps) {
           <Header />
           <main className="z-0 flex-grow relative bg-white dark:bg-black">
             <ToastProvider>
+              <NextNProgress
+                color="#06b6d4"
+                height={3}
+                showOnShallow={false}
+                options={{ parent: 'main', showSpinner: false }}
+              />
               <Component {...pageProps} />
             </ToastProvider>
           </main>

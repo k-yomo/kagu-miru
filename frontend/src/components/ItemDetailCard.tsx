@@ -45,11 +45,11 @@ export default function ItemDetailCard({ itemId }: Props) {
           </div>
           <div className="my-1 flex items-center">
             <Rating rating={item.averageRating} maxRating={5} />
-            <div className="ml-1 text-sm text-gray-600 dark:text-gray-300">
+            <div className="ml-1 text-sm text-text-secondary dark:text-text-secondary-dark">
               {item.reviewCount}
             </div>
           </div>
-          <div className="my-2 text-xl sm:text-2xl font-bold">
+          <div className="my-2 text-xl sm:text-2xl text-black dark:text-white font-bold">
             {item.price.toLocaleString()}円
           </div>
         </div>
