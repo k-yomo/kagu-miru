@@ -71,9 +71,7 @@ export default memo(function ItemList({ items, onClickItem, isAdmin }: Props) {
               <PlatformBadge platform={item.platform} size="xs" />
               <div className="flex items-center">
                 <Rating rating={item.averageRating} maxRating={5} />
-                <div className="ml-1 text-xs">
-                  {item.reviewCount}件
-                </div>
+                <div className="ml-1 text-xs">{item.reviewCount}件</div>
               </div>
               <h4 className="mt-1 break-all line-clamp-2 text-sm sm:text-md">
                 {item.name}
