@@ -95,3 +95,5 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
+
+replace github.com/aquasecurity/esquery => github.com/k-yomo/esquery v0.2.1-0.20211221130039-11bb2b31eb6a

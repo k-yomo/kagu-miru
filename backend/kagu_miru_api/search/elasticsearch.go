@@ -102,15 +102,15 @@ func (c *elasticsearchClient) SearchItems(ctx context.Context, input *gqlmodel.S
 func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 	var mustQueries []esquery.Mappable
 	if input.Query != "" {
-		mustQueries = append(mustQueries, esquery.MultiMatch(input.Query).
-			Type(esquery.MatchTypeMostFields).
+		mustQueries = append(mustQueries, esquery.CombinedFields(input.Query).
 			Fields(
 				xesquery.Boost(es.ItemFieldName, 20),
 				xesquery.Boost(es.ItemFieldBrandName, 5),
 				xesquery.Boost(es.ItemFieldCategoryNames, 5),
 				xesquery.Boost(es.ItemFieldColors, 5),
 				es.ItemFieldDescription,
-			))
+			).
+			Operator(esquery.OperatorAnd))
 	} else {
 		mustQueries = append(mustQueries, esquery.MatchAll())
 	}
@@ -184,7 +184,6 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 				},
 			},
 			"max_boost": 3,
-			// "min_score": 0,
 		},
 	}))
 
