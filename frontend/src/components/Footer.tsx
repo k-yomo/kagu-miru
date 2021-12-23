@@ -12,9 +12,7 @@ export default function Footer() {
           </div>
 
           <Link href={routes.contact()}>
-            <a
-              className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700"
-            >
+            <a className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700">
               お問い合せ
             </a>
           </Link>
@@ -26,9 +24,7 @@ export default function Footer() {
           </div>
 
           <Link href={routes.privacyPolicy()}>
-            <a
-              className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700"
-            >
+            <a className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700">
               プライバシーポリシー
             </a>
           </Link>
