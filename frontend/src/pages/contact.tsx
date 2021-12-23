@@ -24,6 +24,7 @@ export default function ContactPage() {
               frameBorder="0"
               marginHeight={0}
               marginWidth={0}
+              className="bg-transparent"
             >
               読み込んでいます…
             </iframe>

@@ -11,12 +11,13 @@ export default function Footer() {
             ヘルプ＆ガイド
           </div>
 
-          <a
-            href={routes.contact()}
-            className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700"
-          >
-            お問い合せ
-          </a>
+          <Link href={routes.contact()}>
+            <a
+              className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700"
+            >
+              お問い合せ
+            </a>
+          </Link>
         </div>
 
         <div className="p-5 w-1/2 sm:w-4/12 md:w-3/12">
@@ -24,12 +25,13 @@ export default function Footer() {
             プライバシーと利用規約
           </div>
 
-          <a
-            href={routes.privacyPolicy()}
-            className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700"
-          >
-            プライバシーポリシー
-          </a>
+          <Link href={routes.privacyPolicy()}>
+            <a
+              className="my-3 block text-gray-300 hover:text-gray-100 text-sm font-medium duration-700"
+            >
+              プライバシーポリシー
+            </a>
+          </Link>
         </div>
 
         <div className="p-5 w-1/2 sm:w-4/12 md:w-3/12">
