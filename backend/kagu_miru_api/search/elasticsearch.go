@@ -1,17 +1,12 @@
 package search
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"math"
 	"time"
 
-	"github.com/aquasecurity/esquery"
-	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
@@ -28,10 +23,10 @@ var NotFoundErr = errors.New("item not found")
 type elasticsearchClient struct {
 	itemsIndexName                 string
 	itemsQuerySuggestionsIndexName string
-	esClient                       *elasticsearch.Client
+	esClient                       *elastic.Client
 }
 
-func NewElasticsearchClient(itemsIndexName string, itemsQuerySuggestionsIndexName string, esClient *elasticsearch.Client) Client {
+func NewElasticsearchClient(itemsIndexName string, itemsQuerySuggestionsIndexName string, esClient *elastic.Client) Client {
 	return &elasticsearchClient{
 		itemsIndexName:                 itemsIndexName,
 		itemsQuerySuggestionsIndexName: itemsQuerySuggestionsIndexName,
@@ -41,31 +36,26 @@ func NewElasticsearchClient(itemsIndexName string, itemsQuerySuggestionsIndexNam
 
 type Response struct {
 	Items      []*es.Item
-	Page       uint64
-	TotalPage  uint64
-	TotalCount uint64
+	Page       int
+	TotalPage  int
+	TotalCount int
 }
 
 func (c *elasticsearchClient) GetItem(ctx context.Context, id string) (*es.Item, error) {
 	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetItem")
 	defer span.End()
 
-	response, err := c.esClient.Get(c.itemsIndexName, id, c.esClient.Get.WithContext(ctx))
+	resp, err := c.esClient.Get().Index(c.itemsIndexName).Id(id).Do(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Get: %w", err)
 	}
 
-	result := elastic.GetResult{}
-	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
-		return nil, fmt.Errorf("json.Decoder.Decode: %w", err)
-	}
-
-	if !result.Found {
+	if !resp.Found {
 		return nil, fmt.Errorf("get '%s': %w", id, NotFoundErr)
 	}
 
 	var item es.Item
-	if err := json.Unmarshal(result.Source, &item); err != nil {
+	if err := json.Unmarshal(resp.Source, &item); err != nil {
 		return nil, fmt.Errorf("json.Unmarshal: %w", err)
 	}
 
@@ -82,47 +72,62 @@ func (c *elasticsearchClient) SearchItems(ctx context.Context, input *gqlmodel.S
 		}
 	}()
 
-	esQuery, err := buildSearchQuery(input)
+	searchQuery, err := buildSearchQuery(input)
 	if err != nil {
 		return nil, fmt.Errorf("buildSearchQuery: %w", err)
 	}
-	searchResult, err := c.search(ctx, c.itemsIndexName, esQuery)
+	s, _ := searchQuery.Source()
+	jsonBytes, _ := json.Marshal(s)
+	fmt.Println("***********")
+	fmt.Println(string(jsonBytes))
+	fmt.Println("***********")
+	pageSize := defaultPageSize
+	if input.PageSize != nil {
+		pageSize = int(math.Min(float64(*input.PageSize), float64(maxPageSize)))
+	}
+	resp, err := c.esClient.Search().
+		Index(c.itemsIndexName).
+		Query(searchQuery).
+		SortBy(getSorters(input.SortType)...).
+		From(calcElasticSearchPage(input.Page) * pageSize).
+		Size(pageSize).
+		RequestCache(true).
+		Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("elasticsearchClient.search: %w", err)
+		return nil, fmt.Errorf("esClient.Search: %w", err)
 	}
 
 	return &Response{
-		Items:      mapElasticsearchHitsToItems(ctx, searchResult.Hits.Hits),
+		Items:      mapElasticsearchHitsToItems(ctx, resp.Hits.Hits),
 		Page:       calcElasticSearchPage(input.Page) + 1,
-		TotalPage:  calcTotalPage(uint64(searchResult.Hits.TotalHits.Value), 100),
-		TotalCount: uint64(searchResult.Hits.TotalHits.Value),
+		TotalPage:  calcTotalPage(int(resp.Hits.TotalHits.Value), 100),
+		TotalCount: int(resp.Hits.TotalHits.Value),
 	}, nil
 }
 
-func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
-	var mustQueries []esquery.Mappable
+func buildSearchQuery(input *gqlmodel.SearchInput) (elastic.Query, error) {
+	var mustQueries []elastic.Query
 	if input.Query != "" {
-		mustQueries = append(mustQueries, esquery.CombinedFields(input.Query).
-			Fields(
-				xesquery.Boost(es.ItemFieldName, 20),
-				xesquery.Boost(es.ItemFieldBrandName, 5),
-				xesquery.Boost(es.ItemFieldCategoryNames, 5),
-				xesquery.Boost(es.ItemFieldColors, 5),
-				es.ItemFieldDescription,
-			).
-			Operator(esquery.OperatorAnd))
+		mustQueries = append(mustQueries, elastic.NewCombinedFieldsQuery(
+			input.Query,
+			xesquery.Boost(es.ItemFieldName, 20),
+			xesquery.Boost(es.ItemFieldBrandName, 5),
+			xesquery.Boost(es.ItemFieldCategoryNames, 5),
+			xesquery.Boost(es.ItemFieldColors, 5),
+			es.ItemFieldDescription,
+		).Operator("AND"))
 	} else {
-		mustQueries = append(mustQueries, esquery.MatchAll())
+		mustQueries = append(mustQueries, elastic.NewMatchAllQuery())
 	}
 
-	boolQuery := esquery.Bool().Must(mustQueries...)
+	boolQuery := elastic.NewBoolQuery().Must(mustQueries...)
 
 	if len(input.Filter.CategoryIds) > 0 {
 		var categoryIDs []interface{}
 		for _, id := range input.Filter.CategoryIds {
 			categoryIDs = append(categoryIDs, id)
 		}
-		boolQuery.Filter(esquery.Terms(es.ItemFieldCategoryIDs, categoryIDs...))
+		boolQuery.Filter(elastic.NewTermsQuery(es.ItemFieldCategoryIDs, categoryIDs...))
 	}
 
 	if len(input.Filter.Platforms) > 0 {
@@ -134,7 +139,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 			}
 			platforms = append(platforms, platform)
 		}
-		boolQuery.Filter(esquery.Terms(es.ItemFieldPlatform, platforms...))
+		boolQuery.Filter(elastic.NewTermsQuery(es.ItemFieldPlatform, platforms...))
 	}
 
 	if len(input.Filter.Colors) > 0 {
@@ -144,139 +149,102 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (io.Reader, error) {
 				colors = append(colors, color)
 			}
 		}
-		boolQuery.Filter(esquery.Terms(es.ItemFieldColors, colors...))
+		boolQuery.Filter(elastic.NewTermsQuery(es.ItemFieldColors, colors...))
 	}
 
 	if input.Filter.MinPrice != nil && input.Filter.MaxPrice != nil {
 		boolQuery.Filter(
-			esquery.Range(es.ItemFieldPrice).
+			elastic.NewRangeQuery(es.ItemFieldPrice).
 				Gte(*input.Filter.MinPrice).
 				Lte(*input.Filter.MaxPrice),
 		)
 	} else if input.Filter.MinPrice != nil {
-		boolQuery.Filter(esquery.Range(es.ItemFieldPrice).Gte(*input.Filter.MinPrice))
+		boolQuery.Filter(elastic.NewRangeQuery(es.ItemFieldPrice).Gte(*input.Filter.MinPrice))
 	} else if input.Filter.MaxPrice != nil {
-		boolQuery.Filter(esquery.Range(es.ItemFieldPrice).Lte(*input.Filter.MaxPrice))
+		boolQuery.Filter(elastic.NewRangeQuery(es.ItemFieldPrice).Lte(*input.Filter.MaxPrice))
 	}
 
 	if input.Filter.MinRating != nil {
-		boolQuery.Filter(esquery.Range(es.ItemFieldAverageRating).Gte(*input.Filter.MinRating))
+		boolQuery.Filter(elastic.NewRangeQuery(es.ItemFieldAverageRating).Gte(*input.Filter.MinRating))
 	}
 
-	esQuery := esquery.Search().Query(esquery.CustomQuery(map[string]interface{}{
-		"function_score": map[string]interface{}{
-			"query": boolQuery.Map(),
-			"functions": []map[string]interface{}{
-				{
-					"gauss": map[string]interface{}{
-						es.ItemFieldAverageRating: map[string]interface{}{
-							"origin": 5,
-							"offset": 1,
-							"scale":  1,
-							"decay":  0.4,
-						},
-					},
-				},
-				{
-					"field_value_factor": map[string]string{
-						"field": es.ItemFieldReviewCount,
-					},
-				},
-			},
-			"max_boost": 3,
-		},
-	}))
+	functionScoreQuery := elastic.NewFunctionScoreQuery().Query(boolQuery).
+		AddScoreFunc(elastic.NewGaussDecayFunction().FieldName(es.ItemFieldAverageRating).Origin(5).Offset(1).Scale(1).Decay(0.4)).
+		AddScoreFunc(elastic.NewFieldValueFactorFunction().Field(es.ItemFieldReviewCount)).
+		MaxBoost(3)
 
-	switch input.SortType {
+	return functionScoreQuery, nil
+}
+
+func getSorters(sortType gqlmodel.SearchSortType) []elastic.Sorter {
+	var sorters []elastic.Sorter
+	switch sortType {
 	case gqlmodel.SearchSortTypePriceAsc:
-		esQuery.Sort(es.ItemFieldPrice, esquery.OrderAsc)
+		sorters = []elastic.Sorter{elastic.NewFieldSort(es.ItemFieldPrice).Asc()}
 	case gqlmodel.SearchSortTypePriceDesc:
-		esQuery.Sort(es.ItemFieldPrice, esquery.OrderDesc)
+		sorters = []elastic.Sorter{elastic.NewFieldSort(es.ItemFieldPrice).Desc()}
 	case gqlmodel.SearchSortTypeReviewCount:
-		esQuery.Sort(es.ItemFieldReviewCount, esquery.OrderDesc).Sort(es.ItemFieldAverageRating, esquery.OrderDesc)
+		sorters = []elastic.Sorter{
+			elastic.NewFieldSort(es.ItemFieldReviewCount).Desc(),
+			elastic.NewFieldSort(es.ItemFieldAverageRating).Desc(),
+		}
 	case gqlmodel.SearchSortTypeRating:
-		esQuery.Sort(es.ItemFieldAverageRating, esquery.OrderDesc).Sort(es.ItemFieldReviewCount, esquery.OrderDesc)
+		sorters = []elastic.Sorter{
+			elastic.NewFieldSort(es.ItemFieldAverageRating).Desc(),
+			elastic.NewFieldSort(es.ItemFieldReviewCount).Desc(),
+		}
 	default:
-		esQuery.Sort("_score", esquery.OrderDesc)
+		sorters = []elastic.Sorter{elastic.NewScoreSort().Desc()}
 	}
 
-	pageSize := defaultPageSize
-	if input.PageSize != nil {
-		pageSize = uint64(math.Min(float64(*input.PageSize), float64(maxPageSize)))
-	}
-	esQuery.
-		SourceIncludes(es.AllItemFields...).
-		From(calcElasticSearchPage(input.Page) * pageSize).
-		Size(pageSize)
-
-	esQueryJSON, err := esQuery.MarshalJSON()
-	if err != nil {
-		return nil, fmt.Errorf("esQuery.MarshalJSON(): %w", err)
-	}
-
-	return bytes.NewReader(esQueryJSON), nil
+	return sorters
 }
 
 func (c *elasticsearchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput, itemCategoryID string) (*Response, error) {
-	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetSimilarItems")
+	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetSimilarIts")
 	defer span.End()
 
-	mustQueries := []esquery.Mappable{esquery.CustomQuery(map[string]interface{}{
-		"more_like_this": map[string]interface{}{
-			"fields": []string{
-				xesquery.Boost(es.ItemFieldName, 30),
-				xesquery.Boost(es.ItemFieldBrandName, 10),
-				xesquery.Boost(es.ItemFieldCategoryNames, 5),
-				xesquery.Boost(es.ItemFieldColors, 5),
-				es.ItemFieldDescription,
-			},
-			"like": map[string]interface{}{
-				"_index": c.itemsIndexName,
-				"_id":    input.ItemID,
-			},
-		},
-	})}
-	boolQuery := esquery.Bool().Must(mustQueries...)
-	boolQuery.Filter(esquery.Terms(es.ItemFieldCategoryIDs, itemCategoryID))
-	esQuery := esquery.Search().Query(esquery.CustomQuery(map[string]interface{}{
-		"function_score": map[string]interface{}{
-			"query": boolQuery.Map(),
-			"functions": []map[string]interface{}{
-				{
-					"gauss": map[string]interface{}{
-						es.ItemFieldAverageRating: map[string]interface{}{
-							"origin": 5,
-							"offset": 1,
-							"scale":  1,
-							"decay":  0.4,
-						},
-					},
-				},
-				{
-					"field_value_factor": map[string]string{
-						"field": es.ItemFieldReviewCount,
-					},
-				},
-			},
-			"max_boost": 1,
-		},
-	}))
+	boolQuery := elastic.NewBoolQuery().Must(
+		elastic.NewMoreLikeThisQuery().Field(
+			xesquery.Boost(es.ItemFieldName, 30),
+			xesquery.Boost(es.ItemFieldBrandName, 10),
+			xesquery.Boost(es.ItemFieldCategoryNames, 5),
+			xesquery.Boost(es.ItemFieldColors, 5),
+			es.ItemFieldDescription,
+		).LikeItems(
+			elastic.NewMoreLikeThisQueryItem().
+				Index(c.itemsIndexName).
+				Id(input.ItemID),
+		),
+	).Filter(elastic.NewTermsQuery(es.ItemFieldCategoryIDs, itemCategoryID))
 
-	esQueryJSON, err := esQuery.MarshalJSON()
-	if err != nil {
-		return nil, fmt.Errorf("esQuery.MarshalJSON(): %w", err)
+	functionScoreQuery := elastic.NewFunctionScoreQuery().
+		Query(boolQuery).
+		AddScoreFunc(elastic.NewGaussDecayFunction().FieldName(es.ItemFieldAverageRating).Origin(5).Offset(1).Scale(1).Decay(0.4)).
+		AddScoreFunc(elastic.NewFieldValueFactorFunction().Field(es.ItemFieldReviewCount)).
+		MaxBoost(1)
+
+	pageSize := defaultPageSize
+	if input.PageSize != nil {
+		pageSize = int(math.Min(float64(*input.PageSize), float64(maxPageSize)))
 	}
-
-	searchResult, err := c.search(ctx, c.itemsIndexName, bytes.NewReader(esQueryJSON))
+	resp, err := c.esClient.Search().
+		Index(c.itemsIndexName).
+		Query(functionScoreQuery).
+		SortBy(elastic.NewScoreSort()).
+		From(calcElasticSearchPage(input.Page) * pageSize).
+		Size(pageSize).
+		RequestCache(true).
+		Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("elasticsearchClient.search: %w", err)
+		return nil, fmt.Errorf("esClient.Search: %w", err)
 	}
 
 	return &Response{
-		Items:      mapElasticsearchHitsToItems(ctx, searchResult.Hits.Hits),
+		Items:      mapElasticsearchHitsToItems(ctx, resp.Hits.Hits),
 		Page:       calcElasticSearchPage(input.Page) + 1,
-		TotalPage:  calcTotalPage(uint64(searchResult.Hits.TotalHits.Value), 100),
-		TotalCount: uint64(searchResult.Hits.TotalHits.Value),
+		TotalPage:  calcTotalPage(int(resp.Hits.TotalHits.Value), 100),
+		TotalCount: int(resp.Hits.TotalHits.Value),
 	}, nil
 }
 
@@ -285,33 +253,30 @@ func (c *elasticsearchClient) GetQuerySuggestions(ctx context.Context, query str
 	defer span.End()
 
 	const aggregationTerm = "queries"
-	esQuery, err := esquery.Search().
-		Query(
-			esquery.Bool().Should(
-				esquery.Match("query.autocomplete", query),
-				esquery.Match("query.readingform", query).Fuzziness("AUTO").Operator(esquery.OperatorAnd),
-			),
-		).
-		Aggs(
-			esquery.TermsAgg(aggregationTerm, "query").
-				Order(map[string]string{"_count": string(esquery.OrderDesc)}).
-				Size(10),
-		).
+	boolQuery := elastic.NewBoolQuery().Should(
+		elastic.NewMatchQuery("query.autocomplete", query),
+		elastic.NewMatchQuery("query.readingform", query).Fuzziness("AUTO").Operator("AND"),
+	)
+
+	aggregation := elastic.NewTermsAggregation().
+		Field("query").
+		Order("_count", false).
+		Size(10)
+
+	resp, err := c.esClient.Search().
+		Index(c.itemsQuerySuggestionsIndexName).
+		Query(boolQuery).
+		Aggregation(aggregationTerm, aggregation).
 		Size(0).
-		MarshalJSON()
-
+		RequestCache(true).
+		Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("esquery.MarshalJSON(): %w", err)
+		return nil, fmt.Errorf("esClient.Search: %w", err)
 	}
 
-	searchResult, err := c.search(ctx, c.itemsQuerySuggestionsIndexName, bytes.NewReader(esQuery))
-	if err != nil {
-		return nil, fmt.Errorf("c.search: %w", err)
-	}
-
-	bucketKeyItems, ok := searchResult.Aggregations.Terms(aggregationTerm)
+	bucketKeyItems, ok := resp.Aggregations.Terms(aggregationTerm)
 	if !ok {
-		return nil, fmt.Errorf("aggregation term '%s' not found in the search result, aggs: %+v", aggregationTerm, searchResult.Aggregations)
+		return nil, fmt.Errorf("aggregation term '%s' not found in the search result, aggs: %+v", aggregationTerm, resp.Aggregations)
 	}
 
 	suggestedQueries := make([]string, 0, len(bucketKeyItems.Buckets))
@@ -325,60 +290,22 @@ func (c *elasticsearchClient) GetQuerySuggestions(ctx context.Context, query str
 	return suggestedQueries, nil
 }
 
-func (c *elasticsearchClient) search(ctx context.Context, indexName string, esQuery io.Reader) (*elastic.SearchResult, error) {
-	response, err := c.esClient.Search(
-		c.esClient.Search.WithContext(ctx),
-		c.esClient.Search.WithIndex(indexName),
-		c.esClient.Search.WithBody(esQuery),
-		c.esClient.Search.WithRequestCache(true),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("esClient.Search: %w", err)
-	}
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, errors.Wrapf(err, "read response body failed, response: %s", response.String())
-	}
-	if response.StatusCode >= 400 {
-		return nil, errors.Errorf("search request to elasticsearch failed with status %s, body: %s", response.Status(), body)
-	}
-
-	searchResult := elastic.SearchResult{}
-	if err := json.Unmarshal(body, &searchResult); err != nil {
-		return nil, errors.Wrapf(err, "unmarshal response body json failed, body: %s", body)
-	}
-	return &searchResult, nil
-}
-
 func (c *elasticsearchClient) insertQuerySuggestion(ctx context.Context, query string) error {
-	querySuggestion := es.QuerySuggestion{Query: query, CreatedAt: time.Now()}
-	querySuggestionJSON, err := json.Marshal(querySuggestion)
+	resp, err := c.esClient.Index().
+		Index(c.itemsQuerySuggestionsIndexName).
+		BodyJson(es.QuerySuggestion{Query: query, CreatedAt: time.Now()}).
+		Do(ctx)
 	if err != nil {
-		return fmt.Errorf("json.Marshal: %w", err)
+		return fmt.Errorf("esClient.Index failed: %w", err)
 	}
-
-	response, err := c.esClient.Index(
-		c.itemsQuerySuggestionsIndexName,
-		bytes.NewBuffer(querySuggestionJSON),
-		c.esClient.Index.WithContext(ctx),
-	)
-	if err != nil {
-		return fmt.Errorf("esClient.Delete failed: %w", err)
-	}
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return fmt.Errorf("read body failed: %w", err)
-	}
-	if response.StatusCode >= 400 {
-		return fmt.Errorf("index failed, body: %s: %w", body, err)
+	if resp.Status >= 400 {
+		return fmt.Errorf("index failed, body: %s: %w", resp.Result, err)
 	}
 
 	return nil
 }
 
-func calcTotalPage(totalItems, pageSize uint64) uint64 {
+func calcTotalPage(totalItems, pageSize int) int {
 	if totalItems == 0 {
 		return 1
 	}
@@ -386,10 +313,10 @@ func calcTotalPage(totalItems, pageSize uint64) uint64 {
 	return total / pageSize
 }
 
-func calcElasticSearchPage(inputPage *int) uint64 {
+func calcElasticSearchPage(inputPage *int) int {
 	page := defaultPage
 	if inputPage != nil && *inputPage > 1 {
-		page = uint64(*inputPage) - 1
+		page = int(*inputPage) - 1
 	}
 	return page
 }

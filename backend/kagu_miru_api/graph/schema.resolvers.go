@@ -31,6 +31,9 @@ func (r *queryResolver) Search(ctx context.Context, input gqlmodel.SearchInput) 
 
 	resp, err := r.SearchClient.SearchItems(ctx, &input)
 	if err != nil {
+		fmt.Println("********************")
+		fmt.Println(err)
+		fmt.Println("********************")
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
 	}
 	return mapSearchResponseToGraphqlSearchResponse(resp, r.SearchIDManager.GetSearchID(ctx))

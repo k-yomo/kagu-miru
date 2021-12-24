@@ -11,10 +11,11 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/blendle/zapdriver"
-	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/pm"
 	"github.com/k-yomo/pm/middleware/pm_autoack"
 	"github.com/k-yomo/pm/middleware/pm_recovery"
+	"github.com/olivere/elastic/v7"
+	esconfig "github.com/olivere/elastic/v7/config"
 	"go.uber.org/zap"
 )
 
@@ -29,10 +30,10 @@ func main() {
 		logger.Fatal("failed to initialize config", zap.Error(err))
 	}
 
-	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{cfg.ElasticSearchURL},
-		Username:  cfg.ElasticSearchUsername,
-		Password:  cfg.ElasticSearchPassword,
+	esClient, err := elastic.NewClientFromConfig(&esconfig.Config{
+		URL:      cfg.ElasticSearchURL,
+		Username: cfg.ElasticSearchUsername,
+		Password: cfg.ElasticSearchPassword,
 	})
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))

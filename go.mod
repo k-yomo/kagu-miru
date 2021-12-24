@@ -11,11 +11,9 @@ require (
 	github.com/Code-Hex/gqldoc v0.0.4
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
 	github.com/alexedwards/scs/v2 v2.5.0
-	github.com/aquasecurity/esquery v0.2.0
 	github.com/avct/uasurfer v0.0.0-20191028135549-26b5daa857f1
 	github.com/blendle/zapdriver v1.3.1
 	github.com/cenkalti/backoff/v4 v4.1.2
-	github.com/elastic/go-elasticsearch/v7 v7.16.0
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/k-yomo/pm v0.3.0
@@ -52,7 +50,6 @@ require (
 	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/fatih/structs v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-logr/logr v1.2.2 // indirect

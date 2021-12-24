@@ -1,22 +1,20 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
-	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
+	"github.com/olivere/elastic/v7"
+	"go.uber.org/multierr"
 )
 
 type ItemIndexer struct {
 	indexName string
-	esClient  *elasticsearch.Client
+	esClient  *elastic.Client
 }
 
-func NewItemIndexer(indexName string, esClient *elasticsearch.Client) *ItemIndexer {
+func NewItemIndexer(indexName string, esClient *elastic.Client) *ItemIndexer {
 	return &ItemIndexer{
 		indexName: indexName,
 		esClient:  esClient,
@@ -40,43 +38,26 @@ func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*es.Item) error {
 	if len(items) == 0 {
 		return nil
 	}
-	var bulkParamsBytes []byte
+
+	bulk := i.esClient.Bulk().Index(i.indexName)
 	for _, item := range items {
 		if item.IsActive() {
-			params := &indexingParams{Index: &documentMeta{Index: i.indexName, ID: item.ID}}
-			paramsJSON, err := json.Marshal(params)
-			if err != nil {
-				return fmt.Errorf("json.Marshal failed, params: %v,  err: %w", params, err)
-			}
-			itemJSON, err := json.Marshal(item)
-			if err != nil {
-				return err
-			}
-			bulkParamsBytes = append(bulkParamsBytes, paramsJSON...)
-			bulkParamsBytes = append(bulkParamsBytes, []byte("\n")...)
-			bulkParamsBytes = append(bulkParamsBytes, itemJSON...)
-			bulkParamsBytes = append(bulkParamsBytes, []byte("\n")...)
+			bulk.Add(elastic.NewBulkIndexRequest().Index(i.indexName).Id(item.ID).Doc(item))
 		} else {
-			params := &deleteParams{Delete: &documentMeta{Index: i.indexName, ID: item.ID}}
-			paramsJSON, err := json.Marshal(params)
-			if err != nil {
-				return fmt.Errorf("json.Marshal failed, params: %v,  err: %w", params, err)
-			}
-			bulkParamsBytes = append(bulkParamsBytes, paramsJSON...)
-			bulkParamsBytes = append(bulkParamsBytes, []byte("\n")...)
+			bulk.Add(elastic.NewBulkDeleteRequest().Index(i.indexName).Id(item.ID))
 		}
 	}
 
-	response, err := i.esClient.Bulk(bytes.NewReader(bulkParamsBytes), i.esClient.Bulk.WithContext(ctx))
+	resp, err := bulk.Do(ctx)
 	if err != nil {
 		return fmt.Errorf("esClient.Bulk failed: %w", err)
 	}
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return fmt.Errorf("read body failed: %w", err)
-	}
-	if response.StatusCode >= 400 {
-		return fmt.Errorf("bulk index failed, body: %s: %w", body, err)
+	if resp.Errors {
+		var errs []error
+		for _, failed := range resp.Failed() {
+			errs = append(errs, fmt.Errorf("id: %s, status: %d, err: %s", failed.Id, failed.Status, failed.Result))
+		}
+		return fmt.Errorf("read body failed: %w", multierr.Combine(errs...))
 	}
 
 	return nil

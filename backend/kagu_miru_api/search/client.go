@@ -16,7 +16,7 @@ type Client interface {
 }
 
 const (
-	defaultPage     uint64 = 0
-	defaultPageSize uint64 = 100
-	maxPageSize     uint64 = 1000
+	defaultPage     int = 0
+	defaultPageSize int = 100
+	maxPageSize     int = 1000
 )

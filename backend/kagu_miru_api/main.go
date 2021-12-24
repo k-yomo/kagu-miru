@@ -15,7 +15,6 @@ import (
 	"cloud.google.com/go/spanner"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/config"
@@ -30,6 +29,7 @@ import (
 	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	"github.com/k-yomo/kagu-miru/backend/pkg/spannerutil"
 	"github.com/k-yomo/kagu-miru/backend/pkg/tracing"
+	"github.com/olivere/elastic/v7"
 	"github.com/rs/cors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -75,15 +75,16 @@ func main() {
 
 	dbClient := db.NewSpannerDBClient(spannerClient)
 
-	esClient, err := elasticsearch.NewClient(elasticsearch.Config{
-		Addresses: []string{cfg.ElasticSearchURL},
-		Username:  cfg.ElasticSearchUsername,
-		Password:  cfg.ElasticSearchPassword,
-
-		Transport: otelhttp.NewTransport(http.DefaultTransport, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
-			return fmt.Sprintf("Elasticsearch%s", r.URL.EscapedPath())
-		})),
-	})
+	esClient, err := elastic.NewClient(
+		elastic.SetURL(cfg.ElasticSearchURL),
+		elastic.SetBasicAuth(cfg.ElasticSearchUsername, cfg.ElasticSearchPassword),
+		elastic.SetSniff(false),
+		elastic.SetHttpClient(&http.Client{
+			Transport: otelhttp.NewTransport(http.DefaultTransport, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+				return fmt.Sprintf("Elasticsearch%s", r.URL.EscapedPath())
+			})),
+		}),
+	)
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}
