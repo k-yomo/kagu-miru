@@ -1,0 +1,7 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/" xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+    <ShortName>カグミル</ShortName>
+    <Description>カグミル</Description>
+    <InputEncoding>UTF-8</InputEncoding>
+    <Url type="text/html" method="get" template="https://kagu-miru.com/?q={searchTerms}&searchFrom=OPEN_SEARCH"/>
+    <moz:SearchForm>https://kagu-miru.com/</moz:SearchForm>
+</OpenSearchDescription>

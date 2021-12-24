@@ -186,7 +186,8 @@ export type SearchFilter = {
 export enum SearchFrom {
   Filter = 'FILTER',
   Media = 'MEDIA',
-  QuerySuggestion = 'QUERY_SUGGESTION',
+  OpenSearch = 'OPEN_SEARCH',
+  QuerySuggestion = 'QUERY_SUGGESTION', // https://developer.mozilla.org/ja/docs/Web/OpenSearch
   Search = 'SEARCH',
   Url = 'URL',
 }

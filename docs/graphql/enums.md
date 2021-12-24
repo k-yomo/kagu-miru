@@ -199,6 +199,10 @@
     <td></td>
   </tr>
   <tr>
+    <td><strong>OPEN_SEARCH</strong></td>
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>QUERY_SUGGESTION</strong></td>
     <td></td>
   </tr>

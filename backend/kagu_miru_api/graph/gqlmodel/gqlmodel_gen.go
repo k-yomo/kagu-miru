@@ -358,6 +358,7 @@ type SearchFrom string
 
 const (
 	SearchFromURL             SearchFrom = "URL"
+	SearchFromOpenSearch      SearchFrom = "OPEN_SEARCH"
 	SearchFromSearch          SearchFrom = "SEARCH"
 	SearchFromQuerySuggestion SearchFrom = "QUERY_SUGGESTION"
 	SearchFromFilter          SearchFrom = "FILTER"
@@ -366,6 +367,7 @@ const (
 
 var AllSearchFrom = []SearchFrom{
 	SearchFromURL,
+	SearchFromOpenSearch,
 	SearchFromSearch,
 	SearchFromQuerySuggestion,
 	SearchFromFilter,
@@ -374,7 +376,7 @@ var AllSearchFrom = []SearchFrom{
 
 func (e SearchFrom) IsValid() bool {
 	switch e {
-	case SearchFromURL, SearchFromSearch, SearchFromQuerySuggestion, SearchFromFilter, SearchFromMedia:
+	case SearchFromURL, SearchFromOpenSearch, SearchFromSearch, SearchFromQuerySuggestion, SearchFromFilter, SearchFromMedia:
 		return true
 	}
 	return false

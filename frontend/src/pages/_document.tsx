@@ -20,6 +20,12 @@ export default class MyDocument extends Document {
       <Html lang="ja">
         <Head>
           <link rel="icon" href="/favicon.ico" />
+          <link
+            rel="search"
+            type="application/opensearchdescription+xml"
+            crossOrigin="use-credentials"
+            href="/opensearch.xml"
+          />
           {GA_ID && (
             <>
               <script
