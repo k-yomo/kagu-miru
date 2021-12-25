@@ -104,7 +104,7 @@ export default memo(function SearchBar() {
       <form action=".">
         <input
           id="search"
-          className="appearance-none lock w-full bg-white py-3 pl-10 pr-3 dark:bg-gray-800 border border-gray-700 rounded-md leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
+          className="appearance-none lock py-3 pl-10 pr-3 w-full bg-white dark:bg-gray-800 border border-gray-700 rounded-md leading-5 text-gray-900 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
           placeholder="Search"
           type="search"
           name="search"
