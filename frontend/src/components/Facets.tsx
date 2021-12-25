@@ -106,7 +106,7 @@ function FacetDropdown({
 }: FacetDropdownProps) {
   const cancelButtonRef = useRef(null);
   const selectedIdMap: { [key: string]: boolean } = selectedIds.reduce(
-    (m, v) => ((m[v] = true), m),
+    (m: { [key: string]: boolean }, v) => ((m[v] = true), m),
     {}
   );
 
