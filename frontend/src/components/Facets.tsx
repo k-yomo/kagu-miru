@@ -89,10 +89,6 @@ export default function Facets() {
   );
 }
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
-
 interface FacetDropdownProps {
   isOpen: boolean;
   facet: SearchQuery['search']['facets'][number];
