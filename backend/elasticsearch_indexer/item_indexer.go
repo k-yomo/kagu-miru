@@ -21,19 +21,6 @@ func NewItemIndexer(indexName string, esClient *elastic.Client) *ItemIndexer {
 	}
 }
 
-type indexingParams struct {
-	Index *documentMeta `json:"index"`
-}
-
-type deleteParams struct {
-	Delete *documentMeta `json:"delete"`
-}
-
-type documentMeta struct {
-	Index string `json:"_index"`
-	ID    string `json:"_id"`
-}
-
 func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*es.Item) error {
 	if len(items) == 0 {
 		return nil

@@ -23,13 +23,12 @@ export default function Facets() {
 
   const onClickFacet = (
     facetType: FacetType,
-    selectedId: string,
-    isRemove: boolean
+    selectedId: string
   ) => {
     switch (facetType) {
       case FacetType.CategoryIds:
         let categoryIds = searchState.searchInput.filter.categoryIds;
-        if (isRemove) {
+        if (categoryIds.includes(selectedId)) {
           categoryIds = categoryIds.filter((id) => id !== selectedId);
         } else {
           categoryIds = Array.from(new Set([...categoryIds, selectedId]));
@@ -41,7 +40,7 @@ export default function Facets() {
         return;
       case FacetType.BrandNames:
         let brandNames = searchState.searchInput.filter.brandNames;
-        if (isRemove) {
+        if (brandNames.includes(selectedId)) {
           brandNames = brandNames.filter((name) => name !== selectedId);
         } else {
           brandNames = Array.from(new Set([...brandNames, selectedId]));
@@ -53,7 +52,7 @@ export default function Facets() {
         return;
       case FacetType.Colors:
         let colors = searchState.searchInput.filter.colors;
-        if (isRemove) {
+        if (colors.includes(selectedId as ItemColor)) {
           colors = colors.filter(
             (color) => color !== (selectedId as ItemColor)
           );
@@ -70,15 +69,15 @@ export default function Facets() {
   return (
     <div className="flex space-x-2">
       {facets.map((facet) => (
-        <div>
+        <div key={facet.title}>
           <div>
             <button
               onClick={() => setOpenFacetType(facet.facetType)}
-              className="inline-flex justify-center w-full rounded-full border border-gray-300 px-2 py-1.5 bg-white dark:bg-black text-sm"
+              className="inline-flex items-center justify-center w-full rounded-full border border-gray-300 px-2 py-1 bg-white dark:bg-black text-xs"
             >
               {facet.title}
               <ChevronDownIcon
-                className="-mr-1 ml-2 h-5 w-5"
+                className="ml-2 h-5 w-5"
                 aria-hidden="true"
               />
             </button>
@@ -169,6 +168,7 @@ function FacetDropdown({
                 <div className="py-1 divide-y-2">
                   {facet.values.map((facetValue) => (
                     <div
+                      key={facetValue.id}
                       className="flex flex-between px-4 py-2 border-gray-100 dark:border-gray-800 text-sm"
                       onClick={() =>
                         onClickFacet(facet.facetType, facetValue.id)
