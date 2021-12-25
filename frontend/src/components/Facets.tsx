@@ -70,7 +70,7 @@ export default function Facets() {
           <div>
             <button
               onClick={() => setOpenFacetType(facet.facetType)}
-              className="inline-flex items-center justify-center w-full rounded-full border border-gray-300 px-2 py-1 bg-white dark:bg-black text-xs"
+              className="inline-flex items-center justify-center w-full rounded-full border border-gray-300 px-2 py-1.5 bg-white dark:bg-black text-xs"
             >
               {facet.title}
               <ChevronDownIcon className="ml-2 h-5 w-5" aria-hidden="true" />

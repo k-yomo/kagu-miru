@@ -121,19 +121,21 @@ export default function AppliedFilterIcons() {
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <div className="w-[80vw] space-x-2 overflow-auto whitespace-nowrap">
-        {filterIcons}
+    filterIcons.length > 0 && (
+      <div className="flex items-center space-x-2">
+        <div className="w-[80vw] space-x-2 overflow-auto whitespace-nowrap">
+          {filterIcons}
+        </div>
+        {filterIcons.length >= 1 && (
+          <span
+            className="cursor-pointer text-sm text-rose-500 font-bold"
+            onClick={onClickClear}
+          >
+            クリア
+          </span>
+        )}
       </div>
-      {filterIcons.length >= 1 && (
-        <span
-          className="cursor-pointer text-sm text-rose-500 font-bold"
-          onClick={onClickClear}
-        >
-          クリア
-        </span>
-      )}
-    </div>
+    )
   );
 }
 

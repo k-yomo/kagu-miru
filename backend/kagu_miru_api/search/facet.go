@@ -45,9 +45,13 @@ func newFacetFromBucketKeyItems(
 	facetValues := make([]*FacetValue, 0, len(bucketKeyItems.Buckets))
 	totalCount := bucketKeyItems.SumOfOtherDocCount
 	for _, bucket := range bucketKeyItems.Buckets {
+		keyStr, ok := bucket.Key.(string)
+		if !ok {
+			continue
+		}
 		facetValues = append(facetValues, &FacetValue{
-			ID:    bucket.Key.(string),
-			Name:  idNameMap[bucket.Key.(string)],
+			ID:    keyStr,
+			Name:  idNameMap[keyStr],
 			Count: int(bucket.DocCount),
 		})
 		totalCount += bucket.DocCount
@@ -60,17 +64,42 @@ func newFacetFromBucketKeyItems(
 	}
 }
 
-func addAggregationsForFacets(search *elastic.SearchService) *elastic.SearchService {
+func addAggregationsForFacets(search *elastic.SearchService, postFilterMap map[string]elastic.Query) *elastic.SearchService {
 	return search.
-		Aggregation(es.ItemFieldCategoryID, elastic.NewTermsAggregation().Field(es.ItemFieldCategoryID).Size(30)).
-		Aggregation(es.ItemFieldBrandName, elastic.NewTermsAggregation().Field(es.ItemFieldBrandName).Size(30)).
-		Aggregation(es.ItemFieldColors, elastic.NewTermsAggregation().Field(es.ItemFieldColors).Size(30))
+		Aggregation(es.ItemFieldCategoryID, newFilterAggregationForFacet(es.ItemFieldCategoryID, postFilterMap)).
+		Aggregation(es.ItemFieldBrandName, newFilterAggregationForFacet(es.ItemFieldBrandName, postFilterMap)).
+		Aggregation(es.ItemFieldColors, newFilterAggregationForFacet(es.ItemFieldColors, postFilterMap))
 }
 
-func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.Aggregations) []*Facet {
+func newFilterAggregationForFacet(field string, postFilterMap map[string]elastic.Query) elastic.Aggregation {
+	filters := extractFiltersExceptForField(field, postFilterMap)
+	// We can't use filters aggregation when 0 filters
+	if len(filters) == 0 {
+		return elastic.NewTermsAggregation().Field(field).Size(30)
+	}
+	return elastic.NewFiltersAggregation().
+		Filters(filters...).
+		SubAggregation(field, elastic.NewTermsAggregation().Field(field).Size(30))
+}
+
+func extractFiltersExceptForField(field string, filterMap map[string]elastic.Query) []elastic.Query {
+	var filters []elastic.Query
+	for filteredField, filter := range filterMap {
+		if filteredField != field {
+			filters = append(filters, filter)
+		}
+	}
+	return filters
+}
+
+func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.Aggregations, postFilterMap map[string]elastic.Query) []*Facet {
 	var facets []*Facet
 
 	if result, ok := agg.Terms(es.ItemFieldCategoryID); ok {
+		isFilterAggregation := len(extractFiltersExceptForField(es.ItemFieldCategoryID, postFilterMap)) > 0
+		if isFilterAggregation {
+			result, _ = result.Buckets[0].Terms(es.ItemFieldCategoryID)
+		}
 		itemCategories, err := s.dbClient.GetAllItemCategoriesWithParent(ctx)
 		if err != nil {
 			logging.Logger(ctx).Error("failed to get item categories", zap.Error(err))
@@ -83,17 +112,33 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 	}
 
 	if result, ok := agg.Terms(es.ItemFieldBrandName); ok {
+		isFilterAggregation := len(extractFiltersExceptForField(es.ItemFieldBrandName, postFilterMap)) > 0
+		if isFilterAggregation {
+			result, _ = result.Buckets[0].Terms(es.ItemFieldBrandName)
+		}
 		idNameMap := make(map[string]string)
 		for _, bucket := range result.Buckets {
-			idNameMap[bucket.Key.(string)] = bucket.Key.(string)
+			keyStr, ok := bucket.Key.(string)
+			if !ok {
+				continue
+			}
+			idNameMap[keyStr] = keyStr
 		}
 		facets = append(facets, newFacetFromBucketKeyItems(result, FacetTypeBrandNames, idNameMap))
 	}
 
 	if result, ok := agg.Terms(es.ItemFieldColors); ok {
+		isFilterAggregation := len(extractFiltersExceptForField(es.ItemFieldColors, postFilterMap)) > 0
+		if isFilterAggregation {
+			result, _ = result.Buckets[0].Terms(es.ItemFieldColors)
+		}
 		idNameMap := make(map[string]string)
 		for _, bucket := range result.Buckets {
-			idNameMap[bucket.Key.(string)] = bucket.Key.(string)
+			keyStr, ok := bucket.Key.(string)
+			if !ok {
+				continue
+			}
+			idNameMap[keyStr] = keyStr
 		}
 		facets = append(facets, newFacetFromBucketKeyItems(result, FacetTypeColors, idNameMap))
 	}

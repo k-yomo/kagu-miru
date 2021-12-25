@@ -138,7 +138,7 @@ export const TopPageInner = memo(function TopPageInner({
           <SearchBar />
           <SortTypeSelectBox />
         </div>
-        <div className="sticky top-0 z-10 py-1 space-y-2 bg-white dark:bg-black">
+        <div className="sticky top-0 z-10 py-2 space-y-2 bg-white dark:bg-black">
           <Facets />
           <AppliedFilterIcons />
         </div>
