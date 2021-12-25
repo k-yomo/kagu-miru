@@ -115,12 +115,6 @@ function FacetDropdown({
       <Transition.Root
         show={isOpen}
         as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
       >
         <Dialog
           initialFocus={cancelButtonRef}
@@ -168,18 +162,18 @@ function FacetDropdown({
                         id={`facetCheckBox_${facetValue.id}`}
                         type="checkbox"
                         name={facetValue.name}
-                        checked={selectedIdMap[facetValue.id]}
+                        checked={selectedIdMap[facetValue.id] || false}
+                        readOnly
                         className="h-4 w-4 rounded cursor-pointer"
                       />
-                      <label
-                        htmlFor={`facetCheckBox_${facetValue.id}`}
+                      <div
                         className="ml-2 cursor-pointer text-sm"
                       >
                         <div>{facetValue.name}</div>
                         <div className="text-xs text-text-secondary dark:text-text-secondary-dark">
                           {facetValue.count.toLocaleString()}件
                         </div>
-                      </label>
+                      </div>
                     </div>
                   ))}
                 </div>
