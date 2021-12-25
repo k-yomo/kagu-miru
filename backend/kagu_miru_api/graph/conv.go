@@ -128,8 +128,8 @@ func mapSearchItemColorToGraphqlItemColor(color string) gqlmodel.ItemColor {
 	}
 }
 
-func mapSearchResponseToGraphqlSearchResponse(res *search.Response, searchID string) (*gqlmodel.SearchResponse, error) {
-	graphqlItems, err := mapSearchToGraphqlItems(res.Items)
+func mapSearchResponseToGraphqlSearchResponse(resp *search.Response, searchID string) (*gqlmodel.SearchResponse, error) {
+	graphqlItems, err := mapSearchToGraphqlItems(resp.Items)
 	if err != nil {
 		return nil, err
 	}
@@ -137,13 +137,72 @@ func mapSearchResponseToGraphqlSearchResponse(res *search.Response, searchID str
 		SearchID: searchID,
 		ItemConnection: &gqlmodel.ItemConnection{
 			PageInfo: &gqlmodel.PageInfo{
-				Page:       int(res.Page),
-				TotalPage:  int(res.TotalPage),
-				TotalCount: int(res.TotalCount),
+				Page:       resp.Page,
+				TotalPage:  resp.TotalPage,
+				TotalCount: resp.TotalCount,
 			},
 			Nodes: graphqlItems,
 		},
+		Facets: mapSearchFacetsToGraphqlFacets(resp.Facets),
 	}, nil
+}
+
+func mapSearchFacetsToGraphqlFacets(facets []*search.Facet) []*gqlmodel.Facet {
+	graphqlFacets := make([]*gqlmodel.Facet, 0, len(facets))
+	for _, facet := range facets {
+		var facetValues []*gqlmodel.FacetValue
+		switch facet.FacetType {
+		case search.FacetTypeColors:
+			facetValues = mapSearchFacetColorValuesToGraphqlFacetValues(facet.Values)
+		default:
+			facetValues = mapSearchFacetValuesToGraphqlFacetValues(facet.Values)
+		}
+		graphqlFacets = append(graphqlFacets, &gqlmodel.Facet{
+			Title:      facet.Title,
+			FacetType:  mapSearchFacetTypeToGraphqlFacetType(facet.FacetType),
+			Values:     facetValues,
+			TotalCount: facet.TotalCount,
+		})
+	}
+
+	return graphqlFacets
+}
+
+func mapSearchFacetTypeToGraphqlFacetType(facetType search.FacetType) gqlmodel.FacetType {
+	switch facetType {
+	case search.FacetTypeCategoryIDs:
+		return gqlmodel.FacetTypeCategoryIDS
+	case search.FacetTypeBrandNames:
+		return gqlmodel.FacetTypeBrandNames
+	case search.FacetTypeColors:
+		return gqlmodel.FacetTypeColors
+	default:
+		return ""
+	}
+}
+
+func mapSearchFacetValuesToGraphqlFacetValues(facetValues []*search.FacetValue) []*gqlmodel.FacetValue {
+	graphqlFacetValues := make([]*gqlmodel.FacetValue, 0, len(facetValues))
+	for _, facetValue := range facetValues {
+		graphqlFacetValues = append(graphqlFacetValues, &gqlmodel.FacetValue{
+			ID:    facetValue.ID,
+			Name:  facetValue.Name,
+			Count: facetValue.Count,
+		})
+	}
+	return graphqlFacetValues
+}
+
+func mapSearchFacetColorValuesToGraphqlFacetValues(facetValues []*search.FacetValue) []*gqlmodel.FacetValue {
+	graphqlFacetValues := make([]*gqlmodel.FacetValue, 0, len(facetValues))
+	for _, facetValue := range facetValues {
+		graphqlFacetValues = append(graphqlFacetValues, &gqlmodel.FacetValue{
+			ID:    mapSearchItemColorToGraphqlItemColor(facetValue.ID).String(),
+			Name:  facetValue.Name,
+			Count: facetValue.Count,
+		})
+	}
+	return graphqlFacetValues
 }
 
 func mapSearchResponseToGraphqlGetSimilarItemsResponse(res *search.Response, searchID string) (*gqlmodel.GetSimilarItemsResponse, error) {

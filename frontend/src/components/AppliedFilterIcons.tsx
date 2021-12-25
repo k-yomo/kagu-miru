@@ -21,6 +21,22 @@ export default function AppliedFilterIcons() {
 
   const filter = searchState.searchInput.filter;
   const filterIcons = [];
+  if (filter.platforms.length > 0) {
+    const platformFilterIcons = filter.platforms.map((platform) => (
+      <FilterIcon
+        key={`platformFilter:${platform}`}
+        name={platFormText(platform)}
+        onClear={() =>
+          dispatch({
+            type: SearchActionType.SET_PLATFORM_FILTER,
+            payload: filter.platforms.filter((p) => p !== platform),
+          })
+        }
+      />
+    ));
+    filterIcons.push(platformFilterIcons);
+  }
+
   if (filter.categoryIds.length > 0) {
     const categoryFilterIcons = filter.categoryIds.map((categoryId) => (
       <FilterIcon
@@ -37,20 +53,20 @@ export default function AppliedFilterIcons() {
     filterIcons.push(categoryFilterIcons);
   }
 
-  if (filter.platforms.length > 0) {
-    const platformFilterIcons = filter.platforms.map((platform) => (
+  if (filter.brandNames.length > 0) {
+    const categoryFilterIcons = filter.brandNames.map((brandName) => (
       <FilterIcon
-        key={`platformFilter:${platform}`}
-        name={platFormText(platform)}
+        key={`brandFilter:${brandName}`}
+        name={brandName}
         onClear={() =>
           dispatch({
-            type: SearchActionType.SET_PLATFORM_FILTER,
-            payload: filter.platforms.filter((p) => p !== platform),
+            type: SearchActionType.SET_BRAND_FILTER,
+            payload: filter.brandNames.filter((name) => name !== brandName),
           })
         }
       />
     ));
-    filterIcons.push(platformFilterIcons);
+    filterIcons.push(categoryFilterIcons);
   }
 
   if (filter.colors.length > 0) {
@@ -105,8 +121,10 @@ export default function AppliedFilterIcons() {
   }
 
   return (
-    <div className="space-x-2">
-      {filterIcons}
+    <div className="flex items-center space-x-2">
+      <div className="w-[80vw] space-x-2 overflow-auto whitespace-nowrap">
+        {filterIcons}
+      </div>
       {filterIcons.length >= 1 && (
         <span
           className="cursor-pointer text-sm text-rose-500 font-bold"

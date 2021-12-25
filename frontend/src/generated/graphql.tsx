@@ -41,6 +41,25 @@ export enum EventId {
   SimilarItems = 'SIMILAR_ITEMS',
 }
 
+export type Facet = {
+  facetType: FacetType;
+  title: Scalars['String'];
+  totalCount: Scalars['Int'];
+  values: Array<FacetValue>;
+};
+
+export enum FacetType {
+  BrandNames = 'BRAND_NAMES',
+  CategoryIds = 'CATEGORY_IDS',
+  Colors = 'COLORS',
+}
+
+export type FacetValue = {
+  count: Scalars['Int'];
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
 export type GetSimilarItemsInput = {
   itemId: Scalars['ID'];
   page?: InputMaybe<Scalars['Int']>;
@@ -175,6 +194,7 @@ export type SearchDisplayItemsActionParams = {
 };
 
 export type SearchFilter = {
+  brandNames: Array<Scalars['String']>;
   categoryIds: Array<Scalars['ID']>;
   colors: Array<ItemColor>;
   maxPrice?: InputMaybe<Scalars['Int']>;
@@ -187,7 +207,7 @@ export enum SearchFrom {
   Filter = 'FILTER',
   Media = 'MEDIA',
   OpenSearch = 'OPEN_SEARCH',
-  QuerySuggestion = 'QUERY_SUGGESTION', // https://developer.mozilla.org/ja/docs/Web/OpenSearch
+  QuerySuggestion = 'QUERY_SUGGESTION',
   Search = 'SEARCH',
   Url = 'URL',
 }
@@ -201,6 +221,7 @@ export type SearchInput = {
 };
 
 export type SearchResponse = {
+  facets: Array<Facet>;
   itemConnection: ItemConnection;
   searchId: Scalars['String'];
 };
@@ -266,6 +287,12 @@ export type SearchQuery = {
         platform: ItemSellingPlatform;
       }>;
     };
+    facets: Array<{
+      title: string;
+      facetType: FacetType;
+      totalCount: number;
+      values: Array<{ id: string; name: string; count: number }>;
+    }>;
   };
 };
 
@@ -411,6 +438,16 @@ export const SearchDocument = gql`
         nodes {
           ...itemListItemFragment
         }
+      }
+      facets {
+        title
+        facetType
+        values {
+          id
+          name
+          count
+        }
+        totalCount
       }
     }
   }

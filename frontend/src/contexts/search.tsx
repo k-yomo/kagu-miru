@@ -42,6 +42,16 @@ gql`
           ...itemListItemFragment
         }
       }
+      facets {
+        title
+        facetType
+        values {
+          id
+          name
+          count
+        }
+        totalCount
+      }
     }
   }
 
@@ -56,6 +66,7 @@ export enum SearchActionType {
   CHANGE_PAGE,
   SET_FILTER,
   SET_CATEGORY_FILTER,
+  SET_BRAND_FILTER,
   SET_PLATFORM_FILTER,
   SET_COLOR_FILTER,
   SET_PRICE_FILTER,
@@ -71,6 +82,7 @@ type SearchAction =
   | { type: SearchActionType.CHANGE_PAGE; payload: number }
   | { type: SearchActionType.SET_FILTER; payload: SearchFilter }
   | { type: SearchActionType.SET_CATEGORY_FILTER; payload: string[] }
+  | { type: SearchActionType.SET_BRAND_FILTER; payload: string[] }
   | {
       type: SearchActionType.SET_PLATFORM_FILTER;
       payload: ItemSellingPlatform[];
@@ -135,6 +147,15 @@ const searchReducer = (
         },
         searchFrom: SearchFrom.Filter,
       };
+    case SearchActionType.SET_BRAND_FILTER:
+      return {
+        searchInput: {
+          ...searchInput,
+          filter: { ...searchInput.filter, brandNames: action.payload },
+          page: 0,
+        },
+        searchFrom: SearchFrom.Filter,
+      };
     case SearchActionType.SET_PLATFORM_FILTER:
       return {
         searchInput: {
@@ -179,6 +200,7 @@ const searchReducer = (
 
 export const defaultSearchFilter: SearchFilter = {
   categoryIds: [],
+  brandNames: [],
   platforms: [],
   colors: [],
 };
@@ -187,6 +209,7 @@ const SearchContext = createContext<{
   searchState: SearchState;
   searchId: string;
   items: SearchQuery['search']['itemConnection']['nodes'];
+  facets: SearchQuery['search']['facets'];
   pageInfo: SearchQuery['search']['itemConnection']['pageInfo'] | undefined;
   dispatch: Dispatch<SearchAction>;
   loading: boolean;
@@ -201,6 +224,7 @@ const SearchContext = createContext<{
     searchFrom: SearchFrom.Url,
   },
   items: [],
+  facets: [],
   pageInfo: undefined,
   dispatch: () => {},
   loading: false,
@@ -219,6 +243,9 @@ export function queryParamsToSearchParams(
       query: (queryParams.q as string) || '',
       filter: {
         categoryIds: ((queryParams.categoryIds as string) || '')
+          .split(',')
+          .filter((s) => s),
+        brandNames: ((queryParams.brandNames as string) || '')
           .split(',')
           .filter((s) => s),
         platforms: ((queryParams.platforms as string) || '')
@@ -264,6 +291,8 @@ export function buildSearchUrlQuery(
   };
   if (filter.categoryIds.length > 0)
     urlQuery.categoryIds = filter.categoryIds.join(',');
+  if (filter.brandNames.length > 0)
+    urlQuery.brandNames = filter.brandNames.join(',');
   if (filter.platforms.length > 0)
     urlQuery.platforms = filter.platforms.join(',');
   if (filter.colors.length > 0) urlQuery.colors = filter.colors.join(',');
@@ -291,6 +320,7 @@ export const SearchProvider: FC<Props> = memo(function SearchProvider({
   const [items, setItems] = useState<
     SearchQuery['search']['itemConnection']['nodes']
   >([]);
+  const [facets, setFacets] = useState<SearchQuery['search']['facets']>([]);
   const [pageInfo, setPageInfo] = useState<
     SearchQuery['search']['itemConnection']['pageInfo'] | undefined
   >();
@@ -306,6 +336,7 @@ export const SearchProvider: FC<Props> = memo(function SearchProvider({
     onCompleted: (data) => {
       setSearchId(data.search.searchId);
       setItems(data.search.itemConnection.nodes);
+      setFacets(data.search.facets);
       setPageInfo(data.search.itemConnection.pageInfo);
 
       if (isAdmin) {
@@ -380,6 +411,7 @@ export const SearchProvider: FC<Props> = memo(function SearchProvider({
           searchState,
           searchId,
           items,
+          facets,
           pageInfo,
           dispatch,
           loading,

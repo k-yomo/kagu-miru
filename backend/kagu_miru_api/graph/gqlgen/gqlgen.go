@@ -44,6 +44,19 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Facet struct {
+		FacetType  func(childComplexity int) int
+		Title      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+		Values     func(childComplexity int) int
+	}
+
+	FacetValue struct {
+		Count func(childComplexity int) int
+		ID    func(childComplexity int) int
+		Name  func(childComplexity int) int
+	}
+
 	GetSimilarItemsResponse struct {
 		ItemConnection func(childComplexity int) int
 		SearchID       func(childComplexity int) int
@@ -103,6 +116,7 @@ type ComplexityRoot struct {
 	}
 
 	SearchResponse struct {
+		Facets         func(childComplexity int) int
 		ItemConnection func(childComplexity int) int
 		SearchID       func(childComplexity int) int
 	}
@@ -133,6 +147,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Facet.facetType":
+		if e.complexity.Facet.FacetType == nil {
+			break
+		}
+
+		return e.complexity.Facet.FacetType(childComplexity), true
+
+	case "Facet.title":
+		if e.complexity.Facet.Title == nil {
+			break
+		}
+
+		return e.complexity.Facet.Title(childComplexity), true
+
+	case "Facet.totalCount":
+		if e.complexity.Facet.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.Facet.TotalCount(childComplexity), true
+
+	case "Facet.values":
+		if e.complexity.Facet.Values == nil {
+			break
+		}
+
+		return e.complexity.Facet.Values(childComplexity), true
+
+	case "FacetValue.count":
+		if e.complexity.FacetValue.Count == nil {
+			break
+		}
+
+		return e.complexity.FacetValue.Count(childComplexity), true
+
+	case "FacetValue.id":
+		if e.complexity.FacetValue.ID == nil {
+			break
+		}
+
+		return e.complexity.FacetValue.ID(childComplexity), true
+
+	case "FacetValue.name":
+		if e.complexity.FacetValue.Name == nil {
+			break
+		}
+
+		return e.complexity.FacetValue.Name(childComplexity), true
 
 	case "GetSimilarItemsResponse.itemConnection":
 		if e.complexity.GetSimilarItemsResponse.ItemConnection == nil {
@@ -397,6 +460,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.QuerySuggestionsResponse.SuggestedQueries(childComplexity), true
 
+	case "SearchResponse.facets":
+		if e.complexity.SearchResponse.Facets == nil {
+			break
+		}
+
+		return e.complexity.SearchResponse.Facets(childComplexity), true
+
 	case "SearchResponse.itemConnection":
 		if e.complexity.SearchResponse.ItemConnection == nil {
 			break
@@ -539,9 +609,29 @@ type ItemConnection {
     nodes: [Item!]!
 }
 
+enum FacetType {
+    CATEGORY_IDS
+    BRAND_NAMES
+    COLORS
+}
+
+type FacetValue {
+    id: ID!
+    name: String!
+    count: Int!
+}
+
+type Facet {
+    title: String!
+    facetType: FacetType!
+    values: [FacetValue!]!
+    totalCount: Int!
+}
+
 type SearchResponse {
     searchId: String!
     itemConnection: ItemConnection!
+    facets: [Facet!]!
 }
 
 type GetSimilarItemsResponse {
@@ -600,6 +690,7 @@ enum ItemColor {
 input SearchFilter {
     categoryIds: [ID!]!
     platforms: [ItemSellingPlatform!]!
+    brandNames: [String!]!
     colors: [ItemColor!]!
     minPrice: Int
     maxPrice: Int
@@ -792,6 +883,251 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Facet_title(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Facet) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Facet",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Facet_facetType(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Facet) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Facet",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FacetType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gqlmodel.FacetType)
+	fc.Result = res
+	return ec.marshalNFacetType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Facet_values(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Facet) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Facet",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Values, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gqlmodel.FacetValue)
+	fc.Result = res
+	return ec.marshalNFacetValue2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetValueᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Facet_totalCount(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Facet) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Facet",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FacetValue_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.FacetValue) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FacetValue",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FacetValue_name(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.FacetValue) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FacetValue",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FacetValue_count(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.FacetValue) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FacetValue",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _GetSimilarItemsResponse_searchId(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.GetSimilarItemsResponse) (ret graphql.Marshaler) {
 	defer func() {
@@ -2153,6 +2489,41 @@ func (ec *executionContext) _SearchResponse_itemConnection(ctx context.Context, 
 	return ec.marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SearchResponse_facets(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.SearchResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SearchResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Facets, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gqlmodel.Facet)
+	fc.Result = res
+	return ec.marshalNFacet2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3495,6 +3866,14 @@ func (ec *executionContext) unmarshalInputSearchFilter(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "brandNames":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("brandNames"))
+			it.BrandNames, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "colors":
 			var err error
 
@@ -3634,6 +4013,85 @@ func (ec *executionContext) unmarshalInputSimilarItemsDisplayItemsActionParams(c
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var facetImplementors = []string{"Facet"}
+
+func (ec *executionContext) _Facet(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.Facet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, facetImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Facet")
+		case "title":
+			out.Values[i] = ec._Facet_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "facetType":
+			out.Values[i] = ec._Facet_facetType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "values":
+			out.Values[i] = ec._Facet_values(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._Facet_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var facetValueImplementors = []string{"FacetValue"}
+
+func (ec *executionContext) _FacetValue(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.FacetValue) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, facetValueImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FacetValue")
+		case "id":
+			out.Values[i] = ec._FacetValue_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._FacetValue_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "count":
+			out.Values[i] = ec._FacetValue_count(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
 
 var getSimilarItemsResponseImplementors = []string{"GetSimilarItemsResponse"}
 
@@ -4053,6 +4511,11 @@ func (ec *executionContext) _SearchResponse(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "facets":
+			out.Values[i] = ec._SearchResponse_facets(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4352,6 +4815,124 @@ func (ec *executionContext) unmarshalNEventID2githubᚗcomᚋkᚑyomoᚋkaguᚑm
 
 func (ec *executionContext) marshalNEventID2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐEventID(ctx context.Context, sel ast.SelectionSet, v gqlmodel.EventID) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) marshalNFacet2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.Facet) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFacet2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacet(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNFacet2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacet(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.Facet) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Facet(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFacetType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetType(ctx context.Context, v interface{}) (gqlmodel.FacetType, error) {
+	var res gqlmodel.FacetType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFacetType2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetType(ctx context.Context, sel ast.SelectionSet, v gqlmodel.FacetType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNFacetValue2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetValueᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.FacetValue) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFacetValue2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetValue(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNFacetValue2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐFacetValue(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.FacetValue) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._FacetValue(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {

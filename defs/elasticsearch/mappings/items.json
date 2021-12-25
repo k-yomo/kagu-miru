@@ -73,8 +73,7 @@
         "analyzer": "kuromoji_analyzer"
       },
       "brand_name": {
-        "type": "text",
-        "analyzer": "kuromoji_analyzer"
+        "type": "keyword"
       },
       "colors": {
         "type": "keyword"

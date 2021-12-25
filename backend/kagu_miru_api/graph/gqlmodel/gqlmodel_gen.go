@@ -16,6 +16,19 @@ type Event struct {
 	Params    map[string]interface{} `json:"params"`
 }
 
+type Facet struct {
+	Title      string        `json:"title"`
+	FacetType  FacetType     `json:"facetType"`
+	Values     []*FacetValue `json:"values"`
+	TotalCount int           `json:"totalCount"`
+}
+
+type FacetValue struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}
+
 type GetSimilarItemsInput struct {
 	ItemID   string `json:"itemId"`
 	Page     *int   `json:"page"`
@@ -88,6 +101,7 @@ type SearchDisplayItemsActionParams struct {
 type SearchFilter struct {
 	CategoryIds []string              `json:"categoryIds"`
 	Platforms   []ItemSellingPlatform `json:"platforms"`
+	BrandNames  []string              `json:"brandNames"`
 	Colors      []ItemColor           `json:"colors"`
 	MinPrice    *int                  `json:"minPrice"`
 	MaxPrice    *int                  `json:"maxPrice"`
@@ -105,6 +119,7 @@ type SearchInput struct {
 type SearchResponse struct {
 	SearchID       string          `json:"searchId"`
 	ItemConnection *ItemConnection `json:"itemConnection"`
+	Facets         []*Facet        `json:"facets"`
 }
 
 type SimilarItemsDisplayItemsActionParams struct {
@@ -194,6 +209,49 @@ func (e *EventID) UnmarshalGQL(v interface{}) error {
 }
 
 func (e EventID) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type FacetType string
+
+const (
+	FacetTypeCategoryIDS FacetType = "CATEGORY_IDS"
+	FacetTypeBrandNames  FacetType = "BRAND_NAMES"
+	FacetTypeColors      FacetType = "COLORS"
+)
+
+var AllFacetType = []FacetType{
+	FacetTypeCategoryIDS,
+	FacetTypeBrandNames,
+	FacetTypeColors,
+}
+
+func (e FacetType) IsValid() bool {
+	switch e {
+	case FacetTypeCategoryIDS, FacetTypeBrandNames, FacetTypeColors:
+		return true
+	}
+	return false
+}
+
+func (e FacetType) String() string {
+	return string(e)
+}
+
+func (e *FacetType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = FacetType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid FacetType", str)
+	}
+	return nil
+}
+
+func (e FacetType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

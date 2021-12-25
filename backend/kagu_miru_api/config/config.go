@@ -28,9 +28,10 @@ type Config struct {
 
 	VertexAICategoryClassificationEndpointID string `envconfig:"VERTEX_AI_CATEGORY_CLASSIFICATION_ENDPOINT_ID"`
 
-	ElasticSearchUsername          string `envconfig:"ELASTICSEARCH_USERNAME"`
-	ElasticSearchPassword          string `envconfig:"ELASTICSEARCH_PASSWORD"`
-	ElasticSearchURL               string `default:"http://localhost:9200" envconfig:"ELASTICSEARCH_URL"`
+	ElasticSearchUsername string `envconfig:"ELASTICSEARCH_USERNAME"`
+	ElasticSearchPassword string `envconfig:"ELASTICSEARCH_PASSWORD"`
+	ElasticSearchURL      string `default:"http://localhost:9200" envconfig:"ELASTICSEARCH_URL"`
+	// ItemsIndexName                 string `default:"items" envconfig:"ITEMS_INDEX_NAME"`
 	ItemsIndexName                 string `default:"items" envconfig:"ITEMS_INDEX_NAME"`
 	ItemsQuerySuggestionsIndexName string `default:"items.query_suggestions" envconfig:"ITEMS_QUERY_SUGGESTIONS_INDEX_NAME"`
 }

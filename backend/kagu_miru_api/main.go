@@ -88,7 +88,7 @@ func main() {
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
 	}
-	searchClient := search.NewElasticsearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient)
+	searchClient := search.NewSearchClient(cfg.ItemsIndexName, cfg.ItemsQuerySuggestionsIndexName, esClient, dbClient)
 
 	predictionClient, err := aiplatform.NewPredictionClient(
 		context.Background(),

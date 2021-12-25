@@ -62,9 +62,29 @@ type ItemConnection {
     nodes: [Item!]!
 }
 
+enum FacetType {
+    CATEGORY_IDS
+    BRAND_NAMES
+    COLORS
+}
+
+type FacetValue {
+    id: ID!
+    name: String!
+    count: Int!
+}
+
+type Facet {
+    title: String!
+    facetType: FacetType!
+    values: [FacetValue!]!
+    totalCount: Int!
+}
+
 type SearchResponse {
     searchId: String!
     itemConnection: ItemConnection!
+    facets: [Facet!]!
 }
 
 type GetSimilarItemsResponse {
@@ -123,6 +143,7 @@ enum ItemColor {
 input SearchFilter {
     categoryIds: [ID!]!
     platforms: [ItemSellingPlatform!]!
+    brandNames: [String!]!
     colors: [ItemColor!]!
     minPrice: Int
     maxPrice: Int

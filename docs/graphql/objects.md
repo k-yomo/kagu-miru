@@ -4,6 +4,64 @@
 
 [Objects](https://graphql.github.io/graphql-spec/June2018/#sec-Objects) in GraphQL represent the resources you can access. An object can contain a list of fields, which are specifically typed.
 
+### Facet
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>facetType</strong> (<a href="enums.md#facettype">FacetType!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>title</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>totalCount</strong> (<a href="scalars.md#int">Int!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>values</strong> (<a href="objects.md#facetvalue">[FacetValue!]!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### FacetValue
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>count</strong> (<a href="scalars.md#int">Int!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>id</strong> (<a href="scalars.md#id">ID!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>name</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### GetSimilarItemsResponse
 
   
@@ -216,6 +274,10 @@
   <tr>
     <th>Name</th>
     <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>facets</strong> (<a href="objects.md#facet">[Facet!]!</a>)</td> 
+    <td></td>
   </tr>
   <tr>
     <td><strong>itemConnection</strong> (<a href="objects.md#itemconnection">ItemConnection!</a>)</td> 

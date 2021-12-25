@@ -50,6 +50,31 @@
 
 ---
 
+### FacetType
+
+
+
+<table>
+  <tr>
+    <th>Value</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>BRAND_NAMES</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>CATEGORY_IDS</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>COLORS</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### ItemColor
 
 

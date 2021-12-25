@@ -22,3 +22,7 @@ func (s *SpannerDBClient) GetItem(ctx context.Context, itemID string) (*xspanner
 func (s *SpannerDBClient) GetAllItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error) {
 	return xspanner.GetAllItemCategories(ctx, s.spannerClient)
 }
+
+func (s *SpannerDBClient) GetAllItemCategoriesWithParent(ctx context.Context) ([]*xspanner.ItemCategoryWithParent, error) {
+	return xspanner.GetAllItemCategoriesWithParent(ctx, s.spannerClient)
+}

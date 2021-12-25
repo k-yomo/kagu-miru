@@ -23,6 +23,7 @@ import MobileSearchFilterModal from '@src/components/MobileSearchFilterModal';
 import PlatformFilter from '@src/components/PlatformFilter';
 import SearchPageScreenImg from '@public/images/search_screen.jpeg';
 import ItemList from '@src/components/ItemList';
+import Facets from '@src/components/Facets';
 
 export default function TopPage() {
   const router = useRouter();
@@ -137,7 +138,8 @@ export const TopPageInner = memo(function TopPageInner({
           <SearchBar />
           <SortTypeSelectBox />
         </div>
-        <div className="mb-4">
+        <div className="sticky top-0 z-10 py-1 space-y-2 bg-white dark:bg-black">
+          <Facets />
           <AppliedFilterIcons />
         </div>
         {loading ? <Loading /> : <></>}

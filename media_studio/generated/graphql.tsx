@@ -41,6 +41,25 @@ export enum EventId {
   SimilarItems = 'SIMILAR_ITEMS',
 }
 
+export type Facet = {
+  facetType: FacetType;
+  title: Scalars['String'];
+  totalCount: Scalars['Int'];
+  values: Array<FacetValue>;
+};
+
+export enum FacetType {
+  BrandNames = 'BRAND_NAMES',
+  CategoryIds = 'CATEGORY_IDS',
+  Colors = 'COLORS',
+}
+
+export type FacetValue = {
+  count: Scalars['Int'];
+  id: Scalars['ID'];
+  name: Scalars['String'];
+};
+
 export type GetSimilarItemsInput = {
   itemId: Scalars['ID'];
   page?: InputMaybe<Scalars['Int']>;
@@ -175,6 +194,7 @@ export type SearchDisplayItemsActionParams = {
 };
 
 export type SearchFilter = {
+  brandNames: Array<Scalars['String']>;
   categoryIds: Array<Scalars['ID']>;
   colors: Array<ItemColor>;
   maxPrice?: InputMaybe<Scalars['Int']>;
@@ -201,6 +221,7 @@ export type SearchInput = {
 };
 
 export type SearchResponse = {
+  facets: Array<Facet>;
   itemConnection: ItemConnection;
   searchId: Scalars['String'];
 };
