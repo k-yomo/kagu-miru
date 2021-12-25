@@ -120,7 +120,7 @@ export default function AppliedFilterIcons() {
     );
   }
 
-  if (filterIcons.length > 0) {
+  if (filterIcons.length === 0) {
     return null;
   }
 
