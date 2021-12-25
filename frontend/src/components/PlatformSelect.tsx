@@ -36,7 +36,7 @@ export default memo(function PlatformSelect({
               type="checkbox"
               name={platform}
               checked={platforms.includes(platform)}
-              className="h-5 w-5 rounded cursor-pointer text-rose-500 focus:ring-0 form-checkbox"
+              className="h-5 w-5 rounded cursor-pointer bg-gray-200 dark:bg-gray-800 border-none text-rose-500 focus:ring-0 form-checkbox"
               onChange={onChange}
             />
             <label
