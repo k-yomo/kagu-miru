@@ -111,7 +111,7 @@ export default function MobileSearchFilterModal() {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-4"
             >
-              <div className="fixed flex flex-col bottom-0 w-screen h-[90vh] overflow-hidden bg-white dark:bg-black rounded-xl transition-all transform">
+              <div className="fixed flex flex-col bottom-0 w-screen h-[80vh] overflow-hidden bg-white dark:bg-black rounded-xl transition-all transform">
                 <Dialog.Title
                   as="h3"
                   className="my-5 text-xl font-bold text-center"
