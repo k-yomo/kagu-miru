@@ -21,13 +21,14 @@ func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodel.Event)
 }
 
 func (r *queryResolver) Search(ctx context.Context, input gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error) {
-	if input.Query != "" && len(input.Filter.CategoryIds) == 0 {
-		categoryIDs, err := r.QueryClassifierClient.CategorizeQuery(ctx, input.Query)
-		if err != nil {
-			logging.Logger(ctx).Error("failed to predict query's category", zap.Error(err))
-		}
-		input.Filter.CategoryIds = categoryIDs
-	}
+	// Categorizing Query is slow (~ 1sec), so disabling for the time being
+	// if input.Query != "" && len(input.Filter.CategoryIds) == 0 {
+	// 	categoryIDs, err := r.QueryClassifierClient.CategorizeQuery(ctx, input.Query)
+	// 	if err != nil {
+	// 		logging.Logger(ctx).Error("failed to predict query's category", zap.Error(err))
+	// 	}
+	// 	input.Filter.CategoryIds = categoryIDs
+	// }
 
 	resp, err := r.SearchClient.SearchItems(ctx, &input)
 	if err != nil {
