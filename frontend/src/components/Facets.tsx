@@ -21,10 +21,7 @@ export default function Facets() {
     }
   };
 
-  const onClickFacet = (
-    facetType: FacetType,
-    selectedId: string
-  ) => {
+  const onClickFacet = (facetType: FacetType, selectedId: string) => {
     switch (facetType) {
       case FacetType.CategoryIds:
         let categoryIds = searchState.searchInput.filter.categoryIds;
@@ -76,10 +73,7 @@ export default function Facets() {
               className="inline-flex items-center justify-center w-full rounded-full border border-gray-300 px-2 py-1 bg-white dark:bg-black text-xs"
             >
               {facet.title}
-              <ChevronDownIcon
-                className="ml-2 h-5 w-5"
-                aria-hidden="true"
-              />
+              <ChevronDownIcon className="ml-2 h-5 w-5" aria-hidden="true" />
             </button>
           </div>
           <FacetDropdown
