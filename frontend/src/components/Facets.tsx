@@ -112,10 +112,7 @@ function FacetDropdown({
 
   return (
     <>
-      <Transition.Root
-        show={isOpen}
-        as={Fragment}
-      >
+      <Transition.Root show={isOpen} as={Fragment}>
         <Dialog
           initialFocus={cancelButtonRef}
           as="div"
@@ -149,6 +146,9 @@ function FacetDropdown({
               leaveTo="opacity-0 translate-y-4"
             >
               <div className="fixed flex flex-col bottom-0 w-screen h-[70vh] overflow-y-auto bg-white dark:bg-black rounded-t-xl transition-all transform">
+                <Dialog.Title as="h3" className="mt-4 ml-4 text-xl font-bold">
+                  {facet.title}
+                </Dialog.Title>
                 <div className="py-1 divide-y-2">
                   {facet.values.map((facetValue) => (
                     <div
@@ -166,9 +166,7 @@ function FacetDropdown({
                         readOnly
                         className="h-4 w-4 rounded cursor-pointer"
                       />
-                      <div
-                        className="ml-2 cursor-pointer text-sm"
-                      >
+                      <div className="ml-2 cursor-pointer text-sm">
                         <div>{facetValue.name}</div>
                         <div className="text-xs text-text-secondary dark:text-text-secondary-dark">
                           {facetValue.count.toLocaleString()}件
