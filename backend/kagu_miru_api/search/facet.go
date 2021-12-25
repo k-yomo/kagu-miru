@@ -108,7 +108,10 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 		for _, itemCategory := range itemCategories {
 			idNameMap[itemCategory.ID] = strings.Join(itemCategory.CategoryNames(), " > ")
 		}
-		facets = append(facets, newFacetFromBucketKeyItems(result, FacetTypeCategoryIDs, idNameMap))
+		facet := newFacetFromBucketKeyItems(result, FacetTypeCategoryIDs, idNameMap)
+		if facet.TotalCount > 0 {
+			facets = append(facets, facet)
+		}
 	}
 
 	if result, ok := agg.Terms(es.ItemFieldBrandName); ok {
@@ -124,7 +127,10 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 			}
 			idNameMap[keyStr] = keyStr
 		}
-		facets = append(facets, newFacetFromBucketKeyItems(result, FacetTypeBrandNames, idNameMap))
+		facet := newFacetFromBucketKeyItems(result, FacetTypeBrandNames, idNameMap)
+		if facet.TotalCount > 0 {
+			facets = append(facets, facet)
+		}
 	}
 
 	if result, ok := agg.Terms(es.ItemFieldColors); ok {
@@ -140,7 +146,10 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 			}
 			idNameMap[keyStr] = keyStr
 		}
-		facets = append(facets, newFacetFromBucketKeyItems(result, FacetTypeColors, idNameMap))
+		facet := newFacetFromBucketKeyItems(result, FacetTypeColors, idNameMap)
+		if facet.TotalCount > 0 {
+			facets = append(facets, facet)
+		}
 	}
 
 	return facets
