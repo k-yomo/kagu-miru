@@ -99,11 +99,6 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 	if err != nil {
 		return nil, fmt.Errorf("buildSearchQuery: %w", err)
 	}
-	fmt.Println("********************")
-	source, _ := searchQuery.Source()
-	j, _ := json.Marshal(source)
-	fmt.Println(string(j))
-	fmt.Println("********************")
 	pageSize := defaultPageSize
 	if input.PageSize != nil {
 		pageSize = int(math.Min(float64(*input.PageSize), float64(maxPageSize)))
