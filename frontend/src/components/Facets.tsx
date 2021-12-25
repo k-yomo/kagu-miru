@@ -164,7 +164,7 @@ function FacetDropdown({
                         name={facetValue.name}
                         checked={selectedIdMap[facetValue.id] || false}
                         readOnly
-                        className="h-4 w-4 rounded cursor-pointer"
+                        className="h-5 w-5 rounded cursor-pointer text-rose-500 focus:ring-0 form-checkbox"
                       />
                       <div className="ml-2 cursor-pointer text-sm">
                         <div>{facetValue.name}</div>
