@@ -91,8 +91,8 @@ export default function AppliedFilterIcons() {
       name = `${filter.minPrice.toLocaleString()}円 ~ ${filter.maxPrice.toLocaleString()}円`;
     } else if (filter.minPrice) {
       name = `${filter.minPrice.toLocaleString()}円 ~`;
-    } else if (filter.maxPrice) {
-      name = `~ ${filter.maxPrice.toLocaleString()}円`;
+    } else {
+      name = `~ ${filter.maxPrice?.toLocaleString()}円`;
     }
     filterIcons.push(
       <FilterIcon
