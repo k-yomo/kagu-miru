@@ -12,12 +12,12 @@ export default function Footer() {
           </div>
 
           <div className="my-3 block text-gray-300 hover:text-gray-100 text-sm duration-700">
-            <a href="https://developers.rakuten.com/" target="_blank">
+            <a href="https://developers.rakuten.com/" target="_blank" rel="noreferrer">
               Supported by Rakuten Developers
             </a>
           </div>
           <div className="my-3 block text-gray-300 hover:text-gray-100 text-sm duration-700">
-            <a href="https://developer.yahoo.co.jp/sitemap/" target="_blank">
+            <a href="https://developer.yahoo.co.jp/sitemap/" target="_blank" rel="noreferrer">
               Web Services by Yahoo! JAPAN
             </a>
           </div>
