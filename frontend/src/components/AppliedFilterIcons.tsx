@@ -126,7 +126,8 @@ export default function AppliedFilterIcons() {
 
   return (
     <div className="flex items-center space-x-2">
-      <div className="w-[80vw] space-x-2 overflow-auto whitespace-nowrap">
+      {/* TODO: Use flex-1 instead of using fixed width */}
+      <div className="w-[80vw] sm:w-[90%] space-x-2 overflow-auto whitespace-nowrap">
         {filterIcons}
       </div>
       {filterIcons.length >= 1 && (
