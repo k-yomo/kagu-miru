@@ -64,9 +64,22 @@ func mapItemFetcherItemToElasticsearchItem(item *xitem.Item) *es.Item {
 		CategoryNames: item.CategoryNames,
 		BrandName:     item.BrandName,
 		Colors:        item.Colors,
+		WidthRange:    mapIntRangeToESIntRange(item.WidthRange),
+		DepthRange:    mapIntRangeToESIntRange(item.DepthRange),
+		HeightRange:   mapIntRangeToESIntRange(item.HeightRange),
 		TagIDs:        item.TagIDs,
 		JANCode:       item.JANCode,
 		Platform:      item.Platform,
 		IndexedAt:     time.Now().UnixMilli(),
+	}
+}
+
+func mapIntRangeToESIntRange(r *xitem.IntRange) *es.IntRange {
+	if r == nil {
+		return nil
+	}
+	return &es.IntRange{
+		Gte: r.Gte,
+		Lte: r.Lte,
 	}
 }

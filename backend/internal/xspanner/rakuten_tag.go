@@ -14,8 +14,11 @@ const (
 	RakutenTagGroupsTableName = "rakuten_tag_groups"
 	RakutenTagsTableName      = "rakuten_tags"
 
-	BrandTagGroupID = 1000161
-	ColorTagGroupID = 1000111
+	TagGroupIDBrand  = 1000161
+	TagGroupIDColor  = 1000111
+	TagGroupIDWidth  = 1000057
+	TagGroupIDDepth  = 1000058
+	TagGroupIDHeight = 1000059
 )
 
 // RakutenTagGroup represents Tag group in Rakuten

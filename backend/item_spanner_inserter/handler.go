@@ -67,8 +67,18 @@ func mapItemToSpannerItem(item *xitem.Item) *xspanner.Item {
 		CategoryID:    item.CategoryID,
 		BrandName:     spanner.NullString{StringVal: item.BrandName, Valid: item.BrandName != ""},
 		Colors:        item.Colors,
+		WidthRange:    mapIntRangeToSpannerRange(item.WidthRange),
+		DepthRange:    mapIntRangeToSpannerRange(item.DepthRange),
+		HeightRange:   mapIntRangeToSpannerRange(item.HeightRange),
 		JANCode:       spanner.NullString{StringVal: item.JANCode, Valid: item.JANCode != ""},
 		Platform:      item.Platform,
 		UpdatedAt:     time.Now(),
 	}
+}
+
+func mapIntRangeToSpannerRange(r *xitem.IntRange) []int {
+	if r == nil {
+		return nil
+	}
+	return []int{r.Gte, r.Lte}
 }

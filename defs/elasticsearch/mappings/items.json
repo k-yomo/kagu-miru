@@ -78,6 +78,15 @@
       "colors": {
         "type": "keyword"
       },
+      "width_range": {
+        "type": "integer_range"
+      },
+      "depth_range": {
+        "type": "integer_range"
+      },
+      "height_range": {
+        "type": "integer_range"
+      },
       "tag_ids": {
         "type": "long"
       },

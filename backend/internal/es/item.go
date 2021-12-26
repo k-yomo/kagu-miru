@@ -18,6 +18,9 @@ type Item struct {
 	CategoryNames []string       `json:"category_names"`
 	BrandName     string         `json:"brand_name,omitempty"`
 	Colors        []string       `json:"colors"`
+	WidthRange    *IntRange      `json:"width_range,omitempty"`
+	DepthRange    *IntRange      `json:"depth_range,omitempty"`
+	HeightRange   *IntRange      `json:"height_range,omitempty"`
 	TagIDs        []int          `json:"tag_ids"`
 	JANCode       string         `json:"jan_code,omitempty"`
 	Platform      xitem.Platform `json:"platform"`

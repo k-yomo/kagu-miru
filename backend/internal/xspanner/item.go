@@ -26,6 +26,9 @@ type Item struct {
 	CategoryID    string             `spanner:"category_id"`
 	BrandName     spanner.NullString `spanner:"brand_name"`
 	Colors        []string           `spanner:"colors"`
+	WidthRange    []int              `spanner:"width_range"`  // [gte, lte]
+	DepthRange    []int              `spanner:"depth_range"`  // [gte, lte]
+	HeightRange   []int              `spanner:"height_range"` // [gte, lte]
 	// TagIDs        []int    `spanner:"tag_ids"`
 	JANCode   spanner.NullString `spanner:"jan_code"`
 	Platform  xitem.Platform     `spanner:"platform"`

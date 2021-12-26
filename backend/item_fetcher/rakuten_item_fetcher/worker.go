@@ -344,6 +344,9 @@ func mapRakutenItemToIndexItem(
 		CategoryNames: itemCategory.CategoryNames(),
 		BrandName:     metadata.brandName,
 		Colors:        metadata.colors,
+		WidthRange:    mapIntRangeToItemIntRange(metadata.widthRange),
+		DepthRange:    mapIntRangeToItemIntRange(metadata.depthRange),
+		HeightRange:   mapIntRangeToItemIntRange(metadata.heightRange),
 		TagIDs:        rakutenItem.TagIDs,
 		JANCode:       janCode,
 		Platform:      xitem.PlatformRakuten,
@@ -351,8 +354,23 @@ func mapRakutenItemToIndexItem(
 }
 
 type itemMetadata struct {
-	brandName string
-	colors    []string
+	brandName   string
+	colors      []string
+	widthRange  *intRange
+	depthRange  *intRange
+	heightRange *intRange
+}
+
+type intRange struct {
+	Gte int
+	Lte *int
+}
+
+func mapIntRangeToItemIntRange(r *intRange) *xitem.IntRange {
+	if r == nil {
+		return nil
+	}
+	return xitem.NewIntRange(r.Gte, r.Lte)
 }
 
 func extractMetadataFromTags(tagIDs []int, tagMap map[int]*xspanner.RakutenTag) *itemMetadata {
@@ -363,13 +381,50 @@ func extractMetadataFromTags(tagIDs []int, tagMap map[int]*xspanner.RakutenTag) 
 			continue
 		}
 
-		if tag.TagGroupID == xspanner.BrandTagGroupID {
+		switch tag.TagGroupID {
+		case xspanner.TagGroupIDBrand:
 			metadata.brandName = tag.Name
-		}
-		if tag.TagGroupID == xspanner.ColorTagGroupID {
+		case xspanner.TagGroupIDColor:
 			metadata.colors = append(metadata.colors, tag.Name)
+		case xspanner.TagGroupIDWidth:
+			const width0To19ID = 1000483
+			metadata.widthRange = getDimensionRangeByTagID(tag.ID, width0To19ID)
+		case xspanner.TagGroupIDDepth:
+			const depth0To19ID = 1000503
+			metadata.widthRange = getDimensionRangeByTagID(tag.ID, depth0To19ID)
+		case xspanner.TagGroupIDHeight:
+			const height0To19ID = 1000523
+			metadata.widthRange = getDimensionRangeByTagID(tag.ID, height0To19ID)
 		}
 	}
 
 	return &metadata
+}
+
+// getDimensionRangeByTagID gets int range from dimension tag id (width, depth or height)
+// dimension tag id must be in within 20 consecutive id starting from 1: ~19cm up to 20: 200cm ~
+func getDimensionRangeByTagID(tagID int64, tag0To19ID int64) *intRange {
+	const dimensionGteLimit = 200
+	curTagID := tag0To19ID
+	gte, lte := 0, 19
+	for {
+		// not found
+		if gte > dimensionGteLimit {
+			return nil
+		}
+		if tagID == curTagID {
+			if gte == dimensionGteLimit {
+				return &intRange{Gte: gte, Lte: nil}
+			}
+			return &intRange{Gte: gte, Lte: &lte}
+		}
+		// since the number is increase as 0 ~ 19, 20 ~ 29, 30 ~ 39
+		if curTagID == tag0To19ID {
+			gte += 20
+		} else {
+			gte += 10
+		}
+		curTagID++
+		lte += 10
+	}
 }

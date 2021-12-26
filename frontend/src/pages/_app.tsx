@@ -18,13 +18,13 @@ function MyApp({ Component, pageProps }: AppProps) {
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="z-0 flex-grow relative bg-white dark:bg-black">
+            <NextNProgress
+              color="#06b6d4"
+              height={3}
+              showOnShallow={false}
+              options={{ parent: 'main', showSpinner: false }}
+            />
             <ToastProvider>
-              <NextNProgress
-                color="#06b6d4"
-                height={3}
-                showOnShallow={false}
-                options={{ parent: 'main', showSpinner: false }}
-              />
               <Component {...pageProps} />
             </ToastProvider>
           </main>
