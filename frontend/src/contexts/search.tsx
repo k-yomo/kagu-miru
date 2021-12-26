@@ -203,6 +203,7 @@ export const defaultSearchFilter: SearchFilter = {
   brandNames: [],
   platforms: [],
   colors: [],
+  metadata: [],
 };
 
 const SearchContext = createContext<{
@@ -266,6 +267,7 @@ export function queryParamsToSearchParams(
               return [];
             }
           }),
+        metadata: [], // TODO: implement
         minPrice: parseInt(queryParams.minPrice as string) || undefined,
         maxPrice: parseInt(queryParams.maxPrice as string) || undefined,
         minRating: parseInt(queryParams.minRating as string) || undefined,

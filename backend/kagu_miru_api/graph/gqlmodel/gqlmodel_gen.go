@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+type AppliedMetadata struct {
+	Name   string   `json:"name"`
+	Values []string `json:"values"`
+}
+
 type Event struct {
 	ID        EventID                `json:"id"`
 	Action    Action                 `json:"action"`
@@ -106,6 +111,7 @@ type SearchFilter struct {
 	MinPrice    *int                  `json:"minPrice"`
 	MaxPrice    *int                  `json:"maxPrice"`
 	MinRating   *int                  `json:"minRating"`
+	Metadata    []*AppliedMetadata    `json:"metadata"`
 }
 
 type SearchInput struct {
@@ -218,17 +224,19 @@ const (
 	FacetTypeCategoryIDS FacetType = "CATEGORY_IDS"
 	FacetTypeBrandNames  FacetType = "BRAND_NAMES"
 	FacetTypeColors      FacetType = "COLORS"
+	FacetTypeMetadata    FacetType = "METADATA"
 )
 
 var AllFacetType = []FacetType{
 	FacetTypeCategoryIDS,
 	FacetTypeBrandNames,
 	FacetTypeColors,
+	FacetTypeMetadata,
 }
 
 func (e FacetType) IsValid() bool {
 	switch e {
-	case FacetTypeCategoryIDS, FacetTypeBrandNames, FacetTypeColors:
+	case FacetTypeCategoryIDS, FacetTypeBrandNames, FacetTypeColors, FacetTypeMetadata:
 		return true
 	}
 	return false

@@ -66,6 +66,7 @@ enum FacetType {
     CATEGORY_IDS
     BRAND_NAMES
     COLORS
+    METADATA
 }
 
 type FacetValue {
@@ -140,6 +141,11 @@ enum ItemColor {
     TRANSPARENT
 }
 
+input AppliedMetadata {
+    name: String!
+    values: [String!]!
+}
+
 input SearchFilter {
     categoryIds: [ID!]!
     platforms: [ItemSellingPlatform!]!
@@ -148,6 +154,7 @@ input SearchFilter {
     minPrice: Int
     maxPrice: Int
     minRating: Int
+    metadata: [AppliedMetadata!]!
 }
 
 enum EventID {

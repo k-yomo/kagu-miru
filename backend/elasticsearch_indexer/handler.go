@@ -64,22 +64,33 @@ func mapItemFetcherItemToElasticsearchItem(item *xitem.Item) *es.Item {
 		CategoryNames: item.CategoryNames,
 		BrandName:     item.BrandName,
 		Colors:        item.Colors,
-		WidthRange:    mapIntRangeToESIntRange(item.WidthRange),
-		DepthRange:    mapIntRangeToESIntRange(item.DepthRange),
-		HeightRange:   mapIntRangeToESIntRange(item.HeightRange),
-		TagIDs:        item.TagIDs,
+		Metadata:      extractMetadata(item),
 		JANCode:       item.JANCode,
 		Platform:      item.Platform,
 		IndexedAt:     time.Now().UnixMilli(),
 	}
 }
 
-func mapIntRangeToESIntRange(r *xitem.IntRange) *es.IntRange {
-	if r == nil {
-		return nil
+func extractMetadata(item *xitem.Item) []es.Metadata {
+	var facets []es.Metadata
+	if item.WidthRange != nil {
+		facets = append(facets, es.Metadata{
+			Name:  es.MetadataNameWidthRange,
+			Value: es.NewMetadataValueLengthRange(item.WidthRange.Gte, item.WidthRange.Lte),
+		})
 	}
-	return &es.IntRange{
-		Gte: r.Gte,
-		Lte: r.Lte,
+	if item.DepthRange != nil {
+		facets = append(facets, es.Metadata{
+			Name:  es.MetadataNameDepthRange,
+			Value: es.NewMetadataValueLengthRange(item.DepthRange.Gte, item.DepthRange.Lte),
+		})
 	}
+	if item.HeightRange != nil {
+		facets = append(facets, es.Metadata{
+			Name:  es.MetadataNameHeightRange,
+			Value: es.NewMetadataValueLengthRange(item.HeightRange.Gte, item.HeightRange.Lte),
+		})
+	}
+
+	return facets
 }

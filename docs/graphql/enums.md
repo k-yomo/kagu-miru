@@ -71,6 +71,10 @@
     <td><strong>COLORS</strong></td>
     <td></td>
   </tr>
+  <tr>
+    <td><strong>METADATA</strong></td>
+    <td></td>
+  </tr>
 </table>
 
 ---

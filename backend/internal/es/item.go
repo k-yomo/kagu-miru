@@ -18,10 +18,7 @@ type Item struct {
 	CategoryNames []string       `json:"category_names"`
 	BrandName     string         `json:"brand_name,omitempty"`
 	Colors        []string       `json:"colors"`
-	WidthRange    *IntRange      `json:"width_range,omitempty"`
-	DepthRange    *IntRange      `json:"depth_range,omitempty"`
-	HeightRange   *IntRange      `json:"height_range,omitempty"`
-	TagIDs        []int          `json:"tag_ids"`
+	Metadata      []Metadata     `json:"metadata"`
 	JANCode       string         `json:"jan_code,omitempty"`
 	Platform      xitem.Platform `json:"platform"`
 	IndexedAt     int64          `json:"indexed_at"` // unix millis
@@ -47,7 +44,7 @@ const (
 	ItemFieldCategoryNames = "category_names"
 	ItemFieldBrandName     = "brand_name"
 	ItemFieldColors        = "colors"
-	ItemFieldTagIDs        = "tag_ids"
+	ItemFieldMetadata      = "metadata"
 	ItemFieldJANCode       = "jan_code"
 	ItemFieldPlatform      = "platform"
 	ItemFieldIndexedAt     = "indexed_at"
@@ -69,7 +66,7 @@ var AllItemFields = []string{
 	ItemFieldCategoryNames,
 	ItemFieldBrandName,
 	ItemFieldColors,
-	ItemFieldTagIDs,
+	ItemFieldMetadata,
 	ItemFieldJANCode,
 	ItemFieldPlatform,
 	ItemFieldIndexedAt,

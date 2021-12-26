@@ -95,13 +95,9 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 		}
 	}()
 
-	searchQuery, postFilterMap, err := buildSearchQuery(input)
+	searchQuery, err := buildSearchQuery(input)
 	if err != nil {
 		return nil, fmt.Errorf("buildSearchQuery: %w", err)
-	}
-	postFilterBoolQuery := elastic.NewBoolQuery().Must()
-	for _, filter := range postFilterMap {
-		postFilterBoolQuery.Filter(filter)
 	}
 	pageSize := defaultPageSize
 	if input.PageSize != nil {
@@ -111,9 +107,8 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 	search := s.esClient.Search().
 		Index(s.itemsIndexName).
 		Query(searchQuery)
-	search = addAggregationsForFacets(search, postFilterMap)
+	search, postFilterMap := addAggregationsAndPostFiltersForFacets(search, input.Filter)
 	resp, err := search.
-		PostFilter(postFilterBoolQuery).
 		SortBy(getSorters(input.SortType)...).
 		From(calcElasticSearchPage(input.Page) * pageSize).
 		Size(pageSize).
@@ -132,7 +127,7 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 	}, nil
 }
 
-func buildSearchQuery(input *gqlmodel.SearchInput) (query elastic.Query, postFilterMap map[string]elastic.Query, err error) {
+func buildSearchQuery(input *gqlmodel.SearchInput) (query elastic.Query, err error) {
 	var mustQueries []elastic.Query
 	if input.Query != "" {
 		mustQueries = append(mustQueries, elastic.NewMultiMatchQuery(
@@ -154,7 +149,7 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (query elastic.Query, postFil
 		for _, filterPlatform := range input.Filter.Platforms {
 			platform, err := mapGraphqlPlatformToPlatform(filterPlatform)
 			if err != nil {
-				return nil, nil, fmt.Errorf("platform comversion faild: %w", err)
+				return nil, fmt.Errorf("platform comversion faild: %w", err)
 			}
 			platforms = append(platforms, platform)
 		}
@@ -182,34 +177,17 @@ func buildSearchQuery(input *gqlmodel.SearchInput) (query elastic.Query, postFil
 		AddScoreFunc(elastic.NewFieldValueFactorFunction().Field(es.ItemFieldReviewCount)).
 		MaxBoost(3)
 
-	// filters for facetable fields
-	postFilterQueryMap := make(map[string]elastic.Query)
-	if len(input.Filter.CategoryIds) > 0 {
-		var categoryIDs []interface{}
-		for _, id := range input.Filter.CategoryIds {
-			categoryIDs = append(categoryIDs, id)
-		}
-		// Since we aggregate for category_id
-		postFilterQueryMap[es.ItemFieldCategoryID] = elastic.NewTermsQuery(es.ItemFieldCategoryIDs, categoryIDs...)
-	}
-	if len(input.Filter.BrandNames) > 0 {
-		var brandNames []interface{}
-		for _, brandName := range input.Filter.BrandNames {
-			brandNames = append(brandNames, brandName)
-		}
-		postFilterQueryMap[es.ItemFieldBrandName] = elastic.NewTermsQuery(es.ItemFieldBrandName, brandNames...)
-	}
-	if len(input.Filter.Colors) > 0 {
-		var colors []interface{}
-		for _, gqlColor := range input.Filter.Colors {
-			if color := mapGraphqlItemColorToSearchItemColor(gqlColor); color != "" {
-				colors = append(colors, color)
-			}
-		}
-		postFilterQueryMap[es.ItemFieldColors] = elastic.NewTermsQuery(es.ItemFieldColors, colors...)
-	}
+	return searchQuery, nil
+}
 
-	return searchQuery, postFilterQueryMap, nil
+func extractFiltersExceptForField(field string, filterMap map[string]elastic.Query) []elastic.Query {
+	var filters []elastic.Query
+	for filteredField, filter := range filterMap {
+		if filteredField != field {
+			filters = append(filters, filter)
+		}
+	}
+	return filters
 }
 
 func getSorters(sortType gqlmodel.SearchSortType) []elastic.Sorter {

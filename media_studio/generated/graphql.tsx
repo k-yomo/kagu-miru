@@ -28,6 +28,11 @@ export enum Action {
   Display = 'DISPLAY',
 }
 
+export type AppliedMetadata = {
+  name: Scalars['String'];
+  values: Array<Scalars['String']>;
+};
+
 export type Event = {
   action: Action;
   createdAt: Scalars['Time'];
@@ -52,6 +57,7 @@ export enum FacetType {
   BrandNames = 'BRAND_NAMES',
   CategoryIds = 'CATEGORY_IDS',
   Colors = 'COLORS',
+  Metadata = 'METADATA',
 }
 
 export type FacetValue = {
@@ -198,6 +204,7 @@ export type SearchFilter = {
   categoryIds: Array<Scalars['ID']>;
   colors: Array<ItemColor>;
   maxPrice?: InputMaybe<Scalars['Int']>;
+  metadata: Array<AppliedMetadata>;
   minPrice?: InputMaybe<Scalars['Int']>;
   minRating?: InputMaybe<Scalars['Int']>;
   platforms: Array<ItemSellingPlatform>;

@@ -613,6 +613,7 @@ enum FacetType {
     CATEGORY_IDS
     BRAND_NAMES
     COLORS
+    METADATA
 }
 
 type FacetValue {
@@ -687,6 +688,11 @@ enum ItemColor {
     TRANSPARENT
 }
 
+input AppliedMetadata {
+    name: String!
+    values: [String!]!
+}
+
 input SearchFilter {
     categoryIds: [ID!]!
     platforms: [ItemSellingPlatform!]!
@@ -695,6 +701,7 @@ input SearchFilter {
     minPrice: Int
     maxPrice: Int
     minRating: Int
+    metadata: [AppliedMetadata!]!
 }
 
 enum EventID {
@@ -3646,6 +3653,37 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAppliedMetadata(ctx context.Context, obj interface{}) (gqlmodel.AppliedMetadata, error) {
+	var it gqlmodel.AppliedMetadata
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "values":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("values"))
+			it.Values, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEvent(ctx context.Context, obj interface{}) (gqlmodel.Event, error) {
 	var it gqlmodel.Event
 	asMap := map[string]interface{}{}
@@ -3903,6 +3941,14 @@ func (ec *executionContext) unmarshalInputSearchFilter(ctx context.Context, obj 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("minRating"))
 			it.MinRating, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "metadata":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metadata"))
+			it.Metadata, err = ec.unmarshalNAppliedMetadata2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐAppliedMetadataᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4785,6 +4831,32 @@ func (ec *executionContext) unmarshalNAction2githubᚗcomᚋkᚑyomoᚋkaguᚑmi
 
 func (ec *executionContext) marshalNAction2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐAction(ctx context.Context, sel ast.SelectionSet, v gqlmodel.Action) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNAppliedMetadata2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐAppliedMetadataᚄ(ctx context.Context, v interface{}) ([]*gqlmodel.AppliedMetadata, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*gqlmodel.AppliedMetadata, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAppliedMetadata2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐAppliedMetadata(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAppliedMetadata2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐAppliedMetadata(ctx context.Context, v interface{}) (*gqlmodel.AppliedMetadata, error) {
+	res, err := ec.unmarshalInputAppliedMetadata(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

@@ -4,6 +4,9 @@ import (
 	"context"
 	"strings"
 
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
+	"github.com/k-yomo/kagu-miru/backend/pkg/interfaceconv"
+
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
 	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	"github.com/olivere/elastic/v7"
@@ -64,15 +67,82 @@ func newFacetFromBucketKeyItems(
 	}
 }
 
-func addAggregationsForFacets(search *elastic.SearchService, postFilterMap map[string]elastic.Query) *elastic.SearchService {
-	return search.
-		Aggregation(es.ItemFieldCategoryID, newFilterAggregationForFacet(es.ItemFieldCategoryID, postFilterMap)).
-		Aggregation(es.ItemFieldBrandName, newFilterAggregationForFacet(es.ItemFieldBrandName, postFilterMap)).
-		Aggregation(es.ItemFieldColors, newFilterAggregationForFacet(es.ItemFieldColors, postFilterMap))
+func addAggregationsAndPostFiltersForFacets(search *elastic.SearchService, searchFilter *gqlmodel.SearchFilter) (*elastic.SearchService, map[string]elastic.Query) {
+	// filters for facetable fields
+	postFilterMap := make(map[string]elastic.Query)
+	if len(searchFilter.CategoryIds) > 0 {
+		var categoryIDs []interface{}
+		for _, id := range searchFilter.CategoryIds {
+			categoryIDs = append(categoryIDs, id)
+		}
+		// Since we aggregate for category_id
+		postFilterMap[es.ItemFieldCategoryID] = elastic.NewTermsQuery(es.ItemFieldCategoryIDs, categoryIDs...)
+	}
+	if len(searchFilter.BrandNames) > 0 {
+		var brandNames []interface{}
+		for _, brandName := range searchFilter.BrandNames {
+			brandNames = append(brandNames, brandName)
+		}
+		postFilterMap[es.ItemFieldBrandName] = elastic.NewTermsQuery(es.ItemFieldBrandName, brandNames...)
+	}
+	if len(searchFilter.Colors) > 0 {
+		var colors []interface{}
+		for _, gqlColor := range searchFilter.Colors {
+			if color := mapGraphqlItemColorToSearchItemColor(gqlColor); color != "" {
+				colors = append(colors, color)
+			}
+		}
+		postFilterMap[es.ItemFieldColors] = elastic.NewTermsQuery(es.ItemFieldColors, colors...)
+	}
+
+	var metadataFilters []elastic.Query
+	metadataFilterMap := make(map[string]elastic.Query)
+	if len(searchFilter.Metadata) > 0 {
+		for _, metadata := range searchFilter.Metadata {
+			boolQuery := elastic.NewBoolQuery().Filter(
+				elastic.NewTermQuery(es.MetadataNameFullPath, metadata.Name),
+				elastic.NewTermsQuery(es.MetadataValueFullPath, interfaceconv.StringArrayToInterfaceArray(metadata.Values)),
+			)
+			filter := elastic.NewNestedQuery(es.ItemFieldMetadata, boolQuery)
+			metadataFilterMap[metadata.Name] = filter
+			metadataFilters = append(metadataFilters, filter)
+		}
+	}
+
+	search.
+		Aggregation(
+			es.ItemFieldCategoryID,
+			newFilterAggregationForFacet(
+				es.ItemFieldCategoryID,
+				append(extractFiltersExceptForField(es.ItemFieldCategoryID, postFilterMap), metadataFilters...),
+			),
+		).
+		Aggregation(
+			es.ItemFieldBrandName,
+			newFilterAggregationForFacet(
+				es.ItemFieldBrandName,
+				append(extractFiltersExceptForField(es.ItemFieldBrandName, postFilterMap), metadataFilters...),
+			),
+		).
+		Aggregation(
+			es.ItemFieldColors,
+			newFilterAggregationForFacet(
+				es.ItemFieldColors,
+				append(extractFiltersExceptForField(es.ItemFieldColors, postFilterMap), metadataFilters...),
+			),
+		)
+
+	// for _, metadata := range searchFilter.Metadata {
+	// 	metadataFilters := extractFiltersExceptForField(metadata.Name, metadataFilterMap)
+	// 	search.Aggregation(metadata.Name)
+	// }
+	//
+	return search, postFilterMap
 }
 
-func newFilterAggregationForFacet(field string, postFilterMap map[string]elastic.Query) elastic.Aggregation {
-	filters := extractFiltersExceptForField(field, postFilterMap)
+// newFilterAggregationForFacet initializes the aggregation with filters applied to the other fields
+//  to get the correct facet count for the given field
+func newFilterAggregationForFacet(field string, filters []elastic.Query) elastic.Aggregation {
 	// We can't use filters aggregation when 0 filters
 	if len(filters) == 0 {
 		return elastic.NewTermsAggregation().Field(field).Size(30)
@@ -82,15 +152,15 @@ func newFilterAggregationForFacet(field string, postFilterMap map[string]elastic
 		SubAggregation(field, elastic.NewTermsAggregation().Field(field).Size(30))
 }
 
-func extractFiltersExceptForField(field string, filterMap map[string]elastic.Query) []elastic.Query {
-	var filters []elastic.Query
-	for filteredField, filter := range filterMap {
-		if filteredField != field {
-			filters = append(filters, filter)
-		}
-	}
-	return filters
-}
+// func newFilterMetadataAggregationForFacet(field string, filters []elastic.Query) elastic.Aggregation {
+// 	// We can't use filters aggregation when 0 filters
+// 	if len(filters) == 0 {
+// 		return elastic.NewNestedAggregation().Path(es.MetadataNameFullPath).SubAggregation(field)
+// 	}
+// 	return elastic.NewFiltersAggregation().
+// 		Filters(filters...).
+// 		SubAggregation(field, elastic.NewTermsAggregation().Field(field).Size(30))
+// }
 
 func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.Aggregations, postFilterMap map[string]elastic.Query) []*Facet {
 	var facets []*Facet
