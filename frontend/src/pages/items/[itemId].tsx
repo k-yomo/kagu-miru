@@ -30,16 +30,14 @@ import {
 import { ChevronRightIcon } from '@heroicons/react/solid';
 import { routes } from '@src/routes/routes';
 
+import SwiperCore, { FreeMode, Pagination, Thumbs, Zoom } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
+import 'swiper/css/zoom';
 
-// import Swiper core and required modules
-import SwiperCore, { FreeMode, Pagination, Thumbs } from 'swiper';
-
-// install Swiper modules
-SwiperCore.use([FreeMode, Pagination, Thumbs]);
+SwiperCore.use([FreeMode, Pagination, Thumbs, Zoom]);
 
 gql`
   query itemDetailPageGetItem($id: ID!) {
@@ -179,14 +177,16 @@ export default function ItemDetailPage({ item }: Props) {
       </Head>
       <div className="max-w-[1200px] mx-auto mb-6">
         <div className="relative w-full h-[350px] sm:h-[700px]">
-          <Swiper thumbs={{ swiper: thumbsSwiper }} pagination>
+          <Swiper thumbs={{ swiper: thumbsSwiper }} zoom pagination>
             {imageUrls.map((imageUrl, i) => (
               <SwiperSlide key={imageUrl}>
-                <img
-                  src={changeItemImageSize(imageUrl, item.platform, 512)}
-                  alt={`${item.name} 商品画像 ${i + 1}`}
-                  className="w-full h-[300px] sm:h-[600px] object-cover object-center"
-                />
+                <div className="swiper-zoom-container">
+                  <img
+                    src={changeItemImageSize(imageUrl, item.platform, 512)}
+                    alt={`${item.name} 商品画像 ${i + 1}`}
+                    className="w-full h-[300px] sm:h-[600px] object-contain object-center"
+                  />
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>
@@ -204,7 +204,7 @@ export default function ItemDetailPage({ item }: Props) {
                 <img
                   src={changeItemImageSize(imageUrl, item.platform, 512)}
                   alt={`${item.name} プレビュー画像 ${i + 1}`}
-                  className="w-[50px] sm:w-[100px] h-[50px] sm:h-[100px] object-cover object-center"
+                  className="w-[50px] sm:w-[100px] h-[50px] sm:h-[100px] object-contain object-center"
                 />
               </SwiperSlide>
             ))}
