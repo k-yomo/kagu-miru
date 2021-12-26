@@ -69,3 +69,12 @@ li {
 #post strong {
     @apply text-primary-600;
 }
+
+.swiper-wrapper {
+    @apply flex;
+    @apply items-center;
+}
+
+.swiper-slide {
+    height: auto;
+}

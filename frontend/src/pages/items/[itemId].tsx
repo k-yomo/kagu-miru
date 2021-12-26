@@ -1,14 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import gql from 'graphql-tag';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 import apolloClient from '@src/lib/apolloClient';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import {
   Action,
   EventId,
   ItemDetailPageGetItemDocument,
   ItemDetailPageGetItemQuery,
+  ItemSellingPlatform,
   SearchClickItemActionParams,
   SimilarItemsDisplayItemsActionParams,
   useItemDetailPageGetSimilarItemsLazyQuery,
@@ -16,18 +19,27 @@ import {
 } from '@src/generated/graphql';
 import ItemList from '@src/components/ItemList';
 import Loading from '@src/components/Loading';
-import Image from 'next/image';
 import { changeItemImageSize } from '@src/lib/platformImage';
 import PlatformBadge from '@src/components/PlatformBadge';
 import Rating from '@src/components/Rating';
 import SEOMeta from '@src/components/SEOMeta';
-import { useRouter } from 'next/router';
-import { routes } from '@src/routes/routes';
 import {
-  findCategoryNameById,
   findCategoryIdsById,
+  findCategoryNameById,
 } from '@src/lib/itemCategories';
 import { ChevronRightIcon } from '@heroicons/react/solid';
+import { routes } from '@src/routes/routes';
+
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import 'swiper/css/navigation';
+import 'swiper/css/thumbs';
+
+// import Swiper core and required modules
+import SwiperCore, { FreeMode, Pagination, Thumbs } from 'swiper';
+
+// install Swiper modules
+SwiperCore.use([FreeMode, Pagination, Thumbs]);
 
 gql`
   query itemDetailPageGetItem($id: ID!) {
@@ -85,6 +97,7 @@ interface Props {
 // TODO: complete the page
 export default function ItemDetailPage({ item }: Props) {
   const router = useRouter();
+  const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   const [getSimilarItems, { data, loading }] =
     useItemDetailPageGetSimilarItemsLazyQuery({
       fetchPolicy: 'no-cache',
@@ -115,6 +128,17 @@ export default function ItemDetailPage({ item }: Props) {
   const similarItems = data?.getSimilarItems?.itemConnection.nodes;
 
   const mainImgUrl = changeItemImageSize(item.imageUrls[0], item.platform, 512);
+  // Because of implementation error, yahoo shopping item has two dup images (medium and small)
+  // So restricting images to remove the dup.
+  // TODO: remove this condition after reindex
+  const imageUrls = (
+    [
+      ItemSellingPlatform.YahooShopping,
+      ItemSellingPlatform.PaypayMall,
+    ] as ItemSellingPlatform[]
+  ).includes(item.platform)
+    ? [item.imageUrls[0]]
+    : item.imageUrls;
 
   const onClickItem = (itemId: string) => {
     const params: SearchClickItemActionParams = {
@@ -154,16 +178,37 @@ export default function ItemDetailPage({ item }: Props) {
         />
       </Head>
       <div className="max-w-[1200px] mx-auto mb-6">
-        <div className="relative w-full h-[300px] sm:h-[600px]">
-          <Image
-            src={mainImgUrl}
-            alt={item.name}
-            layout="fill"
-            objectFit="cover"
-            objectPosition="center"
-            priority
-            unoptimized
-          />
+        <div className="relative w-full h-[350px] sm:h-[700px]">
+          <Swiper thumbs={{ swiper: thumbsSwiper }} pagination>
+            {imageUrls.map((imageUrl, i) => (
+              <SwiperSlide key={imageUrl}>
+                <img
+                  src={changeItemImageSize(imageUrl, item.platform, 512)}
+                  alt={`${item.name} 商品画像 ${i + 1}`}
+                  className="w-full h-[300px] sm:h-[600px] object-cover object-center"
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+          <Swiper
+            onSwiper={setThumbsSwiper}
+            spaceBetween={5}
+            slidesPerView={6}
+            freeMode
+          >
+            {imageUrls.map((imageUrl, i) => (
+              <SwiperSlide
+                key={imageUrl}
+                className="max-w-[50px] sm:max-w-[100px]"
+              >
+                <img
+                  src={changeItemImageSize(imageUrl, item.platform, 512)}
+                  alt={`${item.name} プレビュー画像 ${i + 1}`}
+                  className="w-[50px] sm:w-[100px] h-[50px] sm:h-[100px] object-cover object-center"
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
         <div className="mx-3">
           <div className="mt-1">

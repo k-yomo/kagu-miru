@@ -290,7 +290,7 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, ite
 		URL:           yahooShoppingItem.Url,
 		AffiliateURL:  yahooShoppingItem.Url,
 		Price:         yahooShoppingItem.Price,
-		ImageURLs:     []string{yahooShoppingItem.Image.Medium, yahooShoppingItem.Image.Small},
+		ImageURLs:     []string{yahooShoppingItem.Image.Medium},
 		AverageRating: yahooShoppingItem.Review.Rate,
 		ReviewCount:   yahooShoppingItem.Review.Count,
 		CategoryID:    itemCategory.ID,
