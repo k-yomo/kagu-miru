@@ -88,11 +88,11 @@ export default function AppliedFilterIcons() {
   if (filter.minPrice || filter.maxPrice) {
     let name: string;
     if (filter.minPrice && filter.maxPrice) {
-      name = `${filter.minPrice}円 ~ ${filter.maxPrice}円`;
+      name = `${filter.minPrice.toLocaleString()}円 ~ ${filter.maxPrice.toLocaleString()}円`;
     } else if (filter.minPrice) {
-      name = `${filter.minPrice}円 ~`;
-    } else {
-      name = `~ ${filter.maxPrice}円`;
+      name = `${filter.minPrice.toLocaleString()}円 ~`;
+    } else if (filter.maxPrice) {
+      name = `~ ${filter.maxPrice.toLocaleString()}円`;
     }
     filterIcons.push(
       <FilterIcon
