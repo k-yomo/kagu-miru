@@ -55,7 +55,7 @@ func main() {
 		pubsubClient.Subscription(cfg.PubsubItemUpdateSubscriptionID),
 		pm.NewBatchMessageHandler(newItemUpdateHandler(spannerClient, logger), pm.BatchMessageHandlerConfig{
 			DelayThreshold: 1 * time.Second,
-			CountThreshold: 1000,
+			CountThreshold: 500,
 			ByteThreshold:  1e7, // 10MB
 			NumGoroutines:  10,
 		}),
