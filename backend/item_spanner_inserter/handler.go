@@ -76,9 +76,9 @@ func mapItemToSpannerItem(item *xitem.Item) *xspanner.Item {
 	}
 }
 
-func mapIntRangeToSpannerRange(r *xitem.IntRange) []int {
+func mapIntRangeToSpannerRange(r *xitem.IntRange) []int64 {
 	if r == nil {
 		return nil
 	}
-	return []int{r.Gte, r.Lte}
+	return []int64{int64(r.Gte), int64(r.Lte)}
 }
