@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import gql from 'graphql-tag';
 import Head from 'next/head';
+import Link from 'next/link';
 import { GetServerSideProps } from 'next';
 import apolloClient from '@src/lib/apolloClient';
 import {
@@ -21,6 +22,12 @@ import PlatformBadge from '@src/components/PlatformBadge';
 import Rating from '@src/components/Rating';
 import SEOMeta from '@src/components/SEOMeta';
 import { useRouter } from 'next/router';
+import { routes } from '@src/routes/routes';
+import {
+  findCategoryNameById,
+  findCategoryIdsById,
+} from '@src/lib/itemCategories';
+import { ChevronRightIcon } from '@heroicons/react/solid';
 
 gql`
   query itemDetailPageGetItem($id: ID!) {
@@ -159,6 +166,25 @@ export default function ItemDetailPage({ item }: Props) {
           />
         </div>
         <div className="mx-3">
+          <div className="mt-1">
+            <span className="text-xs font-bold text-text-secondary dark:text-text-secondary-dark">
+              カテゴリー
+            </span>
+            <div className="flex items-center text-sm">
+              {findCategoryIdsById(item.categoryId).map((categoryId, i) => (
+                <>
+                  {i !== 0 && (
+                    <ChevronRightIcon className="w-5 h-5 text-text-secondary dark:text-text-secondary-dark" />
+                  )}
+                  <Link href={`${routes.top()}?categoryIds=${categoryId}`}>
+                    <a className="block text-primary-500 cursor-pointer">
+                      {findCategoryNameById(categoryId)}
+                    </a>
+                  </Link>
+                </>
+              ))}
+            </div>
+          </div>
           <h1 className="my-2 text-lg font-bold">{item.name}</h1>
           <div className="my-2">
             <PlatformBadge platform={item.platform} size="md" />

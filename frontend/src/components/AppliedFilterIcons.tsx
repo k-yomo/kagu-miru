@@ -5,7 +5,7 @@ import {
   SearchActionType,
   useSearch,
 } from '@src/contexts/search';
-import { itemCategoryIdNameMap } from '@src/lib/itemCategories';
+import { findCategoryNameById } from '@src/lib/itemCategories';
 import { platFormText } from '@src/conv/platform';
 import { colorText } from '@src/conv/color';
 
@@ -41,7 +41,7 @@ export default function AppliedFilterIcons() {
     const categoryFilterIcons = filter.categoryIds.map((categoryId) => (
       <FilterIcon
         key={`categoryFilter:${categoryId}`}
-        name={itemCategoryIdNameMap[categoryId]}
+        name={findCategoryNameById(categoryId)}
         onClear={() =>
           dispatch({
             type: SearchActionType.SET_CATEGORY_FILTER,
