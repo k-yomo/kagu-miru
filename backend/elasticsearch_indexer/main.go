@@ -34,6 +34,7 @@ func main() {
 		URL:      cfg.ElasticSearchURL,
 		Username: cfg.ElasticSearchUsername,
 		Password: cfg.ElasticSearchPassword,
+		Sniff:    func() *bool { f := false; return &f }(),
 	})
 	if err != nil {
 		logger.Fatal("failed to initialize elasticsearch client", zap.Error(err))
