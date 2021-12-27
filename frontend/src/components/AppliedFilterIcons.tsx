@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, ReactNode } from 'react'
 import { XIcon } from '@heroicons/react/solid';
 import {
   defaultSearchFilter,
@@ -20,7 +20,7 @@ export default function AppliedFilterIcons() {
   };
 
   const filter = searchState.searchInput.filter;
-  let filterIcons = [];
+  let filterIcons: ReactNode[] = [];
   if (filter.platforms.length > 0) {
     const platformFilterIcons = filter.platforms.map((platform) => (
       <FilterIcon
