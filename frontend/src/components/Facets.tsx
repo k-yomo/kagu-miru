@@ -155,7 +155,7 @@ function FacetDropdown({
         <Dialog
           initialFocus={cancelButtonRef}
           as="div"
-          className="overflow-y-auto fixed inset-0 z-10"
+          className="overflow-y-auto fixed inset-0 z-1"
           onClose={onClose}
         >
           <div className="flex justify-center items-center">

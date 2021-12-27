@@ -2,7 +2,6 @@ import React, {
   ChangeEvent,
   KeyboardEvent,
   memo,
-  useCallback,
   useEffect,
   useState,
 } from 'react';
@@ -117,7 +116,6 @@ export default memo(function SearchBar() {
               setShowQuerySuggestions(false);
             }, 100);
           }}
-          disabled={loading}
         />
         <QuerySuggestionsDropdown
           show={showQuerySuggestions && suggestedQueries.length > 0}

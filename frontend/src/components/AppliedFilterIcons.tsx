@@ -20,7 +20,7 @@ export default function AppliedFilterIcons() {
   };
 
   const filter = searchState.searchInput.filter;
-  const filterIcons = [];
+  let filterIcons = [];
   if (filter.platforms.length > 0) {
     const platformFilterIcons = filter.platforms.map((platform) => (
       <FilterIcon
@@ -34,7 +34,7 @@ export default function AppliedFilterIcons() {
         }
       />
     ));
-    filterIcons.push(platformFilterIcons);
+    filterIcons = [...filterIcons, ...platformFilterIcons];
   }
 
   if (filter.categoryIds.length > 0) {
@@ -50,11 +50,11 @@ export default function AppliedFilterIcons() {
         }
       />
     ));
-    filterIcons.push(categoryFilterIcons);
+    filterIcons = [...filterIcons, ...categoryFilterIcons];
   }
 
   if (filter.brandNames.length > 0) {
-    const categoryFilterIcons = filter.brandNames.map((brandName) => (
+    const brandFilterIcons = filter.brandNames.map((brandName) => (
       <FilterIcon
         key={`brandFilter:${brandName}`}
         name={brandName}
@@ -66,7 +66,7 @@ export default function AppliedFilterIcons() {
         }
       />
     ));
-    filterIcons.push(categoryFilterIcons);
+    filterIcons = [...filterIcons, ...brandFilterIcons];
   }
 
   if (filter.colors.length > 0) {
@@ -82,7 +82,7 @@ export default function AppliedFilterIcons() {
         }
       />
     ));
-    filterIcons.push(colorFilterIcons);
+    filterIcons = [...filterIcons, ...colorFilterIcons];
   }
 
   if (filter.minPrice || filter.maxPrice) {
@@ -142,7 +142,9 @@ export default function AppliedFilterIcons() {
         />
       ))
     );
-    filterIcons.push(metadataFilterIcons);
+    if (metadataFilterIcons.length > 0) {
+      filterIcons = [...filterIcons, metadataFilterIcons];
+    }
   }
 
   if (filterIcons.length === 0) {
