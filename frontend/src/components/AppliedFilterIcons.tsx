@@ -120,6 +120,31 @@ export default function AppliedFilterIcons() {
     );
   }
 
+  if (filter.metadata) {
+    const metadataFilterIcons = filter.metadata.map((appliedMetadata) =>
+      appliedMetadata.values.map((appliedValue) => (
+        <FilterIcon
+          key={`colorFilter:${appliedMetadata.name}:${appliedValue}`}
+          name={`${appliedMetadata.name}: ${appliedValue}`}
+          onClear={() =>
+            dispatch({
+              type: SearchActionType.SET_METADATA_FILTER,
+              payload: filter.metadata
+                .map((m) => ({
+                  name: m.name,
+                  values: m.values.filter(
+                    (v) => m.name !== appliedMetadata.name || v !== appliedValue
+                  ),
+                }))
+                .filter((m) => m.values.length !== 0),
+            })
+          }
+        />
+      ))
+    );
+    filterIcons.push(metadataFilterIcons);
+  }
+
   if (filterIcons.length === 0) {
     return null;
   }

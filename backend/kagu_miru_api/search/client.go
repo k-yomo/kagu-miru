@@ -107,7 +107,7 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 	search := s.esClient.Search().
 		Index(s.itemsIndexName).
 		Query(searchQuery)
-	search, postFilterMap := addAggregationsAndPostFiltersForFacets(search, input.Filter)
+	search, postFilterMap, postMetadataFilterMap := applyAggregationsAndPostFiltersForFacets(search, input.Filter)
 	resp, err := search.
 		SortBy(getSorters(input.SortType)...).
 		From(calcElasticSearchPage(input.Page) * pageSize).
@@ -120,7 +120,7 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 
 	return &Response{
 		Items:      mapElasticsearchHitsToItems(ctx, resp.Hits.Hits),
-		Facets:     s.mapAggregationToFacets(ctx, resp.Aggregations, postFilterMap),
+		Facets:     s.mapAggregationToFacets(ctx, resp.Aggregations, postFilterMap, postMetadataFilterMap),
 		Page:       calcElasticSearchPage(input.Page) + 1,
 		TotalPage:  calcTotalPage(int(resp.Hits.TotalHits.Value), 100),
 		TotalCount: int(resp.Hits.TotalHits.Value),

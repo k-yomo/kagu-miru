@@ -176,6 +176,8 @@ func mapSearchFacetTypeToGraphqlFacetType(facetType search.FacetType) gqlmodel.F
 		return gqlmodel.FacetTypeBrandNames
 	case search.FacetTypeColors:
 		return gqlmodel.FacetTypeColors
+	case search.FacetTypeMetadata:
+		return gqlmodel.FacetTypeMetadata
 	default:
 		return ""
 	}

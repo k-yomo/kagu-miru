@@ -14,7 +14,9 @@ const (
 	MetadataNameWidthRange  = "幅(cm)"
 	MetadataNameDepthRange  = "奥行き(cm)"
 	MetadataNameHeightRange = "高さ(cm)"
+)
 
+const (
 	MetadataValueLengthRangeFrom0to19    = "〜 19cm"
 	MetadataValueLengthRangeFrom20to29   = "20 〜 29cm"
 	MetadataValueLengthRangeFrom30to39   = "30 〜 39cm"

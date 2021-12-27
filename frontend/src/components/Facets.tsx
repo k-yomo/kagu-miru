@@ -1,15 +1,14 @@
-import React, { Fragment, useRef, useState } from 'react';
+import React, { Fragment, memo, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import { SearchActionType, useSearch } from '@src/contexts/search';
 import { FacetType, ItemColor, SearchQuery } from '@src/generated/graphql';
-import { useTheme } from 'next-themes';
 
-export default function Facets() {
+export default memo(function Facets() {
   const { facets, searchState, dispatch } = useSearch();
-  const [openFacetType, setOpenFacetType] = useState<FacetType | undefined>();
+  const [openFacetTitle, setOpenFacetTitle] = useState<string | undefined>();
 
-  const getSelectedIds = (facetType: FacetType) => {
+  const getSelectedIds = (facetType: FacetType, title: string) => {
     switch (facetType) {
       case FacetType.CategoryIds:
         return searchState.searchInput.filter.categoryIds;
@@ -17,12 +16,21 @@ export default function Facets() {
         return searchState.searchInput.filter.brandNames;
       case FacetType.Colors:
         return searchState.searchInput.filter.colors;
+      case FacetType.Metadata:
+        return (
+          searchState.searchInput.filter.metadata.find((m) => m.name == title)
+            ?.values || []
+        );
       default:
         return [];
     }
   };
 
-  const onClickFacet = (facetType: FacetType, selectedId: string) => {
+  const onClickFacet = (
+    facetType: FacetType,
+    selectedId: string,
+    title: string
+  ) => {
     switch (facetType) {
       case FacetType.CategoryIds:
         let categoryIds = searchState.searchInput.filter.categoryIds;
@@ -61,18 +69,41 @@ export default function Facets() {
           type: SearchActionType.SET_COLOR_FILTER,
           payload: colors,
         });
+        return;
+      case FacetType.Metadata:
+        let metadata = searchState.searchInput.filter.metadata;
+        const selectedMetadata = metadata.find((m) => m.name === title);
+        // already selected
+        if (selectedMetadata) {
+          if (selectedMetadata.values.includes(selectedId)) {
+            selectedMetadata.values = selectedMetadata.values.filter(
+              (v) => v !== selectedId
+            );
+          } else {
+            selectedMetadata.values = Array.from(
+              new Set([...selectedMetadata.values, selectedId])
+            );
+          }
+        } else {
+          metadata = [...metadata, { name: title, values: [selectedId] }];
+        }
+        dispatch({
+          type: SearchActionType.SET_METADATA_FILTER,
+          payload: metadata,
+        });
+        return;
     }
   };
 
   return (
-    <div className="flex space-x-2">
+    <div className="flex w-[95vw] sm:w-[90%] space-x-2 overflow-auto whitespace-nowrap">
       {facets.map((facet) => {
-        const selectedIds = getSelectedIds(facet.facetType);
+        const selectedIds = getSelectedIds(facet.facetType, facet.title);
         return (
           <div key={facet.title}>
             <div>
               <button
-                onClick={() => setOpenFacetType(facet.facetType)}
+                onClick={() => setOpenFacetTitle(facet.title)}
                 className={`inline-flex items-center justify-center w-full rounded-full border ${
                   selectedIds.length > 0
                     ? 'border-rose-500'
@@ -84,24 +115,24 @@ export default function Facets() {
               </button>
             </div>
             <FacetDropdown
-              isOpen={facet.facetType === openFacetType}
+              isOpen={facet.title === openFacetTitle}
               facet={facet}
               selectedIds={selectedIds}
               onClickFacet={onClickFacet}
-              onClose={() => setOpenFacetType(undefined)}
+              onClose={() => setOpenFacetTitle(undefined)}
             />
           </div>
         );
       })}
     </div>
   );
-}
+});
 
 interface FacetDropdownProps {
   isOpen: boolean;
   facet: SearchQuery['search']['facets'][number];
   selectedIds: string[];
-  onClickFacet: (facetType: FacetType, id: string) => void;
+  onClickFacet: (facetType: FacetType, id: string, title: string) => void;
   onClose: () => void;
 }
 
@@ -163,11 +194,14 @@ function FacetDropdown({
                       key={facetValue.id}
                       className="flex items-center flex-between px-4 py-2 border-gray-100 dark:border-gray-800 text-sm"
                       onClick={() =>
-                        onClickFacet(facet.facetType, facetValue.id)
+                        onClickFacet(
+                          facet.facetType,
+                          facetValue.id,
+                          facet.title
+                        )
                       }
                     >
                       <input
-                        id={`facetCheckBox_${facetValue.id}`}
                         type="checkbox"
                         name={facetValue.name}
                         checked={selectedIdMap[facetValue.id] || false}

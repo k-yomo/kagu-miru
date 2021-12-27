@@ -391,10 +391,10 @@ func extractMetadataFromTags(tagIDs []int, tagMap map[int]*xspanner.RakutenTag) 
 			metadata.widthRange = getDimensionRangeByTagID(tag.ID, width0To19ID)
 		case xspanner.TagGroupIDDepth:
 			const depth0To19ID = 1000503
-			metadata.widthRange = getDimensionRangeByTagID(tag.ID, depth0To19ID)
+			metadata.depthRange = getDimensionRangeByTagID(tag.ID, depth0To19ID)
 		case xspanner.TagGroupIDHeight:
 			const height0To19ID = 1000523
-			metadata.widthRange = getDimensionRangeByTagID(tag.ID, height0To19ID)
+			metadata.heightRange = getDimensionRangeByTagID(tag.ID, height0To19ID)
 		}
 	}
 

@@ -14,12 +14,13 @@ import {
   EventId,
   ItemColor,
   ItemSellingPlatform,
+  SearchFrom,
+  SearchSortType,
   SearchDisplayItemsActionParams,
   SearchFilter,
-  SearchFrom,
+  AppliedMetadata,
   SearchInput,
   SearchQuery,
-  SearchSortType,
   useSearchLazyQuery,
   useTrackEventMutation,
 } from '@src/generated/graphql';
@@ -71,6 +72,7 @@ export enum SearchActionType {
   SET_COLOR_FILTER,
   SET_PRICE_FILTER,
   SET_RATING_FILTER,
+  SET_METADATA_FILTER,
 }
 
 type SearchAction =
@@ -95,7 +97,8 @@ type SearchAction =
       type: SearchActionType.SET_PRICE_FILTER;
       payload: { minPrice?: number; maxPrice?: number };
     }
-  | { type: SearchActionType.SET_RATING_FILTER; payload?: number };
+  | { type: SearchActionType.SET_RATING_FILTER; payload?: number }
+  | { type: SearchActionType.SET_METADATA_FILTER; payload: AppliedMetadata[] };
 
 const searchReducer = (
   state: SearchState,
@@ -193,6 +196,15 @@ const searchReducer = (
         },
         searchFrom: SearchFrom.Filter,
       };
+    case SearchActionType.SET_METADATA_FILTER:
+      return {
+        searchInput: {
+          ...searchInput,
+          filter: { ...searchInput.filter, metadata: action.payload },
+          page: 0,
+        },
+        searchFrom: SearchFrom.Filter,
+      };
     default:
       return state;
   }
@@ -267,7 +279,15 @@ export function queryParamsToSearchParams(
               return [];
             }
           }),
-        metadata: [], // TODO: implement
+        metadata: Object.keys(queryParams)
+          .filter((key) => key.startsWith('m:'))
+          .map((key) => {
+            const metadataName = key.slice(2);
+            return {
+              name: metadataName,
+              values: (queryParams[key] as string).split(',').filter((s) => s),
+            };
+          }),
         minPrice: parseInt(queryParams.minPrice as string) || undefined,
         maxPrice: parseInt(queryParams.maxPrice as string) || undefined,
         minRating: parseInt(queryParams.minRating as string) || undefined,
@@ -301,6 +321,11 @@ export function buildSearchUrlQuery(
   if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
   if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
   if (filter.minRating) urlQuery.minRating = filter.minRating.toString();
+  if (filter.metadata.length > 0) {
+    filter.metadata.forEach((m) => {
+      urlQuery[`m:${m.name}`] = m.values.join(',');
+    });
+  }
   if (sortType && sortType !== SearchSortType.BestMatch)
     urlQuery.sort = sortType;
   if (page && page >= 2) urlQuery.page = page.toString();
