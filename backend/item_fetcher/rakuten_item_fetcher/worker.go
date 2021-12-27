@@ -329,7 +329,7 @@ func mapRakutenItemToIndexItem(
 	metadata := extractMetadataFromTags(rakutenItem.TagIDs, tagMap)
 
 	return &xitem.Item{
-		ID:            xitem.ItemUniqueID(xitem.PlatformRakuten, rakutenItem.ID()),
+		ID:            xitem.ItemUniqueID(xitem.PlatformRakuten, rakutenItem.ItemCode),
 		Name:          rakutenItem.ItemName,
 		Description:   rakutenItem.ItemCaption,
 		Status:        status,

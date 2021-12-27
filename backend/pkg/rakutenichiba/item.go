@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/k-yomo/kagu-miru/backend/pkg/httputil"
 	"github.com/k-yomo/kagu-miru/backend/pkg/urlutil"
@@ -55,10 +54,6 @@ type Item struct {
 
 	AsurakuArea      string `json:"asurakuArea"`
 	ShipOverseasArea string `json:"shipOverseasArea"`
-}
-
-func (i *Item) ID() string {
-	return strings.Split(i.ItemCode, ":")[1]
 }
 
 const SearchItemCountPerPage = 30
