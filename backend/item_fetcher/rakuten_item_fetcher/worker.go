@@ -291,7 +291,7 @@ func mapRakutenItemsToIndexItems(
 		}
 		itemCategory, ok := genreIDItemCategoryMap[genreID]
 		if !ok {
-			errors = append(errors, fmt.Errorf("failed to get itemCategory, item id: %s", rakutenItem.ID()))
+			errors = append(errors, fmt.Errorf("failed to get itemCategory, item id: %s", rakutenItem.ItemCode))
 			continue
 		}
 		item, err := mapRakutenItemToIndexItem(rakutenItem, itemCategory, tagMap)
@@ -316,7 +316,7 @@ func mapRakutenItemToIndexItem(
 	case 1:
 		status = xitem.StatusActive
 	default:
-		return nil, fmt.Errorf("unknown status %d, item id: %v", rakutenItem.Availability, rakutenItem.ID())
+		return nil, fmt.Errorf("unknown status %d, item id: %v", rakutenItem.Availability, rakutenItem.ItemCode)
 	}
 
 	imageURLs := make([]string, 0, len(rakutenItem.MediumImageURLs))
