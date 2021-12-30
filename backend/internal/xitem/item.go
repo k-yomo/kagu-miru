@@ -39,7 +39,6 @@ type Item struct {
 	WidthRange    *IntRange `json:"widthRange,omitempty"`
 	DepthRange    *IntRange `json:"depthRange,omitempty"`
 	HeightRange   *IntRange `json:"heightRange,omitempty"`
-	TagIDs        []int     `json:"tag_ids"`
 	JANCode       string    `json:"jan_code,omitempty"`
 	Platform      Platform  `json:"platform"`
 }

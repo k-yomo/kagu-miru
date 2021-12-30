@@ -41,9 +41,7 @@ export default memo(function ItemList({ items, onClickItem, isAdmin }: Props) {
     } else {
       return (
         <Link href={routes.itemDetail(id)}>
-          <a href={url} onClick={() => onClickItem(id)}>
-            {children}
-          </a>
+          <a onClick={() => onClickItem(id)}>{children}</a>
         </Link>
       );
     }

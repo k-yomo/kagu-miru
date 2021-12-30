@@ -65,6 +65,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/k-yomo/jp-dimension-parser v0.2.1 // indirect
 	github.com/machinebox/graphql v0.2.2 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/moq v0.0.0-20200106131100-75d0ddfc0007 // indirect

@@ -347,7 +347,6 @@ func mapRakutenItemToIndexItem(
 		WidthRange:    mapIntRangeToItemIntRange(metadata.widthRange),
 		DepthRange:    mapIntRangeToItemIntRange(metadata.depthRange),
 		HeightRange:   mapIntRangeToItemIntRange(metadata.heightRange),
-		TagIDs:        rakutenItem.TagIDs,
 		JANCode:       janCode,
 		Platform:      xitem.PlatformRakuten,
 	}, nil

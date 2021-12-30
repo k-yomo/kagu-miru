@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"sort"
 	"sync"
 	"sync/atomic"
+
+	"github.com/k-yomo/jp-dimension-parser/dimparser"
 
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/spanner"
@@ -282,6 +285,8 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, ite
 	if yahooShoppingItem.Seller.IsPMallSeller {
 		platform = xitem.PlatformPayPayMall
 	}
+
+	widthRange, depthRange, heightRange := parseDimensions(yahooShoppingItem.Name, yahooShoppingItem.Description)
 	return &xitem.Item{
 		ID:            xitem.ItemUniqueID(platform, yahooShoppingItem.Code),
 		Name:          yahooShoppingItem.Name,
@@ -297,8 +302,34 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, ite
 		CategoryIDs:   itemCategory.CategoryIDs(),
 		CategoryNames: itemCategory.CategoryNames(),
 		BrandName:     yahooShoppingItem.Brand.Name,
-		// TagIDs:
-		JANCode:  yahooShoppingItem.JanCode,
-		Platform: platform,
+		WidthRange:    widthRange,
+		DepthRange:    depthRange,
+		HeightRange:   heightRange,
+		JANCode:       yahooShoppingItem.JanCode,
+		Platform:      platform,
 	}, nil
+}
+
+func parseDimensions(name string, description string) (widthRange, depthRange, heightRange *xitem.IntRange) {
+	dimensions := dimparser.Parse(name)
+	if dimensions == nil {
+		dimensions = dimparser.Parse(description)
+	}
+	if dimensions == nil {
+		return nil, nil, nil
+	}
+
+	if dimensions.Width > 0 {
+		w := int(math.Round(dimensions.Width.Centimeters()))
+		widthRange = xitem.NewIntRange(w, &w)
+	}
+	if dimensions.Depth > 0 {
+		w := int(math.Round(dimensions.Depth.Centimeters()))
+		depthRange = xitem.NewIntRange(w, &w)
+	}
+	if dimensions.Height > 0 {
+		w := int(math.Round(dimensions.Height.Centimeters()))
+		heightRange = xitem.NewIntRange(w, &w)
+	}
+	return
 }

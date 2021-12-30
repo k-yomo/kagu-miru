@@ -1,4 +1,4 @@
-import React, { memo, ReactNode } from 'react'
+import React, { memo, ReactNode } from 'react';
 import { XIcon } from '@heroicons/react/solid';
 import {
   defaultSearchFilter,
