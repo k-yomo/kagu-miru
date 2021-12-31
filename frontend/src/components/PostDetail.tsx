@@ -198,7 +198,7 @@ export default function PostDetail({
             />
           ))}
         </div>
-        <div className="my-4 space-x-2">
+        <div className="my-4 space-x-2 space-y-2">
           {tags?.map((tag) => (
             <PostTagBadge key={tag.value} name={tag.value} />
           ))}
