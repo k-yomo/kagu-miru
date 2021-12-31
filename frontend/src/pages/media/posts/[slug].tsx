@@ -19,7 +19,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (Object.keys(props).length === 0) {
     return { notFound: true };
   }
-  ctx.res.setHeader('Cache-Control', 'public, max-age=3600');
+  ctx.res.setHeader(
+    'Cache-Control',
+    'public, max-age=600, stale-while-revalidate=86400'
+  );
   return { props };
 };
 const Post = (props: PostFragment) => {

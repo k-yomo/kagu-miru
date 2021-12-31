@@ -19,7 +19,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 } | order(publishedAt desc) [0..9]`;
 
   const props = await sanityClient.fetch(query);
-  ctx.res.setHeader('Cache-Control', 'public, max-age=3600');
+  ctx.res.setHeader(
+    'Cache-Control',
+    'public, max-age=600, stale-while-revalidate=86400'
+  );
   return { props: { tag, posts: props } };
 };
 

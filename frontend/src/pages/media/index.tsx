@@ -19,7 +19,10 @@ const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"]{
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const props = await sanityClient.fetch(fetchRecentlyPublishedPostsQuery);
-  ctx.res.setHeader('Cache-Control', 'public, max-age=3600');
+  ctx.res.setHeader(
+    'Cache-Control',
+    'public, max-age=600, stale-while-revalidate=86400'
+  );
   return { props: { posts: props } };
 };
 
