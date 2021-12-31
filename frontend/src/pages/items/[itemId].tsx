@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import gql from 'graphql-tag';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -222,7 +222,7 @@ export default function ItemDetailPage({ item }: Props) {
             </span>
             <div className="flex items-center text-sm">
               {findCategoryIdsById(item.categoryId).map((categoryId, i) => (
-                <div key={categoryId}>
+                <Fragment key={categoryId}>
                   {i !== 0 && (
                     <ChevronRightIcon className="w-5 h-5 text-text-secondary dark:text-text-secondary-dark" />
                   )}
@@ -231,7 +231,7 @@ export default function ItemDetailPage({ item }: Props) {
                       {findCategoryNameById(categoryId)}
                     </a>
                   </Link>
-                </div>
+                </Fragment>
               ))}
             </div>
           </div>
