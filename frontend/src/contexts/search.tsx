@@ -343,14 +343,7 @@ export const SearchProvider: FC<Props> = memo(function SearchProvider({
 }: Props) {
   const router = useRouter();
   const queryParams = useNextQueryParams();
-  const [searchId, setSearchId] = useState<string>('');
-  const [items, setItems] = useState<
-    SearchQuery['search']['itemConnection']['nodes']
-  >([]);
-  const [facets, setFacets] = useState<SearchQuery['search']['facets']>([]);
-  const [pageInfo, setPageInfo] = useState<
-    SearchQuery['search']['itemConnection']['pageInfo'] | undefined
-  >();
+  const [searchResult, setSearchResult] = useState<SearchQuery['search']>();
   const [searchState, dispatch] = useReducer(
     searchReducer,
     queryParamsToSearchParams(queryParams)
@@ -361,10 +354,11 @@ export const SearchProvider: FC<Props> = memo(function SearchProvider({
     fetchPolicy: 'no-cache',
     nextFetchPolicy: 'no-cache',
     onCompleted: (data) => {
-      setSearchId(data.search.searchId);
-      setItems(data.search.itemConnection.nodes);
-      setFacets(data.search.facets);
-      setPageInfo(data.search.itemConnection.pageInfo);
+      if (!data) {
+        return;
+      }
+
+      setSearchResult(data.search);
 
       if (isAdmin) {
         return;
@@ -391,9 +385,6 @@ export const SearchProvider: FC<Props> = memo(function SearchProvider({
   });
 
   useEffect(() => {
-    setItems([]);
-    setPageInfo(undefined);
-
     const { searchInput, searchFrom } = searchState;
     const { query, filter, sortType, page } = searchInput;
     search({
@@ -436,10 +427,10 @@ export const SearchProvider: FC<Props> = memo(function SearchProvider({
       <SearchContext.Provider
         value={{
           searchState,
-          searchId,
-          items,
-          facets,
-          pageInfo,
+          searchId: searchResult?.searchId || '',
+          items: searchResult?.itemConnection.nodes || [],
+          facets: searchResult?.facets || [],
+          pageInfo: searchResult?.itemConnection.pageInfo,
           dispatch,
           loading,
         }}

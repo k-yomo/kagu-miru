@@ -33,9 +33,8 @@ interface Props {
 export default memo(function ItemList({ items, onClickItem, isAdmin }: Props) {
   const ItemWrapper = function ({
     id,
-    url,
     children,
-  }: PropsWithChildren<{ id: string; url: string }>) {
+  }: PropsWithChildren<{ id: string }>) {
     if (isAdmin) {
       return <button onClick={() => onClickItem(id)}>{children}</button>;
     } else {
@@ -49,11 +48,7 @@ export default memo(function ItemList({ items, onClickItem, isAdmin }: Props) {
   return (
     <>
       {items.map((item) => (
-        <ItemWrapper
-          key={item.id}
-          id={item.id}
-          url={!!item.affiliateUrl ? item.affiliateUrl : item.url}
-        >
+        <ItemWrapper key={item.id} id={item.id}>
           <div className="rounded-md sm:shadow">
             <Image
               src={item.imageUrls[0] || 'https://via.placeholder.com/300'}

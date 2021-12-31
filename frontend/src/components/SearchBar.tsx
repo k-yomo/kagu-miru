@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   KeyboardEvent,
   memo,
+  useCallback,
   useEffect,
   useState,
 } from 'react';
@@ -15,7 +16,6 @@ import {
   useGetQuerySuggestionsLazyQuery,
   useTrackEventMutation,
 } from '@src/generated/graphql';
-import { SearchActionType, useSearch } from '@src/contexts/search';
 import gql from 'graphql-tag';
 
 gql`
@@ -27,9 +27,13 @@ gql`
   }
 `;
 
-export default memo(function SearchBar() {
-  const { searchState, dispatch, loading } = useSearch();
-  const [searchQuery, setSearchQuery] = useState(searchState.searchInput.query);
+interface Props {
+  query: string;
+  onSubmit: (query: string, searchFrom: SearchFrom) => void;
+}
+
+export default memo(function SearchBar({ query, onSubmit }: Props) {
+  const [searchQuery, setSearchQuery] = useState(query);
   const [suggestedQueries, setSuggestedQueries] = useState<string[]>([]);
   const [showQuerySuggestions, setShowQuerySuggestions] = useState(false);
   const [trackEvent] = useTrackEventMutation();
@@ -60,13 +64,6 @@ export default memo(function SearchBar() {
       },
     });
 
-  const onSubmit = (query: string, searchFrom: SearchFrom) => {
-    dispatch({
-      type: SearchActionType.CHANGE_QUERY,
-      payload: { query, searchFrom },
-    });
-  };
-
   const onChangeSearchQuery = (e: ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value as string;
     setSearchQuery(query);
@@ -81,11 +78,14 @@ export default memo(function SearchBar() {
     }
   };
 
-  const onClickSuggestedQuery = (query: string) => {
-    setSearchQuery(query);
-    setShowQuerySuggestions(false);
-    onSubmit(query, SearchFrom.QuerySuggestion);
-  };
+  const onClickSuggestedQuery = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      setShowQuerySuggestions(false);
+      onSubmit(query, SearchFrom.QuerySuggestion);
+    },
+    [setSearchQuery, setShowQuerySuggestions, onSubmit]
+  );
 
   useEffect(() => {
     if (getQuerySuggestionsData?.getQuerySuggestions) {
@@ -96,7 +96,7 @@ export default memo(function SearchBar() {
   }, [getQuerySuggestionsData?.getQuerySuggestions]);
 
   return (
-    <div className="z-10 relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400 focus-within:text-gray-600">
+    <div className="z-20 relative flex-1 flex-col md:mr-4 lg:mr-12 w-full text-gray-400 focus-within:text-gray-600">
       <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
         <SearchIcon className="h-5 w-5" aria-hidden="true" />
       </div>

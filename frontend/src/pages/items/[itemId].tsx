@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import gql from 'graphql-tag';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -92,7 +92,6 @@ interface Props {
   item: ItemDetailPageGetItemQuery['getItem'];
 }
 
-// TODO: complete the page
 export default function ItemDetailPage({ item }: Props) {
   const router = useRouter();
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
@@ -138,24 +137,27 @@ export default function ItemDetailPage({ item }: Props) {
     ? [item.imageUrls[0]]
     : item.imageUrls;
 
-  const onClickItem = (itemId: string) => {
-    const params: SearchClickItemActionParams = {
-      searchId: data!.getSimilarItems.searchId,
-      itemId,
-    };
-    trackEvent({
-      variables: {
-        event: {
-          id: EventId.SimilarItems,
-          action: Action.ClickItem,
-          createdAt: new Date(),
-          params,
+  const onClickItem = useCallback(
+    (itemId: string) => {
+      const params: SearchClickItemActionParams = {
+        searchId: data!.getSimilarItems.searchId,
+        itemId,
+      };
+      trackEvent({
+        variables: {
+          event: {
+            id: EventId.SimilarItems,
+            action: Action.ClickItem,
+            createdAt: new Date(),
+            params,
+          },
         },
-      },
-    }).catch(() => {
-      // do nothing
-    });
-  };
+      }).catch(() => {
+        // do nothing
+      });
+    },
+    [data, trackEvent]
+  );
 
   useEffect(() => {
     getSimilarItems({
@@ -217,7 +219,7 @@ export default function ItemDetailPage({ item }: Props) {
             </span>
             <div className="flex items-center text-sm">
               {findCategoryIdsById(item.categoryId).map((categoryId, i) => (
-                <>
+                <div key={categoryId}>
                   {i !== 0 && (
                     <ChevronRightIcon className="w-5 h-5 text-text-secondary dark:text-text-secondary-dark" />
                   )}
@@ -226,7 +228,7 @@ export default function ItemDetailPage({ item }: Props) {
                       {findCategoryNameById(categoryId)}
                     </a>
                   </Link>
-                </>
+                </div>
               ))}
             </div>
           </div>

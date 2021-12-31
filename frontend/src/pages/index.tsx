@@ -1,13 +1,18 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useClipboard } from 'use-clipboard-copy';
 import {
   Action,
   EventId,
   SearchClickItemActionParams,
+  SearchFrom,
   useTrackEventMutation,
 } from '@src/generated/graphql';
-import { SearchProvider, useSearch } from '@src/contexts/search';
+import {
+  SearchActionType,
+  SearchProvider,
+  useSearch,
+} from '@src/contexts/search';
 import { useToast } from '@src/contexts/toast';
 import SEOMeta from '@src/components/SEOMeta';
 import Loading from '@src/components/Loading';
@@ -48,34 +53,48 @@ export const TopPageInner = memo(function TopPageInner({
 }: {
   isAdmin?: boolean;
 }) {
-  const { searchState, searchId, items, pageInfo, loading } = useSearch();
+  const { searchState, searchId, items, pageInfo, loading, dispatch } =
+    useSearch();
   const toast = useToast();
   const clipboard = useClipboard();
   const [trackEvent] = useTrackEventMutation();
 
-  const onClickItem = (itemId: string) => {
-    if (isAdmin) {
-      clipboard.copy(itemId);
-      toast(`商品ID ${itemId} をコピーしました`, { type: 'success' });
-      return;
-    }
-    const params: SearchClickItemActionParams = {
-      searchId: searchId,
-      itemId,
-    };
-    trackEvent({
-      variables: {
-        event: {
-          id: EventId.Search,
-          action: Action.ClickItem,
-          createdAt: new Date(),
-          params,
+  const onSubmitQuery = useCallback(
+    (query: string, searchFrom: SearchFrom) => {
+      dispatch({
+        type: SearchActionType.CHANGE_QUERY,
+        payload: { query, searchFrom },
+      });
+    },
+    [dispatch]
+  );
+
+  const onClickItem = useCallback(
+    (itemId: string) => {
+      if (isAdmin) {
+        clipboard.copy(itemId);
+        toast(`商品ID ${itemId} をコピーしました`, { type: 'success' });
+        return;
+      }
+      const params: SearchClickItemActionParams = {
+        searchId: searchId,
+        itemId,
+      };
+      trackEvent({
+        variables: {
+          event: {
+            id: EventId.Search,
+            action: Action.ClickItem,
+            createdAt: new Date(),
+            params,
+          },
         },
-      },
-    }).catch(() => {
-      // do nothing
-    });
-  };
+      }).catch(() => {
+        // do nothing
+      });
+    },
+    [searchId]
+  );
 
   return (
     <div className="flex max-w-[1200px] mx-auto mt-3 mb-6">
@@ -135,7 +154,10 @@ export const TopPageInner = memo(function TopPageInner({
       </div>
       <div className="flex-1 mx-2">
         <div className="flex flex-col sm:flex-row items-end justify-between my-2 gap-2 w-full">
-          <SearchBar />
+          <SearchBar
+            query={searchState.searchInput.query}
+            onSubmit={onSubmitQuery}
+          />
           <SortTypeSelectBox />
         </div>
         <div className="sticky top-0 z-10 py-2 space-y-2 bg-white dark:bg-black">
@@ -151,7 +173,7 @@ export const TopPageInner = memo(function TopPageInner({
         )}
         <div className="flex flex-col items-center">
           <div className="relative grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">
-            {items && (
+            {items.length > 0 && (
               <ItemList
                 isAdmin={isAdmin!!}
                 items={items}
