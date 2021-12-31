@@ -1,5 +1,6 @@
 import React, { memo, useCallback } from 'react';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import { useClipboard } from 'use-clipboard-copy';
 import {
   Action,
@@ -41,6 +42,9 @@ export default function TopPage() {
         img={{ srcPath: SearchPageScreenImg.src }}
         path={router.asPath}
       />
+      <Head>
+        <link rel="canonical" href="https://kagu-miru.com/" />
+      </Head>
       <SearchProvider>
         <TopPageInner />
       </SearchProvider>
