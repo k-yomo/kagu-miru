@@ -1,11 +1,4 @@
-import React, {
-  Fragment,
-  memo,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { Fragment, memo, useCallback, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import { SearchActionType, useSearch } from '@src/contexts/search';
@@ -137,6 +130,10 @@ const FacetDropdown = memo(function FacetDropdown({
   const selectedIdMap: { [key: string]: boolean } = selectedIds.reduce(
     (m: { [key: string]: boolean }, v) => ((m[v] = true), m),
     {}
+  );
+
+  facet.values.sort((a, b) =>
+    selectedIdMap[a.id]! && selectedIdMap[a.id] ? -1 : 1
   );
 
   return (

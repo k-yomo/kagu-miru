@@ -316,6 +316,7 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 			}
 			// facet must have multiple variations
 			if len(facetValues) > 1 {
+				sortMetadataValues(metadataName, facetValues)
 				metadataFacets = append(metadataFacets, &Facet{
 					Title:      metadataName,
 					FacetType:  FacetTypeMetadata,
@@ -347,6 +348,7 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 			}
 
 			if len(facetValues) > 0 {
+				sortMetadataValues(metadataName, facetValues)
 				metadataFacets = append(metadataFacets, &Facet{
 					Title:      metadataName,
 					FacetType:  FacetTypeMetadata,
@@ -358,8 +360,21 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 	}
 
 	sort.Slice(metadataFacets, func(i, j int) bool {
-		return metadataFacets[i].Title < metadataFacets[j].Title
+		iOrder := es.MetadataNameSortOrderMap[metadataFacets[i].Title]
+		jOrder := es.MetadataNameSortOrderMap[metadataFacets[j].Title]
+		return iOrder < jOrder
 	})
 
 	return append(facets, metadataFacets...)
+}
+
+func sortMetadataValues(metadataName string, facetValues []*FacetValue) {
+	switch metadataName {
+	case es.MetadataNameWidthRange, es.MetadataNameDepthRange, es.MetadataNameHeightRange:
+		sort.Slice(facetValues, func(i, j int) bool {
+			iOrder := es.MetadataValueLengthSortOrderMap[facetValues[i].ID]
+			jOrder := es.MetadataValueLengthSortOrderMap[facetValues[j].ID]
+			return iOrder < jOrder
+		})
+	}
 }

@@ -16,6 +16,12 @@ const (
 	MetadataNameHeightRange = "高さ(cm)"
 )
 
+var MetadataNameSortOrderMap = map[string]int{
+	MetadataNameWidthRange:  0,
+	MetadataNameDepthRange:  1,
+	MetadataNameHeightRange: 2,
+}
+
 const (
 	MetadataValueLengthRangeFrom0to19    = "〜 19cm"
 	MetadataValueLengthRangeFrom20to29   = "20 〜 29cm"
@@ -38,6 +44,29 @@ const (
 	MetadataValueLengthRangeFrom190to199 = "190 〜 199cm"
 	MetadataValueLengthRangeFrom200      = "200cm 〜"
 )
+
+var MetadataValueLengthSortOrderMap = map[string]int{
+	MetadataValueLengthRangeFrom0to19:    0,
+	MetadataValueLengthRangeFrom20to29:   1,
+	MetadataValueLengthRangeFrom30to39:   2,
+	MetadataValueLengthRangeFrom40to49:   3,
+	MetadataValueLengthRangeFrom50to59:   4,
+	MetadataValueLengthRangeFrom60to69:   5,
+	MetadataValueLengthRangeFrom70to79:   6,
+	MetadataValueLengthRangeFrom80to89:   7,
+	MetadataValueLengthRangeFrom90to99:   8,
+	MetadataValueLengthRangeFrom100to109: 9,
+	MetadataValueLengthRangeFrom110to119: 10,
+	MetadataValueLengthRangeFrom120to129: 11,
+	MetadataValueLengthRangeFrom130to139: 12,
+	MetadataValueLengthRangeFrom140to149: 13,
+	MetadataValueLengthRangeFrom150to159: 14,
+	MetadataValueLengthRangeFrom160to169: 15,
+	MetadataValueLengthRangeFrom170to179: 16,
+	MetadataValueLengthRangeFrom180to189: 17,
+	MetadataValueLengthRangeFrom190to199: 18,
+	MetadataValueLengthRangeFrom200:      19,
+}
 
 func NewMetadataValueLengthRange(gte int, lte int) string {
 	switch {
