@@ -10,7 +10,7 @@ jobs:
   deploy:
     name: Deploy
     environment:
-      name: production
+      name: elasticsearch-indexer-prod
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
