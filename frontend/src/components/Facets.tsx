@@ -29,7 +29,7 @@ export default memo(function Facets() {
   );
 
   const onClickFacet = useCallback(
-    (facetType: FacetType, selectedId: string, title: string) => {
+    (facetType: FacetType, selectedId: string, name: string) => {
       switch (facetType) {
         case FacetType.CategoryIds:
           let categoryIds = searchState.searchInput.filter.categoryIds;
@@ -71,7 +71,7 @@ export default memo(function Facets() {
           return;
         case FacetType.Metadata:
           let metadata = searchState.searchInput.filter.metadata;
-          const selectedMetadata = metadata.find((m) => m.name === title);
+          const selectedMetadata = metadata.find((m) => m.name === name);
           // already selected
           if (selectedMetadata) {
             if (selectedMetadata.values.includes(selectedId)) {
@@ -84,11 +84,36 @@ export default memo(function Facets() {
               );
             }
           } else {
-            metadata = [...metadata, { name: title, values: [selectedId] }];
+            metadata = [...metadata, { name: name, values: [selectedId] }];
           }
           dispatch({
             type: SearchActionType.SET_METADATA_FILTER,
             payload: metadata,
+          });
+          return;
+      }
+    },
+    [searchState.searchInput.filter, dispatch]
+  );
+
+  const onClearFacet = useCallback(
+    (facetType: FacetType, name: string) => {
+      switch (facetType) {
+        case FacetType.CategoryIds:
+          dispatch({ type: SearchActionType.SET_CATEGORY_FILTER, payload: [] });
+          return;
+        case FacetType.BrandNames:
+          dispatch({ type: SearchActionType.SET_BRAND_FILTER, payload: [] });
+          return;
+        case FacetType.Colors:
+          dispatch({ type: SearchActionType.SET_COLOR_FILTER, payload: [] });
+          return;
+        case FacetType.Metadata:
+          dispatch({
+            type: SearchActionType.SET_METADATA_FILTER,
+            payload: searchState.searchInput.filter.metadata.filter(
+              (m) => m.name !== name
+            ),
           });
           return;
       }
@@ -106,6 +131,7 @@ export default memo(function Facets() {
               facet={facet}
               selectedIds={selectedIds}
               onClickFacet={onClickFacet}
+              onClear={onClearFacet}
             />
           </div>
         );
@@ -117,13 +143,15 @@ export default memo(function Facets() {
 interface FacetDropdownProps {
   facet: SearchQuery['search']['facets'][number];
   selectedIds: string[];
-  onClickFacet: (facetType: FacetType, id: string, title: string) => void;
+  onClickFacet: (facetType: FacetType, id: string, name: string) => void;
+  onClear: (facetType: FacetType, name: string) => void;
 }
 
 const FacetDropdown = memo(function FacetDropdown({
   facet,
   selectedIds,
   onClickFacet,
+  onClear,
 }: FacetDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const cancelButtonRef = useRef(null);
@@ -185,9 +213,17 @@ const FacetDropdown = memo(function FacetDropdown({
               leaveTo="opacity-0 translate-y-4"
             >
               <div className="fixed flex flex-col bottom-0 w-screen h-[70vh] overflow-y-auto bg-white dark:bg-black rounded-t-xl transition-all transform">
-                <Dialog.Title as="h3" className="mt-4 ml-4 text-xl font-bold">
-                  {facet.title}
-                </Dialog.Title>
+                <div className="flex items-center justify-between mt-4 mx-4">
+                  <Dialog.Title as="h3" className="text-xl font-bold">
+                    {facet.title}
+                  </Dialog.Title>
+                  <div
+                    className="cursor-pointer text-sm text-rose-500 font-bold"
+                    onClick={() => onClear(facet.facetType, facet.title)}
+                  >
+                    クリア
+                  </div>
+                </div>
                 <div className="py-1 divide-y-2">
                   {facet.values.map((facetValue) => (
                     <div

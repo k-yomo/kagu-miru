@@ -124,7 +124,7 @@ export default function AppliedFilterIcons() {
     const metadataFilterIcons = filter.metadata.map((appliedMetadata) =>
       appliedMetadata.values.map((appliedValue) => (
         <FilterIcon
-          key={`colorFilter:${appliedMetadata.name}:${appliedValue}`}
+          key={`metadataFilter:${appliedMetadata.name}:${appliedValue}`}
           name={`${appliedMetadata.name}: ${appliedValue}`}
           onClear={() =>
             dispatch({
