@@ -1,6 +1,7 @@
 import React, { Fragment, memo, useCallback, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/solid';
+import { XIcon } from '@heroicons/react/outline';
 import { SearchActionType, useSearch } from '@src/contexts/search';
 import { FacetType, ItemColor, SearchQuery } from '@src/generated/graphql';
 
@@ -96,31 +97,6 @@ export default memo(function Facets() {
     [searchState.searchInput.filter, dispatch]
   );
 
-  const onClearFacet = useCallback(
-    (facetType: FacetType, name: string) => {
-      switch (facetType) {
-        case FacetType.CategoryIds:
-          dispatch({ type: SearchActionType.SET_CATEGORY_FILTER, payload: [] });
-          return;
-        case FacetType.BrandNames:
-          dispatch({ type: SearchActionType.SET_BRAND_FILTER, payload: [] });
-          return;
-        case FacetType.Colors:
-          dispatch({ type: SearchActionType.SET_COLOR_FILTER, payload: [] });
-          return;
-        case FacetType.Metadata:
-          dispatch({
-            type: SearchActionType.SET_METADATA_FILTER,
-            payload: searchState.searchInput.filter.metadata.filter(
-              (m) => m.name !== name
-            ),
-          });
-          return;
-      }
-    },
-    [searchState.searchInput.filter, dispatch]
-  );
-
   return (
     <div className="flex w-[95vw] sm:w-[90%] space-x-2 overflow-auto whitespace-nowrap">
       {facets.map((facet) => {
@@ -131,7 +107,6 @@ export default memo(function Facets() {
               facet={facet}
               selectedIds={selectedIds}
               onClickFacet={onClickFacet}
-              onClear={onClearFacet}
             />
           </div>
         );
@@ -144,14 +119,12 @@ interface FacetDropdownProps {
   facet: SearchQuery['search']['facets'][number];
   selectedIds: string[];
   onClickFacet: (facetType: FacetType, id: string, name: string) => void;
-  onClear: (facetType: FacetType, name: string) => void;
 }
 
 const FacetDropdown = memo(function FacetDropdown({
   facet,
   selectedIds,
   onClickFacet,
-  onClear,
 }: FacetDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const cancelButtonRef = useRef(null);
@@ -217,11 +190,15 @@ const FacetDropdown = memo(function FacetDropdown({
                   <Dialog.Title as="h3" className="text-xl font-bold">
                     {facet.title}
                   </Dialog.Title>
-                  <div
-                    className="cursor-pointer text-sm text-rose-500 font-bold"
-                    onClick={() => onClear(facet.facetType, facet.title)}
-                  >
-                    クリア
+                  <div className="absolute top-0 right-0 mt-3 pr-3">
+                    <button
+                      type="button"
+                      className="rounded-md text-gray-400"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span className="sr-only">Close</span>
+                      <XIcon className="h-6 w-6" aria-hidden="true" />
+                    </button>
                   </div>
                 </div>
                 <div className="py-1 divide-y-2">
