@@ -133,10 +133,6 @@ const FacetDropdown = memo(function FacetDropdown({
     {}
   );
 
-  facet.values.sort((a, b) =>
-    selectedIdMap[a.id]! && selectedIdMap[a.id] ? -1 : 1
-  );
-
   return (
     <>
       <div>
