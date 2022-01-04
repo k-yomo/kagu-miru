@@ -186,15 +186,12 @@ const FacetDropdown = memo(function FacetDropdown({
                   <Dialog.Title as="h3" className="text-xl font-bold">
                     {facet.title}
                   </Dialog.Title>
-                  <div className="absolute top-0 right-0 mt-3 pr-3">
-                    <button
-                      type="button"
-                      className="rounded-md text-gray-400"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span className="sr-only">Close</span>
-                      <XIcon className="h-6 w-6" aria-hidden="true" />
-                    </button>
+                  <div
+                    className="absolute top-0 right-0 mt-3 pr-3 text-gray-400"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <span className="sr-only">Close</span>
+                    <XIcon className="h-6 w-6" aria-hidden="true" />
                   </div>
                 </div>
                 <div className="py-1 divide-y-2">

@@ -118,15 +118,12 @@ export default function MobileSearchFilterModal() {
                 >
                   絞り込み検索
                 </Dialog.Title>
-                <div className="absolute top-0 right-0 mt-3 pr-3">
-                  <button
-                    type="button"
-                    className="rounded-md text-gray-400"
-                    onClick={() => setOpen(false)}
-                  >
-                    <span className="sr-only">Close</span>
-                    <XIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
+                <div
+                  className="absolute top-0 right-0 mt-3 pr-3 text-gray-400"
+                  onClick={() => setOpen(false)}
+                >
+                  <span className="sr-only">Close</span>
+                  <XIcon className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <hr className="border-gray-100 dark:border-gray-800" />
                 <div className="flex-1 px-6 mt-2 overflow-y-scroll text-left">
