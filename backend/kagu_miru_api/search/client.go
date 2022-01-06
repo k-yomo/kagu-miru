@@ -7,6 +7,8 @@ import (
 	"math"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
+
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/db"
 
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
@@ -31,7 +33,7 @@ var NotFoundErr = errors.New("item not found")
 type Client interface {
 	GetItem(ctx context.Context, id string) (*es.Item, error)
 	SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error)
-	GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput, itemCategoryID string) (*Response, error)
+	GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput, item *xspanner.Item) (*Response, error)
 	GetQuerySuggestions(ctx context.Context, query string) ([]string, error)
 }
 
@@ -214,7 +216,7 @@ func getSorters(sortType gqlmodel.SearchSortType) []elastic.Sorter {
 	return sorters
 }
 
-func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput, itemCategoryID string) (*Response, error) {
+func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput, item *xspanner.Item) (*Response, error) {
 	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetSimilarIts")
 	defer span.End()
 
@@ -230,13 +232,27 @@ func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetS
 				Index(s.itemsIndexName).
 				Id(input.ItemID),
 		),
-	).Filter(elastic.NewTermsQuery(es.ItemFieldCategoryIDs, itemCategoryID))
+	).Filter(elastic.NewTermsQuery(es.ItemFieldCategoryIDs, item.CategoryID))
 
 	functionScoreQuery := elastic.NewFunctionScoreQuery().
 		Query(boolQuery).
-		AddScoreFunc(elastic.NewGaussDecayFunction().FieldName(es.ItemFieldAverageRating).Origin(5).Offset(1).Scale(1).Decay(0.4)).
+		AddScoreFunc(
+			elastic.NewGaussDecayFunction().
+				FieldName(es.ItemFieldPrice).Origin(item.Price).
+				Offset(int(math.Round(float64(item.Price) * 0.2))).
+				Scale(int(math.Round(float64(item.Price) * 0.2))).
+				Decay(0.5),
+		).
+		AddScoreFunc(
+			elastic.NewGaussDecayFunction().
+				FieldName(es.ItemFieldAverageRating).
+				Origin(5).
+				Offset(1).
+				Scale(1).
+				Decay(0.5),
+		).
 		AddScoreFunc(elastic.NewFieldValueFactorFunction().Field(es.ItemFieldReviewCount)).
-		MaxBoost(1)
+		MaxBoost(3)
 
 	pageSize := defaultPageSize
 	if input.PageSize != nil {

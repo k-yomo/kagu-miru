@@ -43,7 +43,7 @@ func (r *queryResolver) GetSimilarItems(ctx context.Context, input gqlmodel.GetS
 	if err != nil {
 		return nil, fmt.Errorf("DBClient.GetItem: %w", err)
 	}
-	resp, err := r.SearchClient.GetSimilarItems(ctx, &input, item.CategoryID)
+	resp, err := r.SearchClient.GetSimilarItems(ctx, &input, item)
 	if err != nil {
 		return nil, fmt.Errorf("SearchClient.GetSimilarItems: %w", err)
 	}
