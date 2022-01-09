@@ -1,4 +1,4 @@
-FROM node:14.17.0-slim AS build
+FROM node:16.13.0-slim AS build
 ENV NODE_ENV=production
 
 WORKDIR /build
@@ -9,7 +9,7 @@ RUN npm install --production=false
 COPY ./frontend .
 RUN npm run build
 
-FROM gcr.io/distroless/nodejs:14
+FROM gcr.io/distroless/nodejs:16
 ENV NODE_ENV=production
 WORKDIR /app
 
