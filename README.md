@@ -5,7 +5,7 @@
 
 Prerequisites
 - Go v1.17.x
-- Node v14.8.x
+- Node v16.13.x
 - Docker
 
 ## Setup

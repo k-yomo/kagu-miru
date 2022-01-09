@@ -2,7 +2,7 @@ name: Frontend Workflow
 on:
   push:
     paths:
-      - ".github/workflows/frontend.yml"
+      - ".github/workflows/frontend-lint.yml"
       - "frontend/**"
 
 jobs:
@@ -13,10 +13,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Node 14.x
+      - name: Setup Node 16.13.x
         uses: actions/setup-node@v2.5.1
         with:
-          node-version: 14.x
+          node-version: 16.13.x
 
       - name: Install
         run: npm install

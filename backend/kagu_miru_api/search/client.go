@@ -17,7 +17,6 @@ import (
 	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	"github.com/k-yomo/kagu-miru/backend/pkg/xesquery"
 	"github.com/olivere/elastic/v7"
-	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 )
@@ -28,10 +27,7 @@ const (
 	maxPageSize     int = 1000
 )
 
-var NotFoundErr = errors.New("item not found")
-
 type Client interface {
-	GetItem(ctx context.Context, id string) (*es.Item, error)
 	SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error)
 	GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput, item *xspanner.Item) (*Response, error)
 	GetQuerySuggestions(ctx context.Context, query string) ([]string, error)
@@ -64,27 +60,6 @@ type Response struct {
 	Page       int
 	TotalPage  int
 	TotalCount int
-}
-
-func (s *searchClient) GetItem(ctx context.Context, id string) (*es.Item, error) {
-	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetItem")
-	defer span.End()
-
-	resp, err := s.esClient.Get().Index(s.itemsIndexName).Id(id).Do(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("esClient.Get: %w", err)
-	}
-
-	if !resp.Found {
-		return nil, fmt.Errorf("get '%s': %w", id, NotFoundErr)
-	}
-
-	var item es.Item
-	if err := json.Unmarshal(resp.Source, &item); err != nil {
-		return nil, fmt.Errorf("json.Unmarshal: %w", err)
-	}
-
-	return &item, nil
 }
 
 func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error) {

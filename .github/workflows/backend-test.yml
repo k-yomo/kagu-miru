@@ -2,7 +2,7 @@ name: Backend Test Workflow
 on:
   push:
     paths:
-      - ".github/workflows/kagu-miru-api.yml"
+      - ".github/workflows/backend-test.yml"
       - "backend/**"
       - "go.mod"
 
