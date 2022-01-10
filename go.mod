@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	cloud.google.com/go/aiplatform v1.1.1
-	cloud.google.com/go/profiler v0.1.1
+	cloud.google.com/go/profiler v0.1.2
 	cloud.google.com/go/pubsub v1.17.1
 	cloud.google.com/go/spanner v1.29.0
 	github.com/99designs/gqlgen v0.14.0
@@ -57,7 +57,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
-	github.com/google/pprof v0.0.0-20211008130755-947d60d73cc0 // indirect
+	github.com/google/pprof v0.0.0-20211214055906-6f57359322fd // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
