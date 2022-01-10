@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/aiplatform v1.1.1
 	cloud.google.com/go/profiler v0.1.1
 	cloud.google.com/go/pubsub v1.17.1
-	cloud.google.com/go/spanner v1.28.0
+	cloud.google.com/go/spanner v1.29.0
 	github.com/99designs/gqlgen v0.14.0
 	github.com/Code-Hex/gqldoc v0.0.4
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
@@ -16,11 +16,11 @@ require (
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+	github.com/k-yomo/jp-dimension-parser v0.2.1
 	github.com/k-yomo/pm v0.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/olivere/elastic/v7 v7.0.30
-	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.8.2
 	github.com/vektah/gqlparser/v2 v2.2.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0
@@ -65,7 +65,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/k-yomo/jp-dimension-parser v0.2.1 // indirect
 	github.com/machinebox/graphql v0.2.2 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/moq v0.0.0-20200106131100-75d0ddfc0007 // indirect
@@ -73,6 +72,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-zglob v0.0.3 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect
 	github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e // indirect
