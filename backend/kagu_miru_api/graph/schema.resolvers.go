@@ -66,7 +66,7 @@ func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (
 func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodel.Item, error) {
 	item, err := r.DBClient.GetItem(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("SearchClient.GetItem: %w", err)
+		return nil, fmt.Errorf("DBClient.GetItem: %w", err)
 	}
 	return mapSpannerItemToGraphqlItem(item)
 }

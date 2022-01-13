@@ -4,10 +4,12 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
-import apolloClient from '@src/lib/apolloClient';
+import { ApolloError } from '@apollo/client';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import apolloClient, { isErrorIncludes } from '@src/lib/apolloClient';
 import {
   Action,
+  ErrorCode,
   EventId,
   ItemDetailPageGetItemDocument,
   ItemDetailPageGetItemQuery,
@@ -75,20 +77,23 @@ gql`
 `;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { data, errors } = await apolloClient.query<ItemDetailPageGetItemQuery>(
-    {
+  try {
+    const { data } = await apolloClient.query<ItemDetailPageGetItemQuery>({
       query: ItemDetailPageGetItemDocument,
       variables: { id: ctx.query.itemId as string },
+    });
+
+    ctx.res.setHeader(
+      'Cache-Control',
+      'public, max-age=600, stale-while-revalidate=86400'
+    );
+    return { props: { item: data.getItem } };
+  } catch (e) {
+    if (e instanceof ApolloError && isErrorIncludes(e, ErrorCode.NotFound)) {
+      return { notFound: true };
     }
-  );
-  if (errors) {
-    return { notFound: true };
+    throw e;
   }
-  ctx.res.setHeader(
-    'Cache-Control',
-    'public, max-age=600, stale-while-revalidate=86400'
-  );
-  return { props: { item: data.getItem } };
 };
 
 interface Props {

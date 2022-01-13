@@ -562,6 +562,11 @@ type Mutation {
     trackEvent(event: Event!): Boolean!
 }
 
+enum ErrorCode {
+    NOT_FOUND
+    INTERNAL
+}
+
 type PageInfo {
     page: Int!
     totalPage: Int!

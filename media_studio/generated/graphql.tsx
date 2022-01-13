@@ -33,6 +33,11 @@ export type AppliedMetadata = {
   values: Array<Scalars['String']>;
 };
 
+export enum ErrorCode {
+  Internal = 'INTERNAL',
+  NotFound = 'NOT_FOUND',
+}
+
 export type Event = {
   action: Action;
   createdAt: Scalars['Time'];

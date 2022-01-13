@@ -1,5 +1,6 @@
 import {
   ApolloClient,
+  ApolloError,
   ApolloLink,
   createHttpLink,
   InMemoryCache,
@@ -10,6 +11,7 @@ import { buildClientSchema, IntrospectionQuery } from 'graphql';
 import fetch from 'isomorphic-unfetch';
 import introspectionResult from '../../graphql.schema.json';
 import { GRAPHQL_API_URL } from '@src/config/env';
+import { ErrorCode } from '@src/generated/graphql';
 
 const schema = buildClientSchema(
   introspectionResult as unknown as IntrospectionQuery
@@ -41,3 +43,12 @@ const apolloClient = new ApolloClient({
 });
 
 export default apolloClient;
+
+export function isErrorIncludes(error: ApolloError, code: ErrorCode) {
+  for (const e of error.graphQLErrors) {
+    if (e.extensions?.code === code) {
+      return true;
+    }
+  }
+  return false;
+}

@@ -175,6 +175,47 @@ func (e Action) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type ErrorCode string
+
+const (
+	ErrorCodeNotFound ErrorCode = "NOT_FOUND"
+	ErrorCodeInternal ErrorCode = "INTERNAL"
+)
+
+var AllErrorCode = []ErrorCode{
+	ErrorCodeNotFound,
+	ErrorCodeInternal,
+}
+
+func (e ErrorCode) IsValid() bool {
+	switch e {
+	case ErrorCodeNotFound, ErrorCodeInternal:
+		return true
+	}
+	return false
+}
+
+func (e ErrorCode) String() string {
+	return string(e)
+}
+
+func (e *ErrorCode) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ErrorCode(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ErrorCode", str)
+	}
+	return nil
+}
+
+func (e ErrorCode) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type EventID string
 
 const (

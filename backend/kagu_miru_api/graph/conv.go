@@ -3,6 +3,8 @@ package graph
 import (
 	"fmt"
 
+	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
+
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
@@ -262,4 +264,13 @@ func mapSpannerItemToGraphqlItem(item *xspanner.Item) (*gqlmodel.Item, error) {
 		CategoryID:    item.CategoryID,
 		Platform:      platform,
 	}, nil
+}
+
+func mapFromXErrorType(errType xerror.Type) gqlmodel.ErrorCode {
+	switch errType {
+	case xerror.TypeNotFound:
+		return gqlmodel.ErrorCodeNotFound
+	default:
+		return gqlmodel.ErrorCodeInternal
+	}
 }

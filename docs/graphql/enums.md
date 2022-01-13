@@ -25,6 +25,27 @@
 
 ---
 
+### ErrorCode
+
+
+
+<table>
+  <tr>
+    <th>Value</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>INTERNAL</strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>NOT_FOUND</strong></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### EventID
 
 

@@ -2,7 +2,11 @@ package xspanner
 
 import (
 	"context"
+	"fmt"
 	"time"
+
+	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
+	"google.golang.org/api/iterator"
 
 	"go.opentelemetry.io/otel"
 
@@ -48,6 +52,9 @@ func GetItem(ctx context.Context, spannerClient *spanner.Client, itemID string) 
 
 	row, err := iter.Next()
 	if err != nil {
+		if err == iterator.Done {
+			return nil, xerror.NewNotFound(fmt.Errorf("item '%s' is not found", itemID))
+		}
 		return nil, err
 	}
 	var item Item

@@ -119,6 +119,7 @@ func main() {
 	gqlServer := handler.NewDefaultServer(gqlgen.NewExecutableSchema(gqlConfig))
 	gqlServer.Use(tracing.GraphqlExtension{})
 	gqlServer.Use(logging.GraphQLResponseInterceptor{})
+	gqlServer.SetErrorPresenter(graph.NewErrorPresenter())
 
 	r := newBaseRouter(cfg, logger, searchIDManager)
 	r.Route("/api", func(r chi.Router) {
