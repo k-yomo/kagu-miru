@@ -6,7 +6,7 @@ import {
 } from '@apollo/client';
 import { withScalars } from 'apollo-link-scalars';
 import { buildClientSchema, IntrospectionQuery } from 'graphql';
-import { DateTimeResolver } from 'graphql-scalars';
+// import { DateTimeResolver } from 'graphql-scalars';
 import fetch from 'isomorphic-unfetch';
 import introspectionResult from '../../graphql.schema.json';
 import { GRAPHQL_API_URL } from '@src/config/env';
@@ -15,7 +15,7 @@ const schema = buildClientSchema(
   introspectionResult as unknown as IntrospectionQuery
 );
 const typesMap = {
-  Date: DateTimeResolver,
+  // Date: DateTimeResolver,
 };
 const link = ApolloLink.from([
   withScalars({ schema, typesMap }) as unknown as ApolloLink,

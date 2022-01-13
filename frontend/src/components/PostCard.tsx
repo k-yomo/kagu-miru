@@ -22,7 +22,9 @@ interface Props {
 }
 
 export default memo(function PostCard({ postMeta }: Props) {
-  const mainImageUrl = buildSanityImageSrc(postMeta.mainImage);
+  const mainImageUrl = buildSanityImageSrc(postMeta.mainImage)
+    .quality(30)
+    .width(300);
   const blurImgUrl = buildSanityImageSrc(postMeta.mainImage).blur(10).url();
   return (
     <div className="mx-auto max-w-[400px] h-full shadow-md rounded-md">
@@ -38,7 +40,7 @@ export default memo(function PostCard({ postMeta }: Props) {
               objectFit="cover"
               objectPosition="center"
               loading="lazy"
-              lazyBoundary="600px"
+              lazyBoundary="10000px"
               unoptimized
             />
           </div>

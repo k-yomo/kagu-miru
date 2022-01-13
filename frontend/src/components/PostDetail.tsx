@@ -103,7 +103,7 @@ const serializers = {
       );
     },
     image: ({ node }: { node: SanityImageObject }) => {
-      const imgUrl = buildSanityImageSrc(node).url();
+      const imgUrl = buildSanityImageSrc(node).quality(70).width(600).url();
       const blurImgUrl = buildSanityImageSrc(node).blur(10).url();
       return (
         <div className="relative w-full h-[250px] sm:h-[500px]">
@@ -116,7 +116,7 @@ const serializers = {
             objectFit="cover"
             objectPosition="center"
             loading="lazy"
-            lazyBoundary="600px"
+            lazyBoundary="10000px"
             unoptimized
           />
         </div>
