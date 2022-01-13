@@ -80,7 +80,7 @@ const serializers = {
             url={routes.mediaPost(node.slug)}
             title={node.title}
             subTitle={node.description}
-            imgSrc={buildSanityImageSrc(node.mainImage).url()}
+            imgSrc={buildSanityImageSrc(node.mainImage).width(300).url()}
           />
         </div>
       );
