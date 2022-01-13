@@ -35,7 +35,7 @@ export default function Footer() {
             ヘルプ＆ガイド
           </div>
 
-          <Link href={routes.contact()}>
+          <Link href={routes.contact()} prefetch={false}>
             <a className="my-3 block text-gray-300 hover:text-gray-100 text-sm duration-700">
               お問い合せ
             </a>
@@ -47,7 +47,7 @@ export default function Footer() {
             プライバシーと利用規約
           </div>
 
-          <Link href={routes.privacyPolicy()}>
+          <Link href={routes.privacyPolicy()} prefetch={false}>
             <a className="my-3 block text-gray-300 hover:text-gray-100 text-sm duration-700">
               プライバシーポリシー
             </a>
