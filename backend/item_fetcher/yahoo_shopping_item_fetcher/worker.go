@@ -9,13 +9,13 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/k-yomo/jp-dimension-parser/dimparser"
-
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/spanner"
+	"github.com/k-yomo/jp-dimension-parser/dimparser"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
 	"github.com/k-yomo/kagu-miru/backend/item_fetcher"
+	"github.com/k-yomo/kagu-miru/backend/pkg/jancode"
 	"github.com/k-yomo/kagu-miru/backend/pkg/yahoo_shopping"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
@@ -286,6 +286,14 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, ite
 		platform = xitem.PlatformPayPayMall
 	}
 
+	janCode := yahooShoppingItem.JanCode
+	if janCode == "" {
+		janCode = jancode.ExtractJANCode(yahooShoppingItem.Name)
+	}
+	if janCode == "" {
+		janCode = jancode.ExtractJANCode(yahooShoppingItem.Description)
+	}
+
 	widthRange, depthRange, heightRange := parseDimensions(yahooShoppingItem.Name, yahooShoppingItem.Description)
 	return &xitem.Item{
 		ID:            xitem.ItemUniqueID(platform, yahooShoppingItem.Code),
@@ -305,7 +313,7 @@ func mapYahooShoppingItemToIndexItem(yahooShoppingItem *yahoo_shopping.Item, ite
 		WidthRange:    widthRange,
 		DepthRange:    depthRange,
 		HeightRange:   heightRange,
-		JANCode:       yahooShoppingItem.JanCode,
+		JANCode:       janCode,
 		Platform:      platform,
 	}, nil
 }

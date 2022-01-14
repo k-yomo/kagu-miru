@@ -324,7 +324,10 @@ func mapRakutenItemToIndexItem(
 		imageURLs = append(imageURLs, mediumImage.ImageURL)
 	}
 
-	janCode := jancode.ExtractJANCode(rakutenItem.ItemCaption)
+	janCode := jancode.ExtractJANCode(rakutenItem.ItemName)
+	if janCode == "" {
+		janCode = jancode.ExtractJANCode(rakutenItem.ItemCaption)
+	}
 
 	metadata := extractMetadataFromTags(rakutenItem.TagIDs, tagMap)
 
