@@ -12,7 +12,6 @@ import (
 
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
 	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
-	"github.com/k-yomo/kagu-miru/backend/pkg/imageutil"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
@@ -61,16 +60,16 @@ func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*xitem.Item) error 
 		return i.insertOrUpdateItemsToSpanner(ctx, spannerItems)
 	})
 	eg.Go(func() error {
-		var esItems []*es.Item
+		esItems := make([]*es.Item, 0, len(items))
 		for _, item := range items {
-			esItem := mapItemFetcherItemToElasticsearchItem(item)
-			groupID, ok := itemIDGroupIDMap[esItem.ID]
+			groupID, ok := itemIDGroupIDMap[item.ID]
 			if !ok {
 				continue
 			}
+			esItem := mapItemFetcherItemToElasticsearchItem(item)
 			esItem.GroupID = groupID
+			esItems = append(esItems, esItem)
 		}
-
 		return i.bulkIndexItemsToElasticsearch(ctx, esItems)
 	})
 
@@ -203,11 +202,13 @@ func isSameGroupItem(ctx context.Context, a *es.Item, b *es.Item) (bool, error) 
 		return true, nil
 	}
 
-	if len(a.ImageURLs) == 0 || len(b.ImageURLs) == 0 {
-		return false, nil
-	}
+	return false, nil
 
-	return imageutil.IsSimilarImageByURLs(ctx, a.ImageURLs[0], b.ImageURLs[0])
+	// image comparison precision is still low and produce a lot of false positive
+	// if len(a.ImageURLs) == 0 || len(b.ImageURLs) == 0 {
+	// 	return false, nil
+	// }
+	// return imageutil.IsSimilarImageByURLs(ctx, a.ImageURLs[0], b.ImageURLs[0])
 }
 
 func (i *ItemIndexer) getSimilarItems(ctx context.Context, item *xitem.Item) ([]*es.Item, error) {
