@@ -331,7 +331,7 @@ func dedupItems(items []*es.Item) []*es.Item {
 	groupIDMap := make(map[string]bool)
 	dedupedItems := make([]*es.Item, 0, len(items))
 	for _, item := range items {
-		if groupIDMap[item.GroupID] {
+		if item.GroupID != "" && groupIDMap[item.GroupID] {
 			continue
 		}
 		dedupedItems = append(dedupedItems, item)
