@@ -87,6 +87,12 @@ func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodel.Item,
 			sameGroupItems = append(sameGroupItems, gqlItem)
 		}
 	}
+	sort.Slice(sameGroupItems, func(i, j int) bool {
+		if sameGroupItems[i].AverageRating == sameGroupItems[j].AverageRating {
+			return sameGroupItems[i].ReviewCount > sameGroupItems[j].ReviewCount
+		}
+		return sameGroupItems[i].AverageRating > sameGroupItems[j].AverageRating
+	})
 	targetItem.SameGroupItems = sameGroupItems
 
 	return targetItem, nil

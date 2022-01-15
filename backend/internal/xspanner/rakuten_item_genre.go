@@ -2,6 +2,8 @@ package xspanner
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -12,6 +14,8 @@ import (
 )
 
 const RakutenItemGenresTableName = "rakuten_item_genres"
+
+var rakutenItemGenresTableAllColumnsString = strings.Join(getColumnNames(RakutenItemGenre{}), ", ")
 
 // RakutenItemGenre represents Genre (equivalent of item category in Kagumiru) used in Rakuten
 type RakutenItemGenre struct {
@@ -27,7 +31,7 @@ func GetAllRakutenItemGenres(ctx context.Context, spannerClient *spanner.Client)
 	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllRakutenItemGenres")
 	defer span.End()
 
-	stmt := spanner.NewStatement(`SELECT * FROM rakuten_item_genres`)
+	stmt := spanner.NewStatement(fmt.Sprintf(`SELECT %s FROM rakuten_item_genres`, rakutenItemGenresTableAllColumnsString))
 	iter := spannerClient.Single().Query(ctx, stmt)
 	defer iter.Stop()
 

@@ -2,6 +2,8 @@ package xspanner
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -12,6 +14,8 @@ import (
 )
 
 const YahooShoppingItemCategoriesTableName = "yahoo_shopping_item_categories"
+
+var yahooShoppingItemCategoriesTableAllColumnsString = strings.Join(getColumnNames(YahooShoppingItemCategory{}), ", ")
 
 // YahooShoppingItemCategory represents item category used in Yahoo Shopping
 type YahooShoppingItemCategory struct {
@@ -27,7 +31,7 @@ func GetAllYahooShoppingItemCategories(ctx context.Context, spannerClient *spann
 	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllYahooShoppingItemCategories")
 	defer span.End()
 
-	stmt := spanner.NewStatement(`SELECT * FROM yahoo_shopping_item_categories`)
+	stmt := spanner.NewStatement(fmt.Sprintf(`SELECT %s FROM yahoo_shopping_item_categories`, yahooShoppingItemCategoriesTableAllColumnsString))
 	iter := spannerClient.Single().Query(ctx, stmt)
 	defer iter.Stop()
 

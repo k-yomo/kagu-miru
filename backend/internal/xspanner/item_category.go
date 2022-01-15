@@ -2,7 +2,9 @@ package xspanner
 
 import (
 	"context"
+	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -13,6 +15,8 @@ import (
 )
 
 const ItemCategoriesTableName = "item_categories"
+
+var itemCategoriesTableAllColumnsString = strings.Join(getColumnNames(ItemCategory{}), ", ")
 
 type ItemCategory struct {
 	ID        string             `spanner:"id"`
@@ -86,7 +90,7 @@ func GetAllItemCategories(ctx context.Context, spannerClient *spanner.Client) ([
 	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllItemCategories")
 	defer span.End()
 
-	stmt := spanner.NewStatement(`SELECT * FROM item_categories`)
+	stmt := spanner.NewStatement(fmt.Sprintf(`SELECT %s FROM item_categories`, itemCategoriesTableAllColumnsString))
 	iter := spannerClient.Single().Query(ctx, stmt)
 	defer iter.Stop()
 

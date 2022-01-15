@@ -3,6 +3,7 @@ package xspanner
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/spanner"
@@ -13,6 +14,8 @@ import (
 )
 
 const ItemsTableName = "items"
+
+var itemsTableAllColumnsString = strings.Join(getColumnNames(Item{}), ", ")
 
 type Item struct {
 	ID            string             `spanner:"id"`
@@ -32,10 +35,9 @@ type Item struct {
 	WidthRange    []int64            `spanner:"width_range"`  // [gte, lte]
 	DepthRange    []int64            `spanner:"depth_range"`  // [gte, lte]
 	HeightRange   []int64            `spanner:"height_range"` // [gte, lte]
-	// TagIDs        []int    `spanner:"tag_ids"`
-	JANCode   spanner.NullString `spanner:"jan_code"`
-	Platform  xitem.Platform     `spanner:"platform"`
-	UpdatedAt time.Time          `spanner:"updated_at"`
+	JANCode       spanner.NullString `spanner:"jan_code"`
+	Platform      xitem.Platform     `spanner:"platform"`
+	UpdatedAt     time.Time          `spanner:"updated_at"`
 }
 
 func GetItem(ctx context.Context, spannerClient *spanner.Client, itemID string) (*Item, error) {
@@ -43,7 +45,7 @@ func GetItem(ctx context.Context, spannerClient *spanner.Client, itemID string) 
 	defer span.End()
 
 	stmt := spanner.Statement{
-		SQL:    `SELECT * FROM items WHERE id = @item_id`,
+		SQL:    fmt.Sprintf(`SELECT %s FROM items WHERE id = @item_id`, itemsTableAllColumnsString),
 		Params: map[string]interface{}{"item_id": itemID},
 	}
 	iter := spannerClient.Single().Query(ctx, stmt)
@@ -69,8 +71,8 @@ func GetSameGroupItemsByItemID(ctx context.Context, spannerClient *spanner.Clien
 	defer span.End()
 
 	stmt := spanner.Statement{
-		SQL: `
-SELECT * 
+		SQL: fmt.Sprintf(`
+SELECT %s
 FROM items
 WHERE 
 	group_id = (
@@ -78,7 +80,7 @@ WHERE
 		FROM items 
 		WHERE id = @item_id
 	)
-`,
+`, itemsTableAllColumnsString),
 		Params: map[string]interface{}{"item_id": itemID},
 	}
 	iter := spannerClient.Single().Query(ctx, stmt)

@@ -2,6 +2,8 @@ package xspanner
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -20,6 +22,8 @@ const (
 	TagGroupIDDepth  = 1000058
 	TagGroupIDHeight = 1000059
 )
+
+var rakutenTagsTableAllColumnsString = strings.Join(getColumnNames(RakutenTag{}), ", ")
 
 // RakutenTagGroup represents Tag group in Rakuten
 type RakutenTagGroup struct {
@@ -40,7 +44,7 @@ func GetAllRakutenTags(ctx context.Context, spannerClient *spanner.Client) ([]*R
 	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllRakutenTags")
 	defer span.End()
 
-	stmt := spanner.NewStatement(`SELECT * FROM rakuten_tags`)
+	stmt := spanner.NewStatement(fmt.Sprintf(`SELECT %s FROM rakuten_tags`, rakutenTagsTableAllColumnsString))
 	iter := spannerClient.Single().Query(ctx, stmt)
 	defer iter.Stop()
 
