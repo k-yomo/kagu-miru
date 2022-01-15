@@ -18,7 +18,7 @@ export default {
       validation: (Rule: Rule) => Rule.required(),
     },
     {
-      title: '記事リンク',
+      title: '対象記事',
       name: 'posts',
       type: 'array',
       of: [{ type: 'reference', to: { type: 'post' } }],
