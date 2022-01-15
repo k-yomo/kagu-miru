@@ -42,18 +42,14 @@ func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*xitem.Item) error 
 		return nil
 	}
 
-	var esItems []*es.Item
-	for _, item := range items {
-		esItem := mapItemFetcherItemToElasticsearchItem(item)
-		esItems = append(esItems, esItem)
-	}
-
-	itemIDGroupIDMap, err := i.groupItems(ctx, esItems)
+	itemIDGroupIDMap, err := i.getGroupIDItemIDMap(ctx, items)
 	if err != nil {
 		return err
 	}
 
-	for _, esItem := range esItems {
+	var esItems []*es.Item
+	for _, item := range items {
+		esItem := mapItemFetcherItemToElasticsearchItem(item)
 		groupID, ok := itemIDGroupIDMap[esItem.ID]
 		if !ok {
 			continue
@@ -128,81 +124,24 @@ func (i *ItemIndexer) bulkIndexItemsToElasticsearch(ctx context.Context, items [
 	return nil
 }
 
-type itemGroups struct {
-	sync.Mutex
-	itemGroups [][]*es.Item
-}
-
-func (ifg *itemGroups) Append(a *es.Item, b *es.Item) {
-	ifg.Lock()
-	defer ifg.Unlock()
-	// this is not efficient but should be fine since our list is not that big for now
-	for i, offerGroup := range ifg.itemGroups {
-		var aFound, bFound bool
-		for _, offer := range offerGroup {
-			if offer.ID == a.ID {
-				aFound = true
-			}
-			if offer.ID == b.ID {
-				bFound = true
-			}
-		}
-		if aFound && bFound {
-			return
-		}
-		if aFound {
-			ifg.itemGroups[i] = append(offerGroup, b)
-			return
-		}
-		if bFound {
-			ifg.itemGroups[i] = append(offerGroup, a)
-			return
-		}
-	}
-	ifg.itemGroups = append(ifg.itemGroups, []*es.Item{a, b})
-}
-
-func (i *ItemIndexer) groupItems(ctx context.Context, offers []*es.Item) (map[string]string, error) {
-	ifg := itemGroups{}
-	wg := sync.WaitGroup{}
-	for j := 0; j < len(offers)-1; j++ {
-		for k := j + 1; k < len(offers); k++ {
-			a, b := offers[j], offers[k]
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				isSimilar, err := isSimilarItem(ctx, a, b)
-				if err != nil {
-					// logging
-					return
-				}
-				if isSimilar {
-					ifg.Append(a, b)
-				}
-			}()
-		}
-	}
-	wg.Wait()
-
+func (i *ItemIndexer) getGroupIDItemIDMap(ctx context.Context, items []*xitem.Item) (map[string]string, error) {
 	eg := errgroup.Group{}
 	itemIDGroupIDChan := make(chan map[string]string)
 
-	for _, itemGroup := range ifg.itemGroups {
-		itemGroup := itemGroup
+	for _, item := range items {
+		item := item
 		eg.Go(func() error {
-			itemGroupID, err := i.findOrInitializeItemGroupID(ctx, itemGroup[0])
+			itemGroupID, err := i.findOrInitializeItemGroupID(ctx, item)
 			if err != nil {
 				return err
 			}
-			for _, offer := range itemGroup {
-				itemIDGroupIDChan <- map[string]string{offer.ID: itemGroupID}
-			}
+			itemIDGroupIDChan <- map[string]string{item.ID: itemGroupID}
 			return nil
 		})
 	}
 
 	itemIDGroupIDMap := make(map[string]string)
-	wg = sync.WaitGroup{}
+	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -227,7 +166,7 @@ func (i *ItemIndexer) groupItems(ctx context.Context, offers []*es.Item) (map[st
 	return itemIDGroupIDMap, nil
 }
 
-func (i *ItemIndexer) findOrInitializeItemGroupID(ctx context.Context, item *es.Item) (string, error) {
+func (i *ItemIndexer) findOrInitializeItemGroupID(ctx context.Context, item *xitem.Item) (string, error) {
 	// 1. find group id if already indexed
 	dbItem, err := xspanner.GetItem(ctx, i.spannerClient, item.ID)
 	if err != nil && !xerror.IsErrorType(err, xerror.TypeNotFound) {
@@ -242,7 +181,8 @@ func (i *ItemIndexer) findOrInitializeItemGroupID(ctx context.Context, item *es.
 		return "", err
 	}
 	for _, similarItem := range similarItems {
-		isSimilar, err := isSimilarItem(ctx, item, similarItem)
+		esItem := mapItemFetcherItemToElasticsearchItem(item)
+		isSimilar, err := isSimilarItem(ctx, esItem, similarItem)
 		if err != nil {
 			// logging
 			continue
@@ -271,7 +211,7 @@ func isSimilarItem(ctx context.Context, a *es.Item, b *es.Item) (bool, error) {
 	return imageutil.IsSimilarImageByURLs(ctx, a.ImageURLs[0], b.ImageURLs[0])
 }
 
-func (i *ItemIndexer) getSimilarItems(ctx context.Context, item *es.Item) ([]*es.Item, error) {
+func (i *ItemIndexer) getSimilarItems(ctx context.Context, item *xitem.Item) ([]*es.Item, error) {
 	boolQuery := elastic.NewBoolQuery().Must(
 		elastic.NewMatchQuery(es.ItemFieldName, item.Name),
 	).Filter(
