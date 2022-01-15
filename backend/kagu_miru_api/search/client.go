@@ -2,7 +2,6 @@ package search
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"math"
 	"time"
@@ -12,7 +11,6 @@ import (
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/db"
 
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
-	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	"github.com/k-yomo/kagu-miru/backend/pkg/xesquery"
@@ -96,7 +94,7 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 	}
 
 	return &Response{
-		Items:      mapElasticsearchHitsToItems(ctx, resp.Hits.Hits),
+		Items:      dedupItems(mapElasticsearchHitsToItems(ctx, resp.Hits.Hits)),
 		Facets:     s.mapAggregationToFacets(ctx, resp.Aggregations, postFilterMap, postMetadataFilterMap),
 		Page:       calcElasticSearchPage(input.Page) + 1,
 		TotalPage:  calcTotalPage(int(resp.Hits.TotalHits.Value), 100),
@@ -195,19 +193,22 @@ func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetS
 	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetSimilarIts")
 	defer span.End()
 
-	boolQuery := elastic.NewBoolQuery().Must(
-		elastic.NewMoreLikeThisQuery().Field(
-			xesquery.Boost(es.ItemFieldName, 30),
-			xesquery.Boost(es.ItemFieldBrandName, 10),
-			xesquery.Boost(es.ItemFieldCategoryNames, 5),
-			xesquery.Boost(es.ItemFieldColors, 5),
-			es.ItemFieldDescription,
-		).LikeItems(
-			elastic.NewMoreLikeThisQueryItem().
-				Index(s.itemsIndexName).
-				Id(input.ItemID),
-		),
-	).Filter(elastic.NewTermsQuery(es.ItemFieldCategoryIDs, item.CategoryID))
+	boolQuery := elastic.NewBoolQuery().
+		Must(
+			elastic.NewMoreLikeThisQuery().Field(
+				xesquery.Boost(es.ItemFieldName, 30),
+				xesquery.Boost(es.ItemFieldBrandName, 10),
+				xesquery.Boost(es.ItemFieldCategoryNames, 5),
+				xesquery.Boost(es.ItemFieldColors, 5),
+				es.ItemFieldDescription,
+			).LikeItems(
+				elastic.NewMoreLikeThisQueryItem().
+					Index(s.itemsIndexName).
+					Id(input.ItemID),
+			),
+		).
+		MustNot(elastic.NewTermQuery(es.ItemFieldGroupID, item.GroupID)).
+		Filter(elastic.NewTermQuery(es.ItemFieldCategoryIDs, item.CategoryID))
 
 	functionScoreQuery := elastic.NewFunctionScoreQuery().
 		Query(boolQuery).
@@ -246,7 +247,7 @@ func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetS
 	}
 
 	return &Response{
-		Items:      mapElasticsearchHitsToItems(ctx, resp.Hits.Hits),
+		Items:      dedupItems(mapElasticsearchHitsToItems(ctx, resp.Hits.Hits)),
 		Page:       calcElasticSearchPage(input.Page) + 1,
 		TotalPage:  calcTotalPage(int(resp.Hits.TotalHits.Value), 100),
 		TotalCount: int(resp.Hits.TotalHits.Value),
@@ -326,73 +327,15 @@ func calcElasticSearchPage(inputPage *int) int {
 	return page
 }
 
-func mapGraphqlPlatformToPlatform(platform gqlmodel.ItemSellingPlatform) (xitem.Platform, error) {
-	switch platform {
-	case gqlmodel.ItemSellingPlatformRakuten:
-		return xitem.PlatformRakuten, nil
-	case gqlmodel.ItemSellingPlatformYahooShopping:
-		return xitem.PlatformYahooShopping, nil
-	case gqlmodel.ItemSellingPlatformPaypayMall:
-		return xitem.PlatformPayPayMall, nil
-	default:
-		return "", fmt.Errorf("unknown platform %s", platform.String())
-	}
-}
-
-func mapGraphqlItemColorToSearchItemColor(color gqlmodel.ItemColor) string {
-	switch color {
-	case gqlmodel.ItemColorWhite:
-		return "ホワイト"
-	case gqlmodel.ItemColorYellow:
-		return "イエロー"
-	case gqlmodel.ItemColorOrange:
-		return "オレンジ"
-	case gqlmodel.ItemColorPink:
-		return "ピンク"
-	case gqlmodel.ItemColorRed:
-		return "レッド"
-	case gqlmodel.ItemColorBeige:
-		return "ベージュ"
-	case gqlmodel.ItemColorSilver:
-		return "シルバー"
-	case gqlmodel.ItemColorGold:
-		return "ゴールド"
-	case gqlmodel.ItemColorGray:
-		return "グレー"
-	case gqlmodel.ItemColorPurple:
-		return "パープル"
-	case gqlmodel.ItemColorBrown:
-		return "ブラウン"
-	case gqlmodel.ItemColorGreen:
-		return "グリーン"
-	case gqlmodel.ItemColorBlue:
-		return "ブルー"
-	case gqlmodel.ItemColorBlack:
-		return "ブラック"
-	case gqlmodel.ItemColorNavy:
-		return "ネイビー"
-	case gqlmodel.ItemColorKhaki:
-		return "カーキ"
-	case gqlmodel.ItemColorWineRed:
-		return "ワインレッド"
-	case gqlmodel.ItemColorTransparent:
-		return "透明"
-	default:
-		return ""
-	}
-}
-
-func mapElasticsearchHitsToItems(ctx context.Context, hits []*elastic.SearchHit) []*es.Item {
-	items := make([]*es.Item, 0, len(hits))
-	for _, hit := range hits {
-		var item es.Item
-		if err := json.Unmarshal(hit.Source, &item); err != nil {
-			logging.Logger(ctx).Error("Failed to unmarshal hit.Source into es.Item", zap.String("source", string(hit.Source)))
+func dedupItems(items []*es.Item) []*es.Item {
+	groupIDMap := make(map[string]bool)
+	dedupedItems := make([]*es.Item, 0, len(items))
+	for _, item := range items {
+		if groupIDMap[item.GroupID] {
 			continue
 		}
-
-		items = append(items, &item)
+		dedupedItems = append(dedupedItems, item)
+		groupIDMap[item.GroupID] = true
 	}
-
-	return items
+	return dedupedItems
 }

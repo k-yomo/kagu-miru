@@ -117,6 +117,10 @@
     <td></td>
   </tr>
   <tr>
+    <td><strong>groupID</strong> (<a href="scalars.md#id">ID!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>id</strong> (<a href="scalars.md#id">ID!</a>)</td> 
     <td></td>
   </tr>
@@ -138,6 +142,10 @@
   </tr>
   <tr>
     <td><strong>reviewCount</strong> (<a href="scalars.md#int">Int!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>sameGroupItems</strong> (<a href="objects.md#item">[Item!]!</a>)</td> 
     <td></td>
   </tr>
   <tr>

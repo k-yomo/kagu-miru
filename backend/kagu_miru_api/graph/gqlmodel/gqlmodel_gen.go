@@ -46,19 +46,21 @@ type GetSimilarItemsResponse struct {
 }
 
 type Item struct {
-	ID            string              `json:"id"`
-	Name          string              `json:"name"`
-	Description   string              `json:"description"`
-	Status        ItemStatus          `json:"status"`
-	URL           string              `json:"url"`
-	AffiliateURL  string              `json:"affiliateUrl"`
-	Price         int                 `json:"price"`
-	ImageUrls     []string            `json:"imageUrls"`
-	AverageRating float64             `json:"averageRating"`
-	ReviewCount   int                 `json:"reviewCount"`
-	CategoryID    string              `json:"categoryId"`
-	Colors        []ItemColor         `json:"colors"`
-	Platform      ItemSellingPlatform `json:"platform"`
+	ID             string              `json:"id"`
+	GroupID        string              `json:"groupID"`
+	Name           string              `json:"name"`
+	Description    string              `json:"description"`
+	Status         ItemStatus          `json:"status"`
+	URL            string              `json:"url"`
+	AffiliateURL   string              `json:"affiliateUrl"`
+	Price          int                 `json:"price"`
+	ImageUrls      []string            `json:"imageUrls"`
+	AverageRating  float64             `json:"averageRating"`
+	ReviewCount    int                 `json:"reviewCount"`
+	CategoryID     string              `json:"categoryId"`
+	Colors         []ItemColor         `json:"colors"`
+	Platform       ItemSellingPlatform `json:"platform"`
+	SameGroupItems []*Item             `json:"sameGroupItems"`
 }
 
 type ItemCategory struct {

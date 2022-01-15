@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/k-yomo/kagu-miru/backend/pkg/imageutil"
+
 	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
 
 	"github.com/k-yomo/kagu-miru/backend/pkg/uuid"
@@ -195,20 +197,17 @@ func (i *ItemIndexer) findOrInitializeItemGroupID(ctx context.Context, item *xit
 }
 
 func isSameGroupItem(ctx context.Context, a *es.Item, b *es.Item) (bool, error) {
-	if a.JANCode == b.JANCode {
+	if a.JANCode != "" && a.JANCode == b.JANCode {
 		return true, nil
 	}
 	if a.Name == b.Name {
 		return true, nil
 	}
 
-	return false, nil
-
-	// image comparison precision is still low and produce a lot of false positive
-	// if len(a.ImageURLs) == 0 || len(b.ImageURLs) == 0 {
-	// 	return false, nil
-	// }
-	// return imageutil.IsSimilarImageByURLs(ctx, a.ImageURLs[0], b.ImageURLs[0])
+	if len(a.ImageURLs) == 0 || len(b.ImageURLs) == 0 {
+		return false, nil
+	}
+	return imageutil.IsSimilarImageByURLs(ctx, a.ImageURLs[0], b.ImageURLs[0])
 }
 
 func (i *ItemIndexer) getSimilarItems(ctx context.Context, item *xitem.Item) ([]*es.Item, error) {

@@ -56,6 +56,10 @@ gql`
       reviewCount
       categoryId
       platform
+
+      sameGroupItems {
+        ...itemListItemFragment
+      }
     }
   }
 
@@ -273,8 +277,18 @@ export default function ItemDetailPage({ item }: Props) {
           </button>
         </a>
         <hr className="border-gray-100 dark:border-gray-800" />
+        <div className="px-3 py-2 bg-gray-100 dark:bg-gray-900">
+          <h2 className="mb-2 text-xl">他の出品</h2>
+          <div className="grid grid-flow-col auto-cols-min space-x-4 overflow-x-auto">
+            <ItemList
+              items={item.sameGroupItems}
+              onClickItem={onClickItem}
+              isAdmin={false}
+            />
+          </div>
+        </div>
         <div className="mx-3">
-          <h2 className="my-2 text-2xl">関連商品</h2>
+          <h2 className="my-2 text-xl">関連商品</h2>
           {loading ? <Loading /> : <></>}
           <div className="flex flex-col items-center">
             <div className="relative grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 md:gap-4 text-sm sm:text-md">

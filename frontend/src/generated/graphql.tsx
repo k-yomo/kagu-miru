@@ -88,12 +88,14 @@ export type Item = {
   categoryId: Scalars['ID'];
   colors: Array<ItemColor>;
   description: Scalars['String'];
+  groupID: Scalars['ID'];
   id: Scalars['ID'];
   imageUrls: Array<Scalars['String']>;
   name: Scalars['String'];
   platform: ItemSellingPlatform;
   price: Scalars['Int'];
   reviewCount: Scalars['Int'];
+  sameGroupItems: Array<Item>;
   status: ItemStatus;
   url: Scalars['String'];
 };
@@ -332,6 +334,20 @@ export type ItemDetailPageGetItemQuery = {
     reviewCount: number;
     categoryId: string;
     platform: ItemSellingPlatform;
+    sameGroupItems: Array<{
+      id: string;
+      name: string;
+      description: string;
+      status: ItemStatus;
+      url: string;
+      affiliateUrl: string;
+      price: number;
+      imageUrls: Array<string>;
+      averageRating: number;
+      reviewCount: number;
+      categoryId: string;
+      platform: ItemSellingPlatform;
+    }>;
   };
 };
 
@@ -569,6 +585,20 @@ export const ItemDetailPageGetItemDocument = gql`
       reviewCount
       categoryId
       platform
+      sameGroupItems {
+        id
+        name
+        description
+        status
+        url
+        affiliateUrl
+        price
+        imageUrls
+        averageRating
+        reviewCount
+        categoryId
+        platform
+      }
     }
   }
 `;

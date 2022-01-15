@@ -63,3 +63,42 @@ func GetItem(ctx context.Context, spannerClient *spanner.Client, itemID string) 
 
 	return &item, nil
 }
+
+func GetSameGroupItemsByItemID(ctx context.Context, spannerClient *spanner.Client, itemID string) ([]*Item, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetSameGroupItemsByItemID")
+	defer span.End()
+
+	stmt := spanner.Statement{
+		SQL: `
+SELECT * 
+FROM items
+WHERE 
+	group_id = (
+		SELECT group_id 
+		FROM items 
+		WHERE id = @item_id
+	)
+`,
+		Params: map[string]interface{}{"item_id": itemID},
+	}
+	iter := spannerClient.Single().Query(ctx, stmt)
+	defer iter.Stop()
+
+	var items []*Item
+	for {
+		row, err := iter.Next()
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+			return nil, err
+		}
+		var item Item
+		if err := row.ToStruct(&item); err != nil {
+			return nil, err
+		}
+		items = append(items, &item)
+	}
+
+	return items, nil
+}

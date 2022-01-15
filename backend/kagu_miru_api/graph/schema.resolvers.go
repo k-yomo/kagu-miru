@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
+
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
@@ -64,11 +66,30 @@ func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (
 }
 
 func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodel.Item, error) {
-	item, err := r.DBClient.GetItem(ctx, id)
+	items, err := r.DBClient.GetSameGroupItemsByItemID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("DBClient.GetItem: %w", err)
 	}
-	return mapSpannerItemToGraphqlItem(item)
+	if len(items) == 0 {
+		return nil, xerror.NewNotFound(fmt.Errorf("item '%s' is not found", id))
+	}
+
+	var targetItem *gqlmodel.Item
+	var sameGroupItems []*gqlmodel.Item
+	for _, item := range items {
+		gqlItem, err := mapSpannerItemToGraphqlItem(item)
+		if err != nil {
+			return nil, err
+		}
+		if item.ID == id {
+			targetItem = gqlItem
+		} else {
+			sameGroupItems = append(sameGroupItems, gqlItem)
+		}
+	}
+	targetItem.SameGroupItems = sameGroupItems
+
+	return targetItem, nil
 }
 
 func (r *queryResolver) GetAllItemCategories(ctx context.Context) ([]*gqlmodel.ItemCategory, error) {

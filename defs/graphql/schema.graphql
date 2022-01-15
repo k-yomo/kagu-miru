@@ -48,6 +48,7 @@ enum ItemSellingPlatform {
 
 type Item {
     id: ID!
+    groupID: ID!
     name: String!
     description: String!
     status: ItemStatus!
@@ -60,6 +61,8 @@ type Item {
     categoryId: ID!
     colors: [ItemColor!]!
     platform: ItemSellingPlatform!
+
+    sameGroupItems: [Item!]!
 }
 
 type ItemConnection {

@@ -19,6 +19,10 @@ func (s *SpannerDBClient) GetItem(ctx context.Context, itemID string) (*xspanner
 	return xspanner.GetItem(ctx, s.spannerClient, itemID)
 }
 
+func (s *SpannerDBClient) GetSameGroupItemsByItemID(ctx context.Context, itemID string) ([]*xspanner.Item, error) {
+	return xspanner.GetSameGroupItemsByItemID(ctx, s.spannerClient, itemID)
+}
+
 func (s *SpannerDBClient) GetAllItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error) {
 	return xspanner.GetAllItemCategories(ctx, s.spannerClient)
 }

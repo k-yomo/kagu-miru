@@ -68,3 +68,4 @@ CREATE TABLE items (
 ) PRIMARY KEY(id);
 
 CREATE INDEX items_by_updated_at ON items (updated_at);
+CREATE INDEX items_by_group_id ON items (group_id);
