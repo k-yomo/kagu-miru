@@ -3,7 +3,7 @@ import ItemIdInput from '../components/ItemIdInput';
 
 export default {
   name: 'item',
-  title: 'Item',
+  title: '商品',
   type: 'object',
   fields: [
     {

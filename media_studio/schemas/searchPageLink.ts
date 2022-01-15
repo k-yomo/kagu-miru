@@ -1,5 +1,4 @@
 import { Rule } from '@sanity/types';
-import SearchPageLinkPreview from '../components/SearchPageLinkPreview';
 
 export default {
   title: '検索ページリンク',

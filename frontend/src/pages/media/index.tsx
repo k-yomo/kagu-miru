@@ -8,6 +8,18 @@ import SEOMeta from '@src/components/SEOMeta';
 import PostCard, { PostMeta } from '@src/components/PostCard';
 import Image from 'next/image';
 
+const fetchFeaturedPostsGroupQuery = groq`*[_type == "postsGroup" && id == "featuredPosts"][0]{
+  title,
+  posts[]->{
+    "slug": slug.current,
+    title,
+    description,
+    mainImage,
+    publishedAt,
+    categories,
+  }
+}`;
+
 const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"]{
   "slug": slug.current,
   title,
@@ -18,19 +30,31 @@ const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"]{
 } | order(publishedAt desc) [0..9]`;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const props = await sanityClient.fetch(fetchRecentlyPublishedPostsQuery);
+  const featuredPostsGroup = await sanityClient.fetch(
+    fetchFeaturedPostsGroupQuery
+  );
+  const recentlyPublishedPosts = await sanityClient.fetch(
+    fetchRecentlyPublishedPostsQuery
+  );
   ctx.res.setHeader(
     'Cache-Control',
     'public, max-age=600, stale-while-revalidate=86400'
   );
-  return { props: { posts: props } };
+  return { props: { featuredPostsGroup, recentlyPublishedPosts } };
 };
 
 interface Props {
-  posts: PostMeta[];
+  recentlyPublishedPosts: PostMeta[];
+  featuredPostsGroup: {
+    title: string;
+    posts: PostMeta[];
+  };
 }
 
-export default function MediaTopPage({ posts }: Props) {
+export default function MediaTopPage({
+  recentlyPublishedPosts,
+  featuredPostsGroup,
+}: Props) {
   const router = useRouter();
   return (
     <>
@@ -54,9 +78,17 @@ export default function MediaTopPage({ posts }: Props) {
           />
         </div>
         <div className="mx-4">
+          <h2 className="text-3xl font-bold mt-8 mb-4">
+            {featuredPostsGroup.title}
+          </h2>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 sm:gap-4 gap-y-4 sm:gap-y-8">
+            {featuredPostsGroup.posts.map((post) => (
+              <PostCard key={post.slug} postMeta={post} />
+            ))}
+          </div>
           <h2 className="text-3xl font-bold mt-8 mb-4">新着記事一覧</h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 sm:gap-4 gap-y-4 sm:gap-y-8">
-            {posts.map((post) => (
+            {recentlyPublishedPosts.map((post) => (
               <PostCard key={post.slug} postMeta={post} />
             ))}
           </div>

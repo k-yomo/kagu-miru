@@ -8,6 +8,7 @@ import schemaTypes from 'all:part:@sanity/base/schema-type';
 import blockContent from './blockContent';
 import category from './category';
 import post from './post';
+import postsGroup from './postsGroup';
 import author from './author';
 import item from './item';
 import customHtml from './customHtml';
@@ -26,6 +27,7 @@ export default createSchema({
     // { type: 'typename' } in other document schemas
     category,
     post,
+    postsGroup,
     author,
     blockContent,
     item,

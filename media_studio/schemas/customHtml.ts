@@ -2,7 +2,7 @@ import CustomHtmlPreview from '../components/CustomHtmlPreview';
 
 export default {
   name: 'customHtml',
-  title: 'Custom HTML',
+  title: 'カスタムHTML',
   type: 'object',
   fields: [
     {

@@ -2,7 +2,7 @@ import { Rule } from '@sanity/types';
 
 export default {
   name: 'author',
-  title: 'Author',
+  title: 'ライター',
   type: 'document',
   fields: [
     {

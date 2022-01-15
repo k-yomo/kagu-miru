@@ -2,7 +2,7 @@ import CategoryInput from '../components/CategoryInput';
 
 export default {
   name: 'category',
-  title: 'Category',
+  title: 'カテゴリー',
   type: 'object',
   fields: [
     {
