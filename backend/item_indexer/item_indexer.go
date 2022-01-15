@@ -47,31 +47,30 @@ func (i *ItemIndexer) BulkIndex(ctx context.Context, items []*xitem.Item) error 
 		return err
 	}
 
-	var esItems []*es.Item
-	for _, item := range items {
-		esItem := mapItemFetcherItemToElasticsearchItem(item)
-		groupID, ok := itemIDGroupIDMap[esItem.ID]
-		if !ok {
-			continue
-		}
-		esItem.GroupID = groupID
-	}
-
-	spannerItems := make([]*xspanner.Item, 0, len(items))
-	for _, item := range items {
-		groupID, ok := itemIDGroupIDMap[item.ID]
-		if !ok {
-			continue
-		}
-		spannerItem := mapItemToSpannerItem(item, groupID)
-		spannerItems = append(spannerItems, spannerItem)
-	}
-
 	eg := errgroup.Group{}
 	eg.Go(func() error {
+		spannerItems := make([]*xspanner.Item, 0, len(items))
+		for _, item := range items {
+			groupID, ok := itemIDGroupIDMap[item.ID]
+			if !ok {
+				continue
+			}
+			spannerItem := mapItemToSpannerItem(item, groupID)
+			spannerItems = append(spannerItems, spannerItem)
+		}
 		return i.insertOrUpdateItemsToSpanner(ctx, spannerItems)
 	})
 	eg.Go(func() error {
+		var esItems []*es.Item
+		for _, item := range items {
+			esItem := mapItemFetcherItemToElasticsearchItem(item)
+			groupID, ok := itemIDGroupIDMap[esItem.ID]
+			if !ok {
+				continue
+			}
+			esItem.GroupID = groupID
+		}
+
 		return i.bulkIndexItemsToElasticsearch(ctx, esItems)
 	})
 
@@ -182,12 +181,12 @@ func (i *ItemIndexer) findOrInitializeItemGroupID(ctx context.Context, item *xit
 	}
 	for _, similarItem := range similarItems {
 		esItem := mapItemFetcherItemToElasticsearchItem(item)
-		isSimilar, err := isSimilarItem(ctx, esItem, similarItem)
+		isSameGroup, err := isSameGroupItem(ctx, esItem, similarItem)
 		if err != nil {
 			// logging
 			continue
 		}
-		if isSimilar {
+		if isSameGroup {
 			return similarItem.GroupID, nil
 		}
 	}
@@ -196,7 +195,7 @@ func (i *ItemIndexer) findOrInitializeItemGroupID(ctx context.Context, item *xit
 	return uuid.UUID(), nil
 }
 
-func isSimilarItem(ctx context.Context, a *es.Item, b *es.Item) (bool, error) {
+func isSameGroupItem(ctx context.Context, a *es.Item, b *es.Item) (bool, error) {
 	if a.JANCode == b.JANCode {
 		return true, nil
 	}
