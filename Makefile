@@ -13,9 +13,9 @@ run:
 	(./scripts/create_local_pubsub_resources.sh && goreman -set-ports=false start) & \
 	wait
 
-.PHONY: run-item-fetcher
-run-item-fetcher:
-	goreman -set-ports=false -f item_fetcher.Procfile start
+.PHONY: run-item-index
+run-item-index:
+	goreman -set-ports=false -f item_indexing.Procfile start
 
 .PHONY: run-media-studio
 run-media-studio:
