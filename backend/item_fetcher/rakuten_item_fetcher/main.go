@@ -32,6 +32,7 @@ func main() {
 		logger.Fatal("failed to initialize pubsub client", zap.Error(err))
 	}
 	pubsubItemUpdateTopic := pubsubClient.Topic(cfg.PubsubItemUpdateTopicID)
+	pubsubItemUpdateTopic.EnableMessageOrdering = true
 
 	spannerClient, err := spanner.NewClient(
 		context.Background(),
