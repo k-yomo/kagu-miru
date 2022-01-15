@@ -5,19 +5,18 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
-	"google.golang.org/api/iterator"
-
-	"go.opentelemetry.io/otel"
-
 	"cloud.google.com/go/spanner"
+	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
+	"go.opentelemetry.io/otel"
+	"google.golang.org/api/iterator"
 )
 
 const ItemsTableName = "items"
 
 type Item struct {
 	ID            string             `spanner:"id"`
+	GroupID       spanner.NullString `spanner:"group_id"` // temporally nullable, will fix to NOT NULL after migration
 	Name          string             `spanner:"name"`
 	Description   string             `spanner:"description"`
 	Status        int64              `spanner:"status"`

@@ -33,6 +33,9 @@
       "id": {
         "type": "keyword"
       },
+      "group_id": {
+        "type": "keyword"
+      },
       "name": {
         "type": "text",
         "analyzer": "kuromoji_analyzer"

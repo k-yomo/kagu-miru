@@ -4,6 +4,7 @@ import "github.com/k-yomo/kagu-miru/backend/internal/xitem"
 
 type Item struct {
 	ID            string         `json:"id"`
+	GroupID       string         `json:"group_id"`
 	Name          string         `json:"name"`
 	Description   string         `json:"description"`
 	Status        xitem.Status   `json:"status"`
@@ -30,6 +31,7 @@ func (i *Item) IsActive() bool {
 
 const (
 	ItemFieldID            = "id"
+	ItemFieldGroupID       = "group_id"
 	ItemFieldName          = "name"
 	ItemFieldDescription   = "description"
 	ItemFieldStatus        = "status"
@@ -49,25 +51,3 @@ const (
 	ItemFieldPlatform      = "platform"
 	ItemFieldIndexedAt     = "indexed_at"
 )
-
-var AllItemFields = []string{
-	ItemFieldID,
-	ItemFieldName,
-	ItemFieldDescription,
-	ItemFieldStatus,
-	ItemFieldURL,
-	ItemFieldAffiliateURL,
-	ItemFieldPrice,
-	ItemFieldImageURLs,
-	ItemFieldAverageRating,
-	ItemFieldReviewCount,
-	ItemFieldCategoryID,
-	ItemFieldCategoryIDs,
-	ItemFieldCategoryNames,
-	ItemFieldBrandName,
-	ItemFieldColors,
-	ItemFieldMetadata,
-	ItemFieldJANCode,
-	ItemFieldPlatform,
-	ItemFieldIndexedAt,
-}

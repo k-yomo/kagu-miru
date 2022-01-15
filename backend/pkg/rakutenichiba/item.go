@@ -100,7 +100,7 @@ const (
 )
 
 // SearchItem searches items
-// https://webservice.rakuten.co.jp/api/ichibaitemsearch/
+// https://webservice.rakuten.co.jp/documentation/ichiba-item-search
 func (c *Client) SearchItem(ctx context.Context, params *SearchItemParams) (*SearchItemResponse, error) {
 	if params.Keyword == "" && params.ShopCode == "" && params.ItemCode == "" && params.GenreID == 0 {
 		return nil, errors.New("either one of `Keyword`, `ShopCode`, `ItemCode` or `GenreID` must be supplied")

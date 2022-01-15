@@ -36,3 +36,7 @@ func ErrorType(err error) Type {
 	}
 	return TypeUnknown
 }
+
+func IsErrorType(err error, t Type) bool {
+	return ErrorType(err) == t
+}

@@ -1,4 +1,4 @@
-name: Item Spanner Inserter Deploy Workflow
+name: Item Indexer Deploy Workflow
 on:
   workflow_dispatch:
 
@@ -10,7 +10,7 @@ jobs:
   deploy:
     name: Deploy
     environment:
-      name: item-spanner-inserter-prod
+      name: item-indexer-prod
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,13 +26,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           gcloud --quiet auth configure-docker
-          docker build -t item-spanner-inserter -f item_spanner_inserter.Dockerfile .
-          docker tag item-spanner-inserter asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/item-spanner-inserter:latest
-          docker push asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/item-spanner-inserter
+          docker build -t item-indexer -f item_indexer.Dockerfile .
+          docker tag item-indexer asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/item-indexer:latest
+          docker push asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/item-indexer
         env:
           DOCKER_BUILDKIT: 1
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
         run: |
-          gcloud run deploy item-spanner-inserter-prod --image=asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/item-spanner-inserter:latest --project=${{ secrets.PROD_GCP_PROJECT }} --region=asia-northeast1 --platform=managed
+          gcloud run deploy item-indexer-prod --image=asia.gcr.io/${{ secrets.PROD_GCP_PROJECT }}/item-indexer:latest --project=${{ secrets.PROD_GCP_PROJECT }} --region=asia-northeast1 --platform=managed

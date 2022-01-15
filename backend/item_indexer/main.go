@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/spanner"
 	"github.com/blendle/zapdriver"
 	"github.com/k-yomo/pm"
 	"github.com/k-yomo/pm/middleware/pm_autoack"
@@ -28,6 +29,14 @@ func main() {
 	cfg, err := newConfig()
 	if err != nil {
 		logger.Fatal("failed to initialize config", zap.Error(err))
+	}
+
+	spannerClient, err := spanner.NewClient(
+		context.Background(),
+		fmt.Sprintf("projects/%s/instances/%s/databases/%s", cfg.GCPProjectID, cfg.SpannerInstanceID, cfg.SpannerDatabaseID),
+	)
+	if err != nil {
+		logger.Fatal("failed to initialize spanner client", zap.Error(err))
 	}
 
 	esClient, err := elastic.NewClientFromConfig(&esconfig.Config{
@@ -54,7 +63,7 @@ func main() {
 
 	defer pubsubSubscriber.Close()
 
-	indexer := NewItemIndexer(cfg.ItemsIndexName, esClient)
+	indexer := NewItemIndexer(spannerClient, esClient, cfg.ItemsIndexName)
 	err = pubsubSubscriber.HandleSubscriptionFunc(
 		pubsubClient.Subscription(cfg.PubsubItemUpdateSubscriptionID),
 		pm.NewBatchMessageHandler(newItemUpdateHandler(indexer, logger), pm.BatchMessageHandlerConfig{

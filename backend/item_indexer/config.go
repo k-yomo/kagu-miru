@@ -6,7 +6,10 @@ type config struct {
 	Port int `default:"8111" envconfig:"PORT"`
 
 	GCPProjectID                   string `envconfig:"GCP_PROJECT_ID"`
-	PubsubItemUpdateSubscriptionID string `default:"item-update.elasticsearch-indexer" envconfig:"PUBSUB_ITEM_UPDATE_SUBSCRIPTION_ID"`
+	PubsubItemUpdateSubscriptionID string `default:"item-update.item-indexer" envconfig:"PUBSUB_ITEM_UPDATE_SUBSCRIPTION_ID"`
+
+	SpannerInstanceID string `envconfig:"SPANNER_INSTANCE_ID"`
+	SpannerDatabaseID string `envconfig:"SPANNER_DATABASE_ID"`
 
 	ElasticSearchUsername string `envconfig:"ELASTICSEARCH_USERNAME"`
 	ElasticSearchPassword string `envconfig:"ELASTICSEARCH_PASSWORD"`

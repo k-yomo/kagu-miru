@@ -1,51 +1,14 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
 	"time"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/spanner"
+	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
+
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
-	"github.com/k-yomo/pm"
-	"go.uber.org/zap"
 )
-
-func newItemUpdateHandler(itemIndexer *ItemIndexer, logger *zap.Logger) pm.MessageBatchHandler {
-	return func(messages []*pubsub.Message) error {
-		items := make([]*es.Item, 0, len(messages))
-		for _, m := range messages {
-			var item xitem.Item
-			if err := json.Unmarshal(m.Data, &item); err != nil {
-				logger.Error(
-					"json.Unmarshal failed",
-					zap.Error(err),
-					zap.Any("messageId", m.ID),
-					zap.String("data", string(m.Data)),
-				)
-				continue
-			}
-			// Remove top level category not to show irrelevant items.
-			if len(item.CategoryNames) > 0 {
-				item.CategoryNames = item.CategoryNames[1:]
-			}
-			items = append(items, mapItemFetcherItemToElasticsearchItem(&item))
-		}
-
-		if err := itemIndexer.BulkIndex(context.Background(), items); err != nil {
-			logger.Error(
-				"itemIndexer.BulkIndex failed",
-				zap.Error(err),
-				zap.Any("items", items),
-			)
-			return fmt.Errorf("itemIndexer.BulkIndex: %w", err)
-		}
-		logger.Info(fmt.Sprintf("bluk indexed %d items", len(items)))
-		return nil
-	}
-}
 
 func mapItemFetcherItemToElasticsearchItem(item *xitem.Item) *es.Item {
 	return &es.Item{
@@ -93,4 +56,36 @@ func extractMetadata(item *xitem.Item) []es.Metadata {
 	}
 
 	return facets
+}
+
+func mapItemToSpannerItem(item *xitem.Item, groupID string) *xspanner.Item {
+	return &xspanner.Item{
+		ID:            item.ID,
+		GroupID:       spanner.NullString{StringVal: groupID, Valid: true},
+		Name:          item.Name,
+		Description:   item.Description,
+		Status:        int64(item.Status),
+		URL:           item.URL,
+		AffiliateURL:  item.AffiliateURL,
+		Price:         int64(item.Price),
+		ImageURLs:     item.ImageURLs,
+		AverageRating: item.AverageRating,
+		ReviewCount:   int64(item.ReviewCount),
+		CategoryID:    item.CategoryID,
+		BrandName:     spanner.NullString{StringVal: item.BrandName, Valid: item.BrandName != ""},
+		Colors:        item.Colors,
+		WidthRange:    mapIntRangeToSpannerRange(item.WidthRange),
+		DepthRange:    mapIntRangeToSpannerRange(item.DepthRange),
+		HeightRange:   mapIntRangeToSpannerRange(item.HeightRange),
+		JANCode:       spanner.NullString{StringVal: item.JANCode, Valid: item.JANCode != ""},
+		Platform:      item.Platform,
+		UpdatedAt:     time.Now(),
+	}
+}
+
+func mapIntRangeToSpannerRange(r *xitem.IntRange) []int64 {
+	if r == nil {
+		return nil
+	}
+	return []int64{int64(r.Gte), int64(r.Lte)}
 }

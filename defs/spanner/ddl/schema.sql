@@ -45,6 +45,7 @@ CREATE TABLE rakuten_tags (
 
 CREATE TABLE items (
     id STRING(256) NOT NULL,
+    group_id STRING(256),
     name STRING(256) NOT NULL,
     description STRING(16384) NOT NULL,
     status INT64 NOT NULL,

@@ -2,13 +2,11 @@ package tracking
 
 import (
 	"context"
-	"math/rand"
 	"net/http"
 	"time"
 
-	"github.com/oklog/ulid/v2"
-
 	"github.com/alexedwards/scs/v2"
+	"github.com/k-yomo/kagu-miru/backend/pkg/uuid"
 )
 
 type SearchIDManager struct {
@@ -36,13 +34,7 @@ func (s *SearchIDManager) GetSearchID(ctx context.Context) string {
 	if searchID != "" {
 		return searchID
 	}
-	searchID = uuid()
+	searchID = uuid.UUID()
 	s.sessionManager.Put(ctx, "searchId", searchID)
 	return searchID
-}
-
-func uuid() string {
-	t := time.Now()
-	entropy := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
-	return ulid.MustNew(ulid.Timestamp(t), entropy).String()
 }

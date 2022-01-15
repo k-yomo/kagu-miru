@@ -9,7 +9,7 @@ RUN apk --no-cache add make ca-certificates tzdata
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY backend/elasticsearch_indexer backend/item_indexer
+COPY backend/item_indexer backend/item_indexer
 COPY backend/internal backend/internal
 COPY backend/pkg backend/pkg
 
