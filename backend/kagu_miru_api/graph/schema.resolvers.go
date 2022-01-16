@@ -66,9 +66,18 @@ func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (
 }
 
 func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodel.Item, error) {
-	items, err := r.DBClient.GetSameGroupItemsByItemID(ctx, id)
+	// This is temp implementation while migration since eventually item must have group id
+	item, err := r.DBClient.GetItem(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("DBClient.GetItem: %w", err)
+	}
+	if !item.GroupID.Valid {
+		return mapSpannerItemToGraphqlItem(item)
+	}
+
+	items, err := r.DBClient.GetSameGroupItemsByItemID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("DBClient.GetSameGroupItemsByItemID: %w", err)
 	}
 	if len(items) == 0 {
 		return nil, xerror.NewNotFound(fmt.Errorf("item '%s' is not found", id))
