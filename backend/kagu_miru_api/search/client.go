@@ -6,23 +6,26 @@ import (
 	"math"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
+	"go.uber.org/zap"
+
 	"github.com/k-yomo/kagu-miru/backend/internal/xspanner"
 
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/db"
 
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
-	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	"github.com/k-yomo/kagu-miru/backend/pkg/xesquery"
 	"github.com/olivere/elastic/v7"
 	"go.opentelemetry.io/otel"
-	"go.uber.org/zap"
 )
 
 const (
 	defaultPage     int = 0
 	defaultPageSize int = 100
 	maxPageSize     int = 1000
+
+	minRequiredHitsForQuerySuggestion = 100
 )
 
 type Client interface {
@@ -64,12 +67,6 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_SearchItems")
 	defer span.End()
 
-	go func() {
-		if err := s.insertQuerySuggestion(context.Background(), input.Query); err != nil {
-			logging.Logger(ctx).Error("insertQuerySuggestion failed", zap.Error(err))
-		}
-	}()
-
 	searchQuery, err := buildSearchQuery(input)
 	if err != nil {
 		return nil, fmt.Errorf("buildSearchQuery: %w", err)
@@ -91,6 +88,14 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 		Do(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("esClient.Search: %w", err)
+	}
+
+	if resp.Hits.TotalHits.Value >= minRequiredHitsForQuerySuggestion {
+		go func() {
+			if err := s.insertQuerySuggestion(context.Background(), input.Query); err != nil {
+				logging.Logger(ctx).Error("insertQuerySuggestion failed", zap.Error(err))
+			}
+		}()
 	}
 
 	return &Response{
