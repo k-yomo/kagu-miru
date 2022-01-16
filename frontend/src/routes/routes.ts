@@ -1,5 +1,5 @@
 export const routes = {
-  top: () => '/',
+  home: () => '/',
   search: () => '/search',
 
   itemDetail: (itemId: string) => `/items/${itemId}`,
