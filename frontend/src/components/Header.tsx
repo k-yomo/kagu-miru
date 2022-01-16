@@ -18,7 +18,7 @@ export default memo(function Header() {
 
           <div className="flex items-center justify-end flex-1 divide-x-2 divide-black dark:divide-white">
             <div className="pr-3">
-              <Link href={routes.top()}>
+              <Link href={routes.search()}>
                 <a aria-label="検索">
                   <SearchIcon className="w-5 h-5" />
                 </a>

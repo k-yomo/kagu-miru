@@ -1,5 +1,6 @@
 export const routes = {
   top: () => '/',
+  search: () => '/search',
 
   itemDetail: (itemId: string) => `/items/${itemId}`,
 

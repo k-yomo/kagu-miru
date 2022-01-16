@@ -235,7 +235,7 @@ export default function ItemDetailPage({ item }: Props) {
                   {i !== 0 && (
                     <ChevronRightIcon className="w-5 h-5 text-text-secondary dark:text-text-secondary-dark" />
                   )}
-                  <Link href={`${routes.top()}?categoryIds=${categoryId}`}>
+                  <Link href={`${routes.search()}?categoryIds=${categoryId}`}>
                     <a className="block text-primary-500 cursor-pointer">
                       {findCategoryNameById(categoryId)}
                     </a>
