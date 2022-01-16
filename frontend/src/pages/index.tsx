@@ -20,10 +20,7 @@ TopPage.getInitialProps = async ({ req, res, query }) => {
     return {};
   }
 
-  router.push({
-    pathname: routes.search(),
-    query: router.query,
-  });
+  router.push(`${routes.search()}${router.asPath}`);
 
   return {};
 };
