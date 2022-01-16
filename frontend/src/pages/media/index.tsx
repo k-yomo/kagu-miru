@@ -56,6 +56,13 @@ export default function MediaTopPage({
   featuredPostsGroup,
 }: Props) {
   const router = useRouter();
+
+  const featuredPostSlugs = featuredPostsGroup.posts.map((p) => p.slug);
+  // remove duplicated posts from recently published posts
+  recentlyPublishedPosts = recentlyPublishedPosts.filter(
+    (p) => !featuredPostSlugs.includes(p.slug)
+  );
+
   return (
     <>
       <SEOMeta
