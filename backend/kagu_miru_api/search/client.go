@@ -207,8 +207,12 @@ func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetS
 					Id(input.ItemID),
 			),
 		).
-		MustNot(elastic.NewTermQuery(es.ItemFieldGroupID, item.GroupID)).
+		// MustNot(elastic.NewTermQuery(es.ItemFieldGroupID, item.GroupID)).
 		Filter(elastic.NewTermQuery(es.ItemFieldCategoryIDs, item.CategoryID))
+	// This is temp implementation while migration since eventually item must have group id
+	if item.GroupID.Valid {
+		boolQuery.MustNot(elastic.NewTermQuery(es.ItemFieldGroupID, item.GroupID))
+	}
 
 	functionScoreQuery := elastic.NewFunctionScoreQuery().
 		Query(boolQuery).
