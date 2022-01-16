@@ -2,6 +2,6 @@
     <ShortName>カグミル</ShortName>
     <Description>カグミル</Description>
     <InputEncoding>UTF-8</InputEncoding>
-    <Url type="text/html" method="get" template="https://kagu-miru.com/?q={searchTerms}&amp;searchFrom=OPEN_SEARCH"/>
+    <Url type="text/html" method="get" template="https://kagu-miru.com/search?q={searchTerms}&amp;searchFrom=OPEN_SEARCH"/>
     <moz:SearchForm>https://kagu-miru.com/</moz:SearchForm>
 </OpenSearchDescription>
