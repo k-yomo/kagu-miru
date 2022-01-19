@@ -8,13 +8,13 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
+
 	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/cms"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
-	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
-	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -146,10 +146,11 @@ func (r *queryResolver) Search(ctx context.Context, input gqlmodel.SearchInput) 
 
 	resp, err := r.SearchClient.SearchItems(ctx, &input)
 	if err != nil {
-		logging.Logger(ctx).Error(fmt.Sprintf("SearchClient.SearchItems: %v", err), zap.Error(err))
 		return nil, fmt.Errorf("SearchClient.SearchItems: %w", err)
 	}
-	return mapSearchResponseToGraphqlSearchResponse(resp, r.SearchIDManager.GetSearchID(ctx))
+
+	gqlRes, err := mapSearchResponseToGraphqlSearchResponse(resp, r.SearchIDManager.GetSearchID(ctx))
+	return gqlRes, logging.Error(ctx, fmt.Errorf("mapSearchResponseToGraphqlGetSimilarItemsResponse: %w", err))
 }
 
 func (r *queryResolver) GetSimilarItems(ctx context.Context, input gqlmodel.GetSimilarItemsInput) (*gqlmodel.GetSimilarItemsResponse, error) {
@@ -162,7 +163,8 @@ func (r *queryResolver) GetSimilarItems(ctx context.Context, input gqlmodel.GetS
 		return nil, fmt.Errorf("SearchClient.GetSimilarItems: %w", err)
 	}
 
-	return mapSearchResponseToGraphqlGetSimilarItemsResponse(resp, r.SearchIDManager.GetSearchID(ctx))
+	gqlRes, err := mapSearchResponseToGraphqlGetSimilarItemsResponse(resp, r.SearchIDManager.GetSearchID(ctx))
+	return gqlRes, logging.Error(ctx, fmt.Errorf("mapSearchResponseToGraphqlGetSimilarItemsResponse: %w", err))
 }
 
 func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (*gqlmodel.QuerySuggestionsResponse, error) {
@@ -200,7 +202,7 @@ func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodel.Item,
 	for _, item := range items {
 		gqlItem, err := mapSpannerItemToGraphqlItem(item)
 		if err != nil {
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("mapSpannerItemToGraphqlItem :%w", err))
 		}
 		if item.ID == id {
 			targetItem = gqlItem

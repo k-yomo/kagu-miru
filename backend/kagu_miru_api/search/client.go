@@ -69,7 +69,7 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 
 	searchQuery, err := buildSearchQuery(input)
 	if err != nil {
-		return nil, fmt.Errorf("buildSearchQuery: %w", err)
+		return nil, logging.Error(ctx, fmt.Errorf("buildSearchQuery: %w", err))
 	}
 	pageSize := defaultPageSize
 	if input.PageSize != nil {
@@ -87,7 +87,7 @@ func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchIn
 		RequestCache(true).
 		Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("esClient.Search: %w", err)
+		return nil, logging.Error(ctx, fmt.Errorf("esClient.Search: %w", err))
 	}
 
 	if resp.Hits.TotalHits.Value >= minRequiredHitsForQuerySuggestion {
@@ -252,7 +252,7 @@ func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetS
 		RequestCache(true).
 		Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("esClient.Search: %w", err)
+		return nil, logging.Error(ctx, fmt.Errorf("esClient.Search: %w", err))
 	}
 
 	return &Response{
@@ -286,12 +286,12 @@ func (s *searchClient) GetQuerySuggestions(ctx context.Context, query string) ([
 		RequestCache(true).
 		Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("esClient.Search: %w", err)
+		return nil, logging.Error(ctx, fmt.Errorf("esClient.Search: %w", err))
 	}
 
 	bucketKeyItems, ok := resp.Aggregations.Terms(aggregationTerm)
 	if !ok {
-		return nil, fmt.Errorf("aggregation term '%s' not found in the search result, aggs: %+v", aggregationTerm, resp.Aggregations)
+		return nil, logging.Error(ctx, fmt.Errorf("aggregation term '%s' not found in the search result, aggs: %+v", aggregationTerm, resp.Aggregations))
 	}
 
 	suggestedQueries := make([]string, 0, len(bucketKeyItems.Buckets))

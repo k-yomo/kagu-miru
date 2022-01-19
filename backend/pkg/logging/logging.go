@@ -30,6 +30,13 @@ func Logger(ctx context.Context) *zap.Logger {
 	return ctxzap.Extract(ctx)
 }
 
+func Error(ctx context.Context, err error) error {
+	if err != nil {
+		Logger(ctx).WithOptions(zap.AddCallerSkip(1)).Error(err.Error())
+	}
+	return err
+}
+
 func AddFields(ctx context.Context, fields ...zap.Field) {
 	ctxzap.AddFields(ctx, fields...)
 }

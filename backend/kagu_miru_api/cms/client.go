@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	sanity "github.com/sanity-io/client-go"
 )
 
@@ -40,12 +41,12 @@ func (c *cmsClient) GetFeaturedPosts(ctx context.Context) (*GetFeaturedPostsResp
 }`
 	result, err := c.sanityClient.Query(query).Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query to sanity: %w", err)
+		return nil, logging.Error(ctx, fmt.Errorf("failed to query to sanity: %w", err))
 	}
 
 	var resp GetFeaturedPostsResponse
 	if err := result.Unmarshal(&resp); err != nil {
-		return nil, fmt.Errorf("failed to unmmarshal query response: %w", err)
+		return nil, logging.Error(ctx, fmt.Errorf("failed to query to sanity: %w", err))
 	}
 
 	return &resp, nil

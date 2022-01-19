@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
+
 	"go.opentelemetry.io/otel"
 
 	"google.golang.org/api/iterator"
@@ -102,11 +104,11 @@ func GetAllItemCategories(ctx context.Context, spannerClient *spanner.Client) ([
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("iter.Next :%w", err))
 		}
 		var itemCategory ItemCategory
 		if err := row.ToStruct(&itemCategory); err != nil {
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("row.ToStruct :%w", err))
 		}
 		itemCategories = append(itemCategories, &itemCategory)
 	}
@@ -130,11 +132,11 @@ func GetTopLevelItemCategories(ctx context.Context, spannerClient *spanner.Clien
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("iter.Next :%w", err))
 		}
 		var itemCategory ItemCategory
 		if err := row.ToStruct(&itemCategory); err != nil {
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("row.ToStruct :%w", err))
 		}
 		itemCategories = append(itemCategories, &itemCategory)
 	}

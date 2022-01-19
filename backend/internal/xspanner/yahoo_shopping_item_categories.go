@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
+
 	"go.opentelemetry.io/otel"
 
 	"google.golang.org/api/iterator"
@@ -42,11 +44,11 @@ func GetAllYahooShoppingItemCategories(ctx context.Context, spannerClient *spann
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("iter.Next :%w", err))
 		}
 		var genre YahooShoppingItemCategory
 		if err := row.ToStruct(&genre); err != nil {
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("row.ToStruct :%w", err))
 		}
 		itemCategories = append(itemCategories, &genre)
 	}

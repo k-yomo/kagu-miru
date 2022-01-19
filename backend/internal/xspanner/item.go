@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
+
 	"cloud.google.com/go/spanner"
 	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
 	"github.com/k-yomo/kagu-miru/backend/internal/xitem"
@@ -60,7 +62,7 @@ func GetItem(ctx context.Context, spannerClient *spanner.Client, itemID string) 
 	}
 	var item Item
 	if err := row.ToStruct(&item); err != nil {
-		return nil, err
+		return nil, logging.Error(ctx, fmt.Errorf("unmarshal spanner result to item struct :%w", err))
 	}
 
 	return &item, nil
@@ -93,11 +95,11 @@ WHERE
 			if err == iterator.Done {
 				break
 			}
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("iter.Next :%w", err))
 		}
 		var item Item
 		if err := row.ToStruct(&item); err != nil {
-			return nil, err
+			return nil, logging.Error(ctx, fmt.Errorf("row.ToStruct :%w", err))
 		}
 		items = append(items, &item)
 	}
