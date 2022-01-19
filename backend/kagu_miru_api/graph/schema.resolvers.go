@@ -33,6 +33,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 			Filter: &gqlmodel.SearchFilter{
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformRakuten},
 			},
+			SortType: gqlmodel.SearchSortTypeReviewCount,
 			PageSize: func() *int { i := 10; return &i }(),
 		})
 		return err
@@ -45,6 +46,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 			Filter: &gqlmodel.SearchFilter{
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformYahooShopping},
 			},
+			SortType: gqlmodel.SearchSortTypeReviewCount,
 			PageSize: func() *int { i := 10; return &i }(),
 		})
 		return err
@@ -57,6 +59,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 			Filter: &gqlmodel.SearchFilter{
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformPaypayMall},
 			},
+			SortType: gqlmodel.SearchSortTypeReviewCount,
 			PageSize: func() *int { i := 10; return &i }(),
 		})
 		return err
@@ -150,7 +153,10 @@ func (r *queryResolver) Search(ctx context.Context, input gqlmodel.SearchInput) 
 	}
 
 	gqlRes, err := mapSearchResponseToGraphqlSearchResponse(resp, r.SearchIDManager.GetSearchID(ctx))
-	return gqlRes, logging.Error(ctx, fmt.Errorf("mapSearchResponseToGraphqlGetSimilarItemsResponse: %w", err))
+	if err != nil {
+		return nil, logging.Error(ctx, fmt.Errorf("mapSearchResponseToGraphqlGetSimilarItemsResponse: %w", err))
+	}
+	return gqlRes, nil
 }
 
 func (r *queryResolver) GetSimilarItems(ctx context.Context, input gqlmodel.GetSimilarItemsInput) (*gqlmodel.GetSimilarItemsResponse, error) {
@@ -164,7 +170,10 @@ func (r *queryResolver) GetSimilarItems(ctx context.Context, input gqlmodel.GetS
 	}
 
 	gqlRes, err := mapSearchResponseToGraphqlGetSimilarItemsResponse(resp, r.SearchIDManager.GetSearchID(ctx))
-	return gqlRes, logging.Error(ctx, fmt.Errorf("mapSearchResponseToGraphqlGetSimilarItemsResponse: %w", err))
+	if err != nil {
+		return nil, logging.Error(ctx, fmt.Errorf("mapSearchResponseToGraphqlGetSimilarItemsResponse: %w", err))
+	}
+	return gqlRes, nil
 }
 
 func (r *queryResolver) GetQuerySuggestions(ctx context.Context, query string) (*gqlmodel.QuerySuggestionsResponse, error) {

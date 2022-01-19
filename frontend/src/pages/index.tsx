@@ -308,7 +308,7 @@ function HomeComponentPosts({
         <a>
           <button
             type="button"
-            className="block mx-auto my-4 px-2.5 py-3 w-[80%] rounded border-2 border-gray-800 dark:border-gray-200 text-center focus:outline-none"
+            className="block mx-auto my-4 px-2.5 py-3 w-[80%] rounded border-[1px] border-gray-800 dark:border-gray-200 text-center focus:outline-none"
           >
             記事をもっと見る
           </button>
