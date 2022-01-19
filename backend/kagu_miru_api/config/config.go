@@ -29,6 +29,7 @@ type Config struct {
 	VertexAICategoryClassificationEndpointID string `envconfig:"VERTEX_AI_CATEGORY_CLASSIFICATION_ENDPOINT_ID"`
 
 	SanityProjectID string `envconfig:"SANITY_PROJECT_ID"`
+	SanityDatasetID string `default:"development" envconfig:"SANITY_DATASET_ID"`
 
 	ElasticSearchUsername string `envconfig:"ELASTICSEARCH_USERNAME"`
 	ElasticSearchPassword string `envconfig:"ELASTICSEARCH_PASSWORD"`

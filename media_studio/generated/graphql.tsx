@@ -277,6 +277,7 @@ export type SearchFilter = {
 
 export enum SearchFrom {
   Filter = 'FILTER',
+  Home = 'HOME',
   Media = 'MEDIA',
   OpenSearch = 'OPEN_SEARCH',
   QuerySuggestion = 'QUERY_SUGGESTION',

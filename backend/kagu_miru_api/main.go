@@ -103,7 +103,7 @@ func main() {
 	}
 	queryClassifierClient := queryclassifier.NewQueryClassifierClient(predictionClient, cfg.GCPProjectID, cfg.VertexAICategoryClassificationEndpointID)
 
-	sanityClient, err := sanity.New(cfg.SanityProjectID)
+	sanityClient, err := sanity.New(cfg.SanityProjectID, sanity.WithDataset(cfg.SanityProjectID))
 	if err != nil {
 		logger.Fatal("failed to initialize sanity client", zap.Error(err))
 	}

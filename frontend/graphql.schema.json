@@ -2386,6 +2386,12 @@
             "deprecationReason": null
           },
           {
+            "name": "HOME",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "MEDIA",
             "description": null,
             "isDeprecated": false,

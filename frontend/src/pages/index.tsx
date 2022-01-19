@@ -20,6 +20,7 @@ import {
   Action,
   HomeClickItemActionParams,
   useTrackEventMutation,
+  SearchFrom,
 } from '@src/generated/graphql';
 import ItemList from '@src/components/ItemList';
 import PostCard from '@src/components/PostCard';
@@ -267,7 +268,9 @@ function HomeComponentCategories({
           {displayableCategories.map((category) => (
             <Link
               key={category.id}
-              href={`${routes.search()}?categoryIds=${category.id}`}
+              href={`${routes.search()}?categoryIds=${category.id}&searchFrom=${
+                SearchFrom.Home
+              }`}
             >
               <a className="flex flex-col items-center justify-center my-1 border-[1px] border-gray-100 dark:border-gray-800 p-2 text-sm">
                 {category.imageUrl && (

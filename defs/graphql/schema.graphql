@@ -241,6 +241,7 @@ input Event {
 enum SearchFrom {
     URL
     OPEN_SEARCH
+    HOME
     SEARCH
     QUERY_SUGGESTION
     FILTER
