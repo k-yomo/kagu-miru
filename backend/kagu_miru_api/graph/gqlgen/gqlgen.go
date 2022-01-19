@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -62,6 +63,35 @@ type ComplexityRoot struct {
 		SearchID       func(childComplexity int) int
 	}
 
+	HomeComponent struct {
+		ID      func(childComplexity int) int
+		Payload func(childComplexity int) int
+	}
+
+	HomeComponentPayloadCategories struct {
+		Categories func(childComplexity int) int
+		Title      func(childComplexity int) int
+	}
+
+	HomeComponentPayloadItemGroups struct {
+		Payload func(childComplexity int) int
+		Title   func(childComplexity int) int
+	}
+
+	HomeComponentPayloadItems struct {
+		Items func(childComplexity int) int
+		Title func(childComplexity int) int
+	}
+
+	HomeComponentPayloadMediaPosts struct {
+		Posts func(childComplexity int) int
+		Title func(childComplexity int) int
+	}
+
+	HomeResponse struct {
+		Components func(childComplexity int) int
+	}
+
 	Item struct {
 		AffiliateURL   func(childComplexity int) int
 		AverageRating  func(childComplexity int) int
@@ -83,6 +113,7 @@ type ComplexityRoot struct {
 	ItemCategory struct {
 		Children func(childComplexity int) int
 		ID       func(childComplexity int) int
+		ImageURL func(childComplexity int) int
 		Level    func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Parent   func(childComplexity int) int
@@ -92,6 +123,21 @@ type ComplexityRoot struct {
 	ItemConnection struct {
 		Nodes    func(childComplexity int) int
 		PageInfo func(childComplexity int) int
+	}
+
+	MediaPost struct {
+		Categories   func(childComplexity int) int
+		Description  func(childComplexity int) int
+		ID           func(childComplexity int) int
+		MainImageURL func(childComplexity int) int
+		PublishedAt  func(childComplexity int) int
+		Slug         func(childComplexity int) int
+		Title        func(childComplexity int) int
+	}
+
+	MediaPostCategory struct {
+		ID    func(childComplexity int) int
+		Names func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -109,6 +155,7 @@ type ComplexityRoot struct {
 		GetItem              func(childComplexity int, id string) int
 		GetQuerySuggestions  func(childComplexity int, query string) int
 		GetSimilarItems      func(childComplexity int, input gqlmodel.GetSimilarItemsInput) int
+		Home                 func(childComplexity int) int
 		Search               func(childComplexity int, input gqlmodel.SearchInput) int
 	}
 
@@ -128,6 +175,7 @@ type MutationResolver interface {
 	TrackEvent(ctx context.Context, event gqlmodel.Event) (bool, error)
 }
 type QueryResolver interface {
+	Home(ctx context.Context) (*gqlmodel.HomeResponse, error)
 	Search(ctx context.Context, input gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error)
 	GetSimilarItems(ctx context.Context, input gqlmodel.GetSimilarItemsInput) (*gqlmodel.GetSimilarItemsResponse, error)
 	GetQuerySuggestions(ctx context.Context, query string) (*gqlmodel.QuerySuggestionsResponse, error)
@@ -212,6 +260,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.GetSimilarItemsResponse.SearchID(childComplexity), true
+
+	case "HomeComponent.id":
+		if e.complexity.HomeComponent.ID == nil {
+			break
+		}
+
+		return e.complexity.HomeComponent.ID(childComplexity), true
+
+	case "HomeComponent.payload":
+		if e.complexity.HomeComponent.Payload == nil {
+			break
+		}
+
+		return e.complexity.HomeComponent.Payload(childComplexity), true
+
+	case "HomeComponentPayloadCategories.categories":
+		if e.complexity.HomeComponentPayloadCategories.Categories == nil {
+			break
+		}
+
+		return e.complexity.HomeComponentPayloadCategories.Categories(childComplexity), true
+
+	case "HomeComponentPayloadCategories.title":
+		if e.complexity.HomeComponentPayloadCategories.Title == nil {
+			break
+		}
+
+		return e.complexity.HomeComponentPayloadCategories.Title(childComplexity), true
+
+	case "HomeComponentPayloadItemGroups.payload":
+		if e.complexity.HomeComponentPayloadItemGroups.Payload == nil {
+			break
+		}
+
+		return e.complexity.HomeComponentPayloadItemGroups.Payload(childComplexity), true
+
+	case "HomeComponentPayloadItemGroups.title":
+		if e.complexity.HomeComponentPayloadItemGroups.Title == nil {
+			break
+		}
+
+		return e.complexity.HomeComponentPayloadItemGroups.Title(childComplexity), true
+
+	case "HomeComponentPayloadItems.items":
+		if e.complexity.HomeComponentPayloadItems.Items == nil {
+			break
+		}
+
+		return e.complexity.HomeComponentPayloadItems.Items(childComplexity), true
+
+	case "HomeComponentPayloadItems.title":
+		if e.complexity.HomeComponentPayloadItems.Title == nil {
+			break
+		}
+
+		return e.complexity.HomeComponentPayloadItems.Title(childComplexity), true
+
+	case "HomeComponentPayloadMediaPosts.posts":
+		if e.complexity.HomeComponentPayloadMediaPosts.Posts == nil {
+			break
+		}
+
+		return e.complexity.HomeComponentPayloadMediaPosts.Posts(childComplexity), true
+
+	case "HomeComponentPayloadMediaPosts.title":
+		if e.complexity.HomeComponentPayloadMediaPosts.Title == nil {
+			break
+		}
+
+		return e.complexity.HomeComponentPayloadMediaPosts.Title(childComplexity), true
+
+	case "HomeResponse.components":
+		if e.complexity.HomeResponse.Components == nil {
+			break
+		}
+
+		return e.complexity.HomeResponse.Components(childComplexity), true
 
 	case "Item.affiliateUrl":
 		if e.complexity.Item.AffiliateURL == nil {
@@ -332,6 +457,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ItemCategory.ID(childComplexity), true
 
+	case "ItemCategory.imageUrl":
+		if e.complexity.ItemCategory.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.ItemCategory.ImageURL(childComplexity), true
+
 	case "ItemCategory.level":
 		if e.complexity.ItemCategory.Level == nil {
 			break
@@ -346,7 +478,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ItemCategory.Name(childComplexity), true
 
-	case "ItemCategory.Parent":
+	case "ItemCategory.parent":
 		if e.complexity.ItemCategory.Parent == nil {
 			break
 		}
@@ -373,6 +505,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ItemConnection.PageInfo(childComplexity), true
+
+	case "MediaPost.categories":
+		if e.complexity.MediaPost.Categories == nil {
+			break
+		}
+
+		return e.complexity.MediaPost.Categories(childComplexity), true
+
+	case "MediaPost.description":
+		if e.complexity.MediaPost.Description == nil {
+			break
+		}
+
+		return e.complexity.MediaPost.Description(childComplexity), true
+
+	case "MediaPost.id":
+		if e.complexity.MediaPost.ID == nil {
+			break
+		}
+
+		return e.complexity.MediaPost.ID(childComplexity), true
+
+	case "MediaPost.mainImageUrl":
+		if e.complexity.MediaPost.MainImageURL == nil {
+			break
+		}
+
+		return e.complexity.MediaPost.MainImageURL(childComplexity), true
+
+	case "MediaPost.publishedAt":
+		if e.complexity.MediaPost.PublishedAt == nil {
+			break
+		}
+
+		return e.complexity.MediaPost.PublishedAt(childComplexity), true
+
+	case "MediaPost.slug":
+		if e.complexity.MediaPost.Slug == nil {
+			break
+		}
+
+		return e.complexity.MediaPost.Slug(childComplexity), true
+
+	case "MediaPost.title":
+		if e.complexity.MediaPost.Title == nil {
+			break
+		}
+
+		return e.complexity.MediaPost.Title(childComplexity), true
+
+	case "MediaPostCategory.id":
+		if e.complexity.MediaPostCategory.ID == nil {
+			break
+		}
+
+		return e.complexity.MediaPostCategory.ID(childComplexity), true
+
+	case "MediaPostCategory.names":
+		if e.complexity.MediaPostCategory.Names == nil {
+			break
+		}
+
+		return e.complexity.MediaPostCategory.Names(childComplexity), true
 
 	case "Mutation.trackEvent":
 		if e.complexity.Mutation.TrackEvent == nil {
@@ -449,6 +644,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetSimilarItems(childComplexity, args["input"].(gqlmodel.GetSimilarItemsInput)), true
+
+	case "Query.home":
+		if e.complexity.Query.Home == nil {
+			break
+		}
+
+		return e.complexity.Query.Home(childComplexity), true
 
 	case "Query.search":
 		if e.complexity.Query.Search == nil {
@@ -565,6 +767,7 @@ var sources = []*ast.Source{
 scalar Time
 
 type Query {
+    home: HomeResponse!
     search(input: SearchInput!): SearchResponse!
     getSimilarItems(input: GetSimilarItemsInput!): GetSimilarItemsResponse!
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
@@ -594,7 +797,8 @@ type ItemCategory {
     name: String!
     level: Int!
     parentId: ID
-    Parent: ItemCategory
+    imageUrl: String
+    parent: ItemCategory
     children: [ItemCategory!]!
 }
 
@@ -651,6 +855,56 @@ type Facet {
     facetType: FacetType!
     values: [FacetValue!]!
     totalCount: Int!
+}
+
+type MediaPostCategory {
+    id: ID!
+    names: [String!]!
+}
+
+type MediaPost {
+    id: ID!
+    slug: String!
+    title: String!
+    description: String!
+    mainImageUrl: String!
+    publishedAt: Time!
+    categories: [MediaPostCategory!]!
+}
+
+type HomeComponentPayloadItems {
+    title: String!
+    items: [Item!]!
+}
+
+type HomeComponentPayloadItemGroups {
+    title: String!
+    payload: [HomeComponentPayloadItems!]!
+}
+
+type HomeComponentPayloadMediaPosts {
+    title: String!
+    posts: [MediaPost!]!
+}
+
+type HomeComponentPayloadCategories {
+    title: String!
+    categories: [ItemCategory!]!
+}
+
+union HomeComponentPayload =
+    HomeComponentPayloadItems
+    | HomeComponentPayloadItemGroups
+    | HomeComponentPayloadCategories
+    | HomeComponentPayloadMediaPosts
+
+type HomeComponent {
+    id: ID!
+    payload: HomeComponentPayload!
+}
+
+type HomeResponse {
+    components: [HomeComponent!]!
 }
 
 type SearchResponse {
@@ -729,6 +983,7 @@ input SearchFilter {
 }
 
 enum EventID {
+    HOME
     SEARCH
     QUERY_SUGGESTIONS
     SIMILAR_ITEMS
@@ -766,6 +1021,11 @@ input SearchDisplayItemsActionParams {
 
 input SearchClickItemActionParams {
     searchId: String!
+    itemId: String!
+}
+
+input HomeClickItemActionParams {
+    componentId: ID!
     itemId: String!
 }
 
@@ -1228,6 +1488,391 @@ func (ec *executionContext) _GetSimilarItemsResponse_itemConnection(ctx context.
 	res := resTmp.(*gqlmodel.ItemConnection)
 	fc.Result = res
 	return ec.marshalNItemConnection2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponent_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponent) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponent",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponent_payload(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponent) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponent",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Payload, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(gqlmodel.HomeComponentPayload)
+	fc.Result = res
+	return ec.marshalNHomeComponentPayload2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponentPayload(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponentPayloadCategories_title(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponentPayloadCategories) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponentPayloadCategories",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponentPayloadCategories_categories(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponentPayloadCategories) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponentPayloadCategories",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categories, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gqlmodel.ItemCategory)
+	fc.Result = res
+	return ec.marshalNItemCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemCategoryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponentPayloadItemGroups_title(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponentPayloadItemGroups) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponentPayloadItemGroups",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponentPayloadItemGroups_payload(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponentPayloadItemGroups) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponentPayloadItemGroups",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Payload, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gqlmodel.HomeComponentPayloadItems)
+	fc.Result = res
+	return ec.marshalNHomeComponentPayloadItems2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponentPayloadItemsᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponentPayloadItems_title(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponentPayloadItems) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponentPayloadItems",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponentPayloadItems_items(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponentPayloadItems) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponentPayloadItems",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gqlmodel.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponentPayloadMediaPosts_title(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponentPayloadMediaPosts) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponentPayloadMediaPosts",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeComponentPayloadMediaPosts_posts(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeComponentPayloadMediaPosts) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeComponentPayloadMediaPosts",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Posts, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gqlmodel.MediaPost)
+	fc.Result = res
+	return ec.marshalNMediaPost2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐMediaPostᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _HomeResponse_components(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.HomeResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "HomeResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Components, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gqlmodel.HomeComponent)
+	fc.Result = res
+	return ec.marshalNHomeComponent2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponentᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Item_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Item) (ret graphql.Marshaler) {
@@ -1892,7 +2537,39 @@ func (ec *executionContext) _ItemCategory_parentId(ctx context.Context, field gr
 	return ec.marshalOID2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ItemCategory_Parent(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemCategory) (ret graphql.Marshaler) {
+func (ec *executionContext) _ItemCategory_imageUrl(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemCategory) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ItemCategory",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ItemCategory_parent(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.ItemCategory) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2027,6 +2704,321 @@ func (ec *executionContext) _ItemConnection_nodes(ctx context.Context, field gra
 	res := resTmp.([]*gqlmodel.Item)
 	fc.Result = res
 	return ec.marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPost_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPost",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPost_slug(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPost",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Slug, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPost_title(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPost",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPost_description(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPost",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPost_mainImageUrl(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPost",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MainImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPost_publishedAt(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPost",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PublishedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPost_categories(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPost",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categories, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gqlmodel.MediaPostCategory)
+	fc.Result = res
+	return ec.marshalNMediaPostCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐMediaPostCategoryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPostCategory_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPostCategory) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPostCategory",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaPostCategory_names(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPostCategory) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaPostCategory",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Names, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_trackEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2174,6 +3166,41 @@ func (ec *executionContext) _PageInfo_totalCount(ctx context.Context, field grap
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_home(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Home(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*gqlmodel.HomeResponse)
+	fc.Result = res
+	return ec.marshalNHomeResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_search(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3864,6 +4891,37 @@ func (ec *executionContext) unmarshalInputGetSimilarItemsInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputHomeClickItemActionParams(ctx context.Context, obj interface{}) (gqlmodel.HomeClickItemActionParams, error) {
+	var it gqlmodel.HomeClickItemActionParams
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "componentId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("componentId"))
+			it.ComponentID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "itemId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemId"))
+			it.ItemID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputQuerySuggestionsDisplayActionParams(ctx context.Context, obj interface{}) (gqlmodel.QuerySuggestionsDisplayActionParams, error) {
 	var it gqlmodel.QuerySuggestionsDisplayActionParams
 	asMap := map[string]interface{}{}
@@ -4150,6 +5208,43 @@ func (ec *executionContext) unmarshalInputSimilarItemsDisplayItemsActionParams(c
 
 // region    ************************** interface.gotpl ***************************
 
+func (ec *executionContext) _HomeComponentPayload(ctx context.Context, sel ast.SelectionSet, obj gqlmodel.HomeComponentPayload) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case gqlmodel.HomeComponentPayloadItems:
+		return ec._HomeComponentPayloadItems(ctx, sel, &obj)
+	case *gqlmodel.HomeComponentPayloadItems:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._HomeComponentPayloadItems(ctx, sel, obj)
+	case gqlmodel.HomeComponentPayloadItemGroups:
+		return ec._HomeComponentPayloadItemGroups(ctx, sel, &obj)
+	case *gqlmodel.HomeComponentPayloadItemGroups:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._HomeComponentPayloadItemGroups(ctx, sel, obj)
+	case gqlmodel.HomeComponentPayloadCategories:
+		return ec._HomeComponentPayloadCategories(ctx, sel, &obj)
+	case *gqlmodel.HomeComponentPayloadCategories:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._HomeComponentPayloadCategories(ctx, sel, obj)
+	case gqlmodel.HomeComponentPayloadMediaPosts:
+		return ec._HomeComponentPayloadMediaPosts(ctx, sel, &obj)
+	case *gqlmodel.HomeComponentPayloadMediaPosts:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._HomeComponentPayloadMediaPosts(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
@@ -4251,6 +5346,193 @@ func (ec *executionContext) _GetSimilarItemsResponse(ctx context.Context, sel as
 			}
 		case "itemConnection":
 			out.Values[i] = ec._GetSimilarItemsResponse_itemConnection(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var homeComponentImplementors = []string{"HomeComponent"}
+
+func (ec *executionContext) _HomeComponent(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.HomeComponent) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, homeComponentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HomeComponent")
+		case "id":
+			out.Values[i] = ec._HomeComponent_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "payload":
+			out.Values[i] = ec._HomeComponent_payload(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var homeComponentPayloadCategoriesImplementors = []string{"HomeComponentPayloadCategories", "HomeComponentPayload"}
+
+func (ec *executionContext) _HomeComponentPayloadCategories(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.HomeComponentPayloadCategories) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, homeComponentPayloadCategoriesImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HomeComponentPayloadCategories")
+		case "title":
+			out.Values[i] = ec._HomeComponentPayloadCategories_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "categories":
+			out.Values[i] = ec._HomeComponentPayloadCategories_categories(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var homeComponentPayloadItemGroupsImplementors = []string{"HomeComponentPayloadItemGroups", "HomeComponentPayload"}
+
+func (ec *executionContext) _HomeComponentPayloadItemGroups(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.HomeComponentPayloadItemGroups) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, homeComponentPayloadItemGroupsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HomeComponentPayloadItemGroups")
+		case "title":
+			out.Values[i] = ec._HomeComponentPayloadItemGroups_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "payload":
+			out.Values[i] = ec._HomeComponentPayloadItemGroups_payload(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var homeComponentPayloadItemsImplementors = []string{"HomeComponentPayloadItems", "HomeComponentPayload"}
+
+func (ec *executionContext) _HomeComponentPayloadItems(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.HomeComponentPayloadItems) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, homeComponentPayloadItemsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HomeComponentPayloadItems")
+		case "title":
+			out.Values[i] = ec._HomeComponentPayloadItems_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "items":
+			out.Values[i] = ec._HomeComponentPayloadItems_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var homeComponentPayloadMediaPostsImplementors = []string{"HomeComponentPayloadMediaPosts", "HomeComponentPayload"}
+
+func (ec *executionContext) _HomeComponentPayloadMediaPosts(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.HomeComponentPayloadMediaPosts) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, homeComponentPayloadMediaPostsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HomeComponentPayloadMediaPosts")
+		case "title":
+			out.Values[i] = ec._HomeComponentPayloadMediaPosts_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "posts":
+			out.Values[i] = ec._HomeComponentPayloadMediaPosts_posts(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var homeResponseImplementors = []string{"HomeResponse"}
+
+func (ec *executionContext) _HomeResponse(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.HomeResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, homeResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HomeResponse")
+		case "components":
+			out.Values[i] = ec._HomeResponse_components(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4390,8 +5672,10 @@ func (ec *executionContext) _ItemCategory(ctx context.Context, sel ast.Selection
 			}
 		case "parentId":
 			out.Values[i] = ec._ItemCategory_parentId(ctx, field, obj)
-		case "Parent":
-			out.Values[i] = ec._ItemCategory_Parent(ctx, field, obj)
+		case "imageUrl":
+			out.Values[i] = ec._ItemCategory_imageUrl(ctx, field, obj)
+		case "parent":
+			out.Values[i] = ec._ItemCategory_parent(ctx, field, obj)
 		case "children":
 			out.Values[i] = ec._ItemCategory_children(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4426,6 +5710,95 @@ func (ec *executionContext) _ItemConnection(ctx context.Context, sel ast.Selecti
 			}
 		case "nodes":
 			out.Values[i] = ec._ItemConnection_nodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mediaPostImplementors = []string{"MediaPost"}
+
+func (ec *executionContext) _MediaPost(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.MediaPost) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mediaPostImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MediaPost")
+		case "id":
+			out.Values[i] = ec._MediaPost_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "slug":
+			out.Values[i] = ec._MediaPost_slug(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "title":
+			out.Values[i] = ec._MediaPost_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._MediaPost_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mainImageUrl":
+			out.Values[i] = ec._MediaPost_mainImageUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "publishedAt":
+			out.Values[i] = ec._MediaPost_publishedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "categories":
+			out.Values[i] = ec._MediaPost_categories(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mediaPostCategoryImplementors = []string{"MediaPostCategory"}
+
+func (ec *executionContext) _MediaPostCategory(ctx context.Context, sel ast.SelectionSet, obj *gqlmodel.MediaPostCategory) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mediaPostCategoryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MediaPostCategory")
+		case "id":
+			out.Values[i] = ec._MediaPostCategory_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "names":
+			out.Values[i] = ec._MediaPostCategory_names(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4523,6 +5896,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "home":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_home(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "search":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -5150,6 +6537,138 @@ func (ec *executionContext) marshalNGetSimilarItemsResponse2ᚖgithubᚗcomᚋk�
 	return ec._GetSimilarItemsResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNHomeComponent2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponentᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.HomeComponent) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNHomeComponent2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponent(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNHomeComponent2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponent(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.HomeComponent) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._HomeComponent(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNHomeComponentPayload2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponentPayload(ctx context.Context, sel ast.SelectionSet, v gqlmodel.HomeComponentPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._HomeComponentPayload(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNHomeComponentPayloadItems2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponentPayloadItemsᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.HomeComponentPayloadItems) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNHomeComponentPayloadItems2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponentPayloadItems(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNHomeComponentPayloadItems2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeComponentPayloadItems(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.HomeComponentPayloadItems) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._HomeComponentPayloadItems(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNHomeResponse2githubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeResponse(ctx context.Context, sel ast.SelectionSet, v gqlmodel.HomeResponse) graphql.Marshaler {
+	return ec._HomeResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNHomeResponse2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐHomeResponse(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.HomeResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._HomeResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5517,6 +7036,114 @@ func (ec *executionContext) marshalNMap2map(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNMediaPost2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐMediaPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.MediaPost) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMediaPost2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐMediaPost(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMediaPost2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐMediaPost(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.MediaPost) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._MediaPost(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMediaPostCategory2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐMediaPostCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*gqlmodel.MediaPostCategory) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMediaPostCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐMediaPostCategory(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMediaPostCategory2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐMediaPostCategory(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.MediaPostCategory) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._MediaPostCategory(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *gqlmodel.PageInfo) graphql.Marshaler {

@@ -88,6 +88,30 @@
 
 ---
 
+### HomeClickItemActionParams
+
+
+
+
+#### Input fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>componentId</strong> (<a href="scalars.md#id">ID!</a>)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>itemId</strong> (<a href="scalars.md#string">String!</a>)</td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### QuerySuggestionsDisplayActionParams
 
 

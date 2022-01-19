@@ -7,5 +7,6 @@ View reference documentation to learn about the data types available in your Gra
 - [Mutations](mutations.md)
 - [Objects](objects.md)
 - [Enums](enums.md)
+- [Unions](unions.md)
 - [Input objects](input_objects.md)
 - [Scalars](scalars.md)

@@ -46,6 +46,7 @@ export type Event = {
 };
 
 export enum EventId {
+  Home = 'HOME',
   QuerySuggestions = 'QUERY_SUGGESTIONS',
   Search = 'SEARCH',
   SimilarItems = 'SIMILAR_ITEMS',
@@ -82,6 +83,46 @@ export type GetSimilarItemsResponse = {
   searchId: Scalars['String'];
 };
 
+export type HomeClickItemActionParams = {
+  componentId: Scalars['ID'];
+  itemId: Scalars['String'];
+};
+
+export type HomeComponent = {
+  id: Scalars['ID'];
+  payload: HomeComponentPayload;
+};
+
+export type HomeComponentPayload =
+  | HomeComponentPayloadCategories
+  | HomeComponentPayloadItemGroups
+  | HomeComponentPayloadItems
+  | HomeComponentPayloadMediaPosts;
+
+export type HomeComponentPayloadCategories = {
+  categories: Array<ItemCategory>;
+  title: Scalars['String'];
+};
+
+export type HomeComponentPayloadItemGroups = {
+  payload: Array<HomeComponentPayloadItems>;
+  title: Scalars['String'];
+};
+
+export type HomeComponentPayloadItems = {
+  items: Array<Item>;
+  title: Scalars['String'];
+};
+
+export type HomeComponentPayloadMediaPosts = {
+  posts: Array<MediaPost>;
+  title: Scalars['String'];
+};
+
+export type HomeResponse = {
+  components: Array<HomeComponent>;
+};
+
 export type Item = {
   affiliateUrl: Scalars['String'];
   averageRating: Scalars['Float'];
@@ -101,11 +142,12 @@ export type Item = {
 };
 
 export type ItemCategory = {
-  Parent?: Maybe<ItemCategory>;
   children: Array<ItemCategory>;
   id: Scalars['ID'];
+  imageUrl?: Maybe<Scalars['String']>;
   level: Scalars['Int'];
   name: Scalars['String'];
+  parent?: Maybe<ItemCategory>;
   parentId?: Maybe<Scalars['ID']>;
 };
 
@@ -146,6 +188,21 @@ export enum ItemStatus {
   Inactive = 'INACTIVE',
 }
 
+export type MediaPost = {
+  categories: Array<MediaPostCategory>;
+  description: Scalars['String'];
+  id: Scalars['ID'];
+  mainImageUrl: Scalars['String'];
+  publishedAt: Scalars['Time'];
+  slug: Scalars['String'];
+  title: Scalars['String'];
+};
+
+export type MediaPostCategory = {
+  id: Scalars['ID'];
+  names: Array<Scalars['String']>;
+};
+
 export type Mutation = {
   trackEvent: Scalars['Boolean'];
 };
@@ -165,6 +222,7 @@ export type Query = {
   getItem: Item;
   getQuerySuggestions: QuerySuggestionsResponse;
   getSimilarItems: GetSimilarItemsResponse;
+  home: HomeResponse;
   search: SearchResponse;
 };
 
@@ -315,6 +373,78 @@ export type TrackEventMutationVariables = Exact<{
 }>;
 
 export type TrackEventMutation = { trackEvent: boolean };
+
+export type HomeQueryVariables = Exact<{ [key: string]: never }>;
+
+export type HomeQuery = {
+  home: {
+    components: Array<{
+      id: string;
+      payload:
+        | {
+            __typename: 'HomeComponentPayloadCategories';
+            title: string;
+            categories: Array<{
+              id: string;
+              name: string;
+              imageUrl?: string | null | undefined;
+            }>;
+          }
+        | {
+            __typename: 'HomeComponentPayloadItemGroups';
+            title: string;
+            payload: Array<{
+              title: string;
+              items: Array<{
+                id: string;
+                name: string;
+                description: string;
+                status: ItemStatus;
+                url: string;
+                affiliateUrl: string;
+                price: number;
+                imageUrls: Array<string>;
+                averageRating: number;
+                reviewCount: number;
+                categoryId: string;
+                platform: ItemSellingPlatform;
+              }>;
+            }>;
+          }
+        | {
+            __typename: 'HomeComponentPayloadItems';
+            title: string;
+            items: Array<{
+              id: string;
+              name: string;
+              description: string;
+              status: ItemStatus;
+              url: string;
+              affiliateUrl: string;
+              price: number;
+              imageUrls: Array<string>;
+              averageRating: number;
+              reviewCount: number;
+              categoryId: string;
+              platform: ItemSellingPlatform;
+            }>;
+          }
+        | {
+            __typename: 'HomeComponentPayloadMediaPosts';
+            title: string;
+            posts: Array<{
+              id: string;
+              slug: string;
+              title: string;
+              description: string;
+              mainImageUrl: string;
+              publishedAt: any;
+              categories: Array<{ id: string; names: Array<string> }>;
+            }>;
+          };
+    }>;
+  };
+};
 
 export type ItemDetailPageGetItemQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -570,6 +700,93 @@ export type TrackEventMutationOptions = Apollo.BaseMutationOptions<
   TrackEventMutation,
   TrackEventMutationVariables
 >;
+export const HomeDocument = gql`
+  query home {
+    home {
+      components {
+        id
+        payload {
+          __typename
+          ... on HomeComponentPayloadItemGroups {
+            title
+            payload {
+              ... on HomeComponentPayloadItems {
+                title
+                items {
+                  ...itemListItemFragment
+                }
+              }
+            }
+          }
+          ... on HomeComponentPayloadItems {
+            title
+            items {
+              ...itemListItemFragment
+            }
+          }
+          ... on HomeComponentPayloadCategories {
+            title
+            categories {
+              id
+              name
+              imageUrl
+            }
+          }
+          ... on HomeComponentPayloadMediaPosts {
+            title
+            posts {
+              id
+              slug
+              title
+              description
+              mainImageUrl
+              publishedAt
+              categories {
+                id
+                names
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ${ItemListItemFragmentFragmentDoc}
+`;
+
+/**
+ * __useHomeQuery__
+ *
+ * To run a query within a React component, call `useHomeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useHomeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useHomeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useHomeQuery(
+  baseOptions?: Apollo.QueryHookOptions<HomeQuery, HomeQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<HomeQuery, HomeQueryVariables>(HomeDocument, options);
+}
+export function useHomeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<HomeQuery, HomeQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<HomeQuery, HomeQueryVariables>(
+    HomeDocument,
+    options
+  );
+}
+export type HomeQueryHookResult = ReturnType<typeof useHomeQuery>;
+export type HomeLazyQueryHookResult = ReturnType<typeof useHomeLazyQuery>;
+export type HomeQueryResult = Apollo.QueryResult<HomeQuery, HomeQueryVariables>;
 export const ItemDetailPageGetItemDocument = gql`
   query itemDetailPageGetItem($id: ID!) {
     getItem(id: $id) {
@@ -586,21 +803,11 @@ export const ItemDetailPageGetItemDocument = gql`
       categoryId
       platform
       sameGroupItems {
-        id
-        name
-        description
-        status
-        url
-        affiliateUrl
-        price
-        imageUrls
-        averageRating
-        reviewCount
-        categoryId
-        platform
+        ...itemListItemFragment
       }
     }
   }
+  ${ItemListItemFragmentFragmentDoc}
 `;
 
 /**

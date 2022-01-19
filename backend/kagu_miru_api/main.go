@@ -9,6 +9,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/cms"
+	sanity "github.com/sanity-io/client-go"
+
 	aiplatform "cloud.google.com/go/aiplatform/apiv1"
 	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/pubsub"
@@ -100,6 +103,12 @@ func main() {
 	}
 	queryClassifierClient := queryclassifier.NewQueryClassifierClient(predictionClient, cfg.GCPProjectID, cfg.VertexAICategoryClassificationEndpointID)
 
+	sanityClient, err := sanity.New(cfg.SanityProjectID)
+	if err != nil {
+		logger.Fatal("failed to initialize sanity client", zap.Error(err))
+	}
+	cmsClient := cms.NewCMSClient(sanityClient)
+
 	var eventLoader tracking.EventLoader
 	if cfg.Env.IsDeployed() {
 		pubsubClient, err := pubsub.NewClient(ctx, cfg.GCPProjectID)
@@ -114,7 +123,7 @@ func main() {
 	searchIDManager := tracking.NewSearchIDManager(cfg.Env.IsDeployed())
 
 	gqlConfig := gqlgen.Config{
-		Resolvers: graph.NewResolver(dbClient, searchClient, queryClassifierClient, searchIDManager, eventLoader),
+		Resolvers: graph.NewResolver(dbClient, searchClient, queryClassifierClient, searchIDManager, cmsClient, eventLoader),
 	}
 	gqlServer := handler.NewDefaultServer(gqlgen.NewExecutableSchema(gqlConfig))
 	gqlServer.Use(tracing.GraphqlExtension{})

@@ -12,8 +12,8 @@ export interface PostMeta {
   slug: string;
   title: string;
   description: string;
-  mainImage: SanityImageSource;
-  publishedAt?: string;
+  mainImage: SanityImageSource | string;
+  publishedAt: string;
   categories?: Array<{ id: string; names: string[] }>;
 }
 

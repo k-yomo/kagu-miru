@@ -85,6 +85,140 @@
 
 ---
 
+### HomeComponent
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>id</strong> (<a href="scalars.md#id">ID!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>payload</strong> (<a href="unions.md#homecomponentpayload">HomeComponentPayload!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### HomeComponentPayloadCategories
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>categories</strong> (<a href="objects.md#itemcategory">[ItemCategory!]!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>title</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### HomeComponentPayloadItemGroups
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>payload</strong> (<a href="objects.md#homecomponentpayloaditems">[HomeComponentPayloadItems!]!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>title</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### HomeComponentPayloadItems
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>items</strong> (<a href="objects.md#item">[Item!]!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>title</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### HomeComponentPayloadMediaPosts
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>posts</strong> (<a href="objects.md#mediapost">[MediaPost!]!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>title</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### HomeResponse
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>components</strong> (<a href="objects.md#homecomponent">[HomeComponent!]!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ### Item
 
   
@@ -172,10 +306,6 @@
     <th>Description</th>
   </tr>
   <tr>
-    <td><strong>Parent</strong> (<a href="objects.md#itemcategory">ItemCategory</a>)</td> 
-    <td></td>
-  </tr>
-  <tr>
     <td><strong>children</strong> (<a href="objects.md#itemcategory">[ItemCategory!]!</a>)</td> 
     <td></td>
   </tr>
@@ -184,11 +314,19 @@
     <td></td>
   </tr>
   <tr>
+    <td><strong>imageUrl</strong> (<a href="scalars.md#string">String</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>level</strong> (<a href="scalars.md#int">Int!</a>)</td> 
     <td></td>
   </tr>
   <tr>
     <td><strong>name</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>parent</strong> (<a href="objects.md#itemcategory">ItemCategory</a>)</td> 
     <td></td>
   </tr>
   <tr>
@@ -216,6 +354,72 @@
   </tr>
   <tr>
     <td><strong>pageInfo</strong> (<a href="objects.md#pageinfo">PageInfo!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### MediaPost
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>categories</strong> (<a href="objects.md#mediapostcategory">[MediaPostCategory!]!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>description</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>id</strong> (<a href="scalars.md#id">ID!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>mainImageUrl</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>publishedAt</strong> (<a href="scalars.md#time">Time!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>slug</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>title</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td></td>
+  </tr>
+</table>
+
+---
+
+### MediaPostCategory
+
+  
+
+#### Fields
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><strong>id</strong> (<a href="scalars.md#id">ID!</a>)</td> 
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>names</strong> (<a href="scalars.md#string">[String!]!</a>)</td> 
     <td></td>
   </tr>
 </table>

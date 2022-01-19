@@ -54,6 +54,14 @@
 
 ---
 
+### home
+
+#### Type: [HomeResponse!](objects.md#homeresponse)
+
+ 
+
+---
+
 ### search
 
 #### Type: [SearchResponse!](objects.md#searchresponse)

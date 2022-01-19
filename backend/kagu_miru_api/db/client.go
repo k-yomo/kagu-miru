@@ -11,4 +11,5 @@ type Client interface {
 	GetSameGroupItemsByItemID(ctx context.Context, itemID string) ([]*xspanner.Item, error)
 	GetAllItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error)
 	GetAllItemCategoriesWithParent(ctx context.Context) ([]*xspanner.ItemCategoryWithParent, error)
+	GetTopLevelItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error)
 }

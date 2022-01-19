@@ -23,6 +23,7 @@ require (
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/olivere/elastic/v7 v7.0.31
 	github.com/rs/cors v1.8.2
+	github.com/sanity-io/client-go v1.0.0-alpha.5
 	github.com/vektah/gqlparser/v2 v2.2.0
 	github.com/vitali-fedulov/images/v2 v2.1.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0
@@ -69,6 +70,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/jpillora/backoff v0.0.0-20180909062703-3050d21c67d7 // indirect
 	github.com/machinebox/graphql v0.2.2 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matryer/moq v0.2.3 // indirect

@@ -43,5 +43,17 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require('@tailwindcss/line-clamp'), require('@tailwindcss/forms')],
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+    require('@tailwindcss/forms'),
+    function ({ addUtilities }) {
+      const newUtilities = {
+        '.text-shadow': {
+          textShadow: '3px 3px 3px #808080',
+        },
+      };
+
+      addUtilities(newUtilities);
+    },
+  ],
 };

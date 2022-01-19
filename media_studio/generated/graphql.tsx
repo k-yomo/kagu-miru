@@ -46,6 +46,7 @@ export type Event = {
 };
 
 export enum EventId {
+  Home = 'HOME',
   QuerySuggestions = 'QUERY_SUGGESTIONS',
   Search = 'SEARCH',
   SimilarItems = 'SIMILAR_ITEMS',
@@ -82,6 +83,46 @@ export type GetSimilarItemsResponse = {
   searchId: Scalars['String'];
 };
 
+export type HomeClickItemActionParams = {
+  componentId: Scalars['ID'];
+  itemId: Scalars['String'];
+};
+
+export type HomeComponent = {
+  id: Scalars['ID'];
+  payload: HomeComponentPayload;
+};
+
+export type HomeComponentPayload =
+  | HomeComponentPayloadCategories
+  | HomeComponentPayloadItemGroups
+  | HomeComponentPayloadItems
+  | HomeComponentPayloadMediaPosts;
+
+export type HomeComponentPayloadCategories = {
+  categories: Array<ItemCategory>;
+  title: Scalars['String'];
+};
+
+export type HomeComponentPayloadItemGroups = {
+  payload: Array<HomeComponentPayloadItems>;
+  title: Scalars['String'];
+};
+
+export type HomeComponentPayloadItems = {
+  items: Array<Item>;
+  title: Scalars['String'];
+};
+
+export type HomeComponentPayloadMediaPosts = {
+  posts: Array<MediaPost>;
+  title: Scalars['String'];
+};
+
+export type HomeResponse = {
+  components: Array<HomeComponent>;
+};
+
 export type Item = {
   affiliateUrl: Scalars['String'];
   averageRating: Scalars['Float'];
@@ -101,11 +142,12 @@ export type Item = {
 };
 
 export type ItemCategory = {
-  Parent?: Maybe<ItemCategory>;
   children: Array<ItemCategory>;
   id: Scalars['ID'];
+  imageUrl?: Maybe<Scalars['String']>;
   level: Scalars['Int'];
   name: Scalars['String'];
+  parent?: Maybe<ItemCategory>;
   parentId?: Maybe<Scalars['ID']>;
 };
 
@@ -146,6 +188,21 @@ export enum ItemStatus {
   Inactive = 'INACTIVE',
 }
 
+export type MediaPost = {
+  categories: Array<MediaPostCategory>;
+  description: Scalars['String'];
+  id: Scalars['ID'];
+  mainImageUrl: Scalars['String'];
+  publishedAt: Scalars['Time'];
+  slug: Scalars['String'];
+  title: Scalars['String'];
+};
+
+export type MediaPostCategory = {
+  id: Scalars['ID'];
+  names: Array<Scalars['String']>;
+};
+
 export type Mutation = {
   trackEvent: Scalars['Boolean'];
 };
@@ -165,6 +222,7 @@ export type Query = {
   getItem: Item;
   getQuerySuggestions: QuerySuggestionsResponse;
   getSimilarItems: GetSimilarItemsResponse;
+  home: HomeResponse;
   search: SearchResponse;
 };
 

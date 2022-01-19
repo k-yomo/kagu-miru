@@ -56,6 +56,10 @@
     <th>Description</th>
   </tr>
   <tr>
+    <td><strong>HOME</strong></td>
+    <td></td>
+  </tr>
+  <tr>
     <td><strong>QUERY_SUGGESTIONS</strong></td>
     <td></td>
   </tr>

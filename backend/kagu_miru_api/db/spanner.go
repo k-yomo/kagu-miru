@@ -30,3 +30,8 @@ func (s *SpannerDBClient) GetAllItemCategories(ctx context.Context) ([]*xspanner
 func (s *SpannerDBClient) GetAllItemCategoriesWithParent(ctx context.Context) ([]*xspanner.ItemCategoryWithParent, error) {
 	return xspanner.GetAllItemCategoriesWithParent(ctx, s.spannerClient)
 }
+
+func (s *SpannerDBClient) GetTopLevelItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error) {
+	return xspanner.GetTopLevelItemCategories(ctx, s.spannerClient)
+
+}

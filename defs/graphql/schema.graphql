@@ -2,6 +2,7 @@ scalar Map
 scalar Time
 
 type Query {
+    home: HomeResponse!
     search(input: SearchInput!): SearchResponse!
     getSimilarItems(input: GetSimilarItemsInput!): GetSimilarItemsResponse!
     getQuerySuggestions(query: String!): QuerySuggestionsResponse!
@@ -31,7 +32,8 @@ type ItemCategory {
     name: String!
     level: Int!
     parentId: ID
-    Parent: ItemCategory
+    imageUrl: String
+    parent: ItemCategory
     children: [ItemCategory!]!
 }
 
@@ -88,6 +90,56 @@ type Facet {
     facetType: FacetType!
     values: [FacetValue!]!
     totalCount: Int!
+}
+
+type MediaPostCategory {
+    id: ID!
+    names: [String!]!
+}
+
+type MediaPost {
+    id: ID!
+    slug: String!
+    title: String!
+    description: String!
+    mainImageUrl: String!
+    publishedAt: Time!
+    categories: [MediaPostCategory!]!
+}
+
+type HomeComponentPayloadItems {
+    title: String!
+    items: [Item!]!
+}
+
+type HomeComponentPayloadItemGroups {
+    title: String!
+    payload: [HomeComponentPayloadItems!]!
+}
+
+type HomeComponentPayloadMediaPosts {
+    title: String!
+    posts: [MediaPost!]!
+}
+
+type HomeComponentPayloadCategories {
+    title: String!
+    categories: [ItemCategory!]!
+}
+
+union HomeComponentPayload =
+    HomeComponentPayloadItems
+    | HomeComponentPayloadItemGroups
+    | HomeComponentPayloadCategories
+    | HomeComponentPayloadMediaPosts
+
+type HomeComponent {
+    id: ID!
+    payload: HomeComponentPayload!
+}
+
+type HomeResponse {
+    components: [HomeComponent!]!
 }
 
 type SearchResponse {
@@ -166,6 +218,7 @@ input SearchFilter {
 }
 
 enum EventID {
+    HOME
     SEARCH
     QUERY_SUGGESTIONS
     SIMILAR_ITEMS
@@ -203,6 +256,11 @@ input SearchDisplayItemsActionParams {
 
 input SearchClickItemActionParams {
     searchId: String!
+    itemId: String!
+}
+
+input HomeClickItemActionParams {
+    componentId: ID!
     itemId: String!
 }
 

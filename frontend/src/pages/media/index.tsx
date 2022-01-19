@@ -72,7 +72,7 @@ export default function MediaTopPage({
         img={{ srcPath: MediaTopImg.src }}
         path={router.asPath}
       />
-      <div className="max-w-[1000px] sm:mx-auto mb-8">
+      <div className="max-w-[1400px] sm:mx-auto mb-8">
         <div className="relative w-full h-[200px] sm:h-[300px] rounded-t-md">
           <Image
             src={MediaTopImg.src}

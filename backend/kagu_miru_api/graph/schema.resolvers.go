@@ -9,17 +9,129 @@ import (
 	"sort"
 
 	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
-
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/cms"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
 	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 )
 
 func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodel.Event) (bool, error) {
 	r.EventLoader.Load(ctx, tracking.NewEvent(ctx, event))
 	return true, nil
+}
+
+func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error) {
+	eg := errgroup.Group{}
+
+	var rakutenItemsRes *gqlmodel.SearchResponse
+	eg.Go(func() error {
+		var err error
+		rakutenItemsRes, err = r.Search(ctx, gqlmodel.SearchInput{
+			Filter: &gqlmodel.SearchFilter{
+				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformRakuten},
+			},
+			PageSize: func() *int { i := 10; return &i }(),
+		})
+		return err
+	})
+
+	var yahooShoppingItemsRes *gqlmodel.SearchResponse
+	eg.Go(func() error {
+		var err error
+		yahooShoppingItemsRes, err = r.Search(ctx, gqlmodel.SearchInput{
+			Filter: &gqlmodel.SearchFilter{
+				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformYahooShopping},
+			},
+			PageSize: func() *int { i := 10; return &i }(),
+		})
+		return err
+	})
+
+	var paypayMallItemsRes *gqlmodel.SearchResponse
+	eg.Go(func() error {
+		var err error
+		paypayMallItemsRes, err = r.Search(ctx, gqlmodel.SearchInput{
+			Filter: &gqlmodel.SearchFilter{
+				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformPaypayMall},
+			},
+			PageSize: func() *int { i := 10; return &i }(),
+		})
+		return err
+	})
+
+	var topLevelItemCategories []*gqlmodel.ItemCategory
+	eg.Go(func() error {
+		categories, err := r.DBClient.GetTopLevelItemCategories(ctx)
+		if err != nil {
+			return err
+		}
+		topLevelItemCategories = mapSpannerItemCategoriesToGraphqlItemCategories(categories)
+		sort.Slice(topLevelItemCategories, func(i, j int) bool {
+			return topLevelItemCategories[i].ID < topLevelItemCategories[j].ID
+		})
+
+		return nil
+	})
+
+	var featuredPostsResp *cms.GetFeaturedPostsResponse
+	eg.Go(func() error {
+		var err error
+		featuredPostsResp, err = r.CMSClient.GetFeaturedPosts(ctx)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+
+	platformPopularItemGroupsComponent := &gqlmodel.HomeComponent{
+		ID: "platformPopularItemGroups",
+		Payload: gqlmodel.HomeComponentPayloadItemGroups{
+			Title: "EC人気アイテム",
+			Payload: []*gqlmodel.HomeComponentPayloadItems{
+				{
+					Title: "楽天",
+					Items: rakutenItemsRes.ItemConnection.Nodes,
+				},
+				{
+					Title: "Yahooショッピング",
+					Items: yahooShoppingItemsRes.ItemConnection.Nodes,
+				},
+				{
+					Title: "PayPayモール",
+					Items: paypayMallItemsRes.ItemConnection.Nodes,
+				},
+			},
+		},
+	}
+
+	categoriesComponent := &gqlmodel.HomeComponent{
+		ID: "categories",
+		Payload: &gqlmodel.HomeComponentPayloadCategories{
+			Title:      "カテゴリーから探す",
+			Categories: topLevelItemCategories,
+		},
+	}
+
+	featuredPostsComponent := &gqlmodel.HomeComponent{
+		ID: "featuredPosts",
+		Payload: &gqlmodel.HomeComponentPayloadMediaPosts{
+			Title: featuredPostsResp.Title,
+			Posts: mapPostsToGraphqlPosts(featuredPostsResp.Posts),
+		},
+	}
+
+	return &gqlmodel.HomeResponse{Components: []*gqlmodel.HomeComponent{
+		platformPopularItemGroupsComponent,
+		categoriesComponent,
+		featuredPostsComponent,
+	}}, nil
 }
 
 func (r *queryResolver) Search(ctx context.Context, input gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error) {

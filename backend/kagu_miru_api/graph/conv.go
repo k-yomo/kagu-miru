@@ -3,6 +3,8 @@ package graph
 import (
 	"fmt"
 
+	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/cms"
+
 	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
 
 	"github.com/k-yomo/kagu-miru/backend/internal/es"
@@ -20,7 +22,8 @@ func mapSpannerItemCategoriesToGraphqlItemCategories(itemCategories []*xspanner.
 			ID:       itemCategory.ID,
 			Name:     itemCategory.Name,
 			Level:    int(itemCategory.Level),
-			ParentID: pointerconv.StringToPointer(itemCategory.ParentID.String()),
+			ParentID: pointerconv.StringToPointer(itemCategory.ParentID.StringVal),
+			ImageURL: pointerconv.StringToPointer(itemCategory.ImageURL.StringVal),
 		}
 		gqlItemCategories = append(gqlItemCategories, gqlItemCategory)
 	}
@@ -273,4 +276,32 @@ func mapFromXErrorType(errType xerror.Type) gqlmodel.ErrorCode {
 	default:
 		return gqlmodel.ErrorCodeInternal
 	}
+}
+
+func mapPostsToGraphqlPosts(posts []*cms.Post) []*gqlmodel.MediaPost {
+	gqlPosts := make([]*gqlmodel.MediaPost, 0, len(posts))
+	for _, post := range posts {
+		gqlPosts = append(gqlPosts, &gqlmodel.MediaPost{
+			ID:           post.ID,
+			Slug:         post.Slug,
+			Title:        post.Title,
+			Description:  post.Description,
+			MainImageURL: post.MainImage.Asset.Ref,
+			PublishedAt:  post.PublishedAt,
+			Categories:   mapPostCategoriesToGraphqlPostCategories(post.Categories),
+		})
+	}
+
+	return gqlPosts
+}
+
+func mapPostCategoriesToGraphqlPostCategories(postCategories []*cms.Category) []*gqlmodel.MediaPostCategory {
+	gqlPostCategories := make([]*gqlmodel.MediaPostCategory, 0, len(postCategories))
+	for _, category := range postCategories {
+		gqlPostCategories = append(gqlPostCategories, &gqlmodel.MediaPostCategory{
+			ID:    category.ID,
+			Names: category.Names,
+		})
+	}
+	return gqlPostCategories
 }

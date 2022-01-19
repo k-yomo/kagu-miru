@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+type HomeComponentPayload interface {
+	IsHomeComponentPayload()
+}
+
 type AppliedMetadata struct {
 	Name   string   `json:"name"`
 	Values []string `json:"values"`
@@ -45,6 +49,48 @@ type GetSimilarItemsResponse struct {
 	ItemConnection *ItemConnection `json:"itemConnection"`
 }
 
+type HomeClickItemActionParams struct {
+	ComponentID string `json:"componentId"`
+	ItemID      string `json:"itemId"`
+}
+
+type HomeComponent struct {
+	ID      string               `json:"id"`
+	Payload HomeComponentPayload `json:"payload"`
+}
+
+type HomeComponentPayloadCategories struct {
+	Title      string          `json:"title"`
+	Categories []*ItemCategory `json:"categories"`
+}
+
+func (HomeComponentPayloadCategories) IsHomeComponentPayload() {}
+
+type HomeComponentPayloadItemGroups struct {
+	Title   string                       `json:"title"`
+	Payload []*HomeComponentPayloadItems `json:"payload"`
+}
+
+func (HomeComponentPayloadItemGroups) IsHomeComponentPayload() {}
+
+type HomeComponentPayloadItems struct {
+	Title string  `json:"title"`
+	Items []*Item `json:"items"`
+}
+
+func (HomeComponentPayloadItems) IsHomeComponentPayload() {}
+
+type HomeComponentPayloadMediaPosts struct {
+	Title string       `json:"title"`
+	Posts []*MediaPost `json:"posts"`
+}
+
+func (HomeComponentPayloadMediaPosts) IsHomeComponentPayload() {}
+
+type HomeResponse struct {
+	Components []*HomeComponent `json:"components"`
+}
+
 type Item struct {
 	ID             string              `json:"id"`
 	GroupID        string              `json:"groupID"`
@@ -68,13 +114,29 @@ type ItemCategory struct {
 	Name     string          `json:"name"`
 	Level    int             `json:"level"`
 	ParentID *string         `json:"parentId"`
-	Parent   *ItemCategory   `json:"Parent"`
+	ImageURL *string         `json:"imageUrl"`
+	Parent   *ItemCategory   `json:"parent"`
 	Children []*ItemCategory `json:"children"`
 }
 
 type ItemConnection struct {
 	PageInfo *PageInfo `json:"pageInfo"`
 	Nodes    []*Item   `json:"nodes"`
+}
+
+type MediaPost struct {
+	ID           string               `json:"id"`
+	Slug         string               `json:"slug"`
+	Title        string               `json:"title"`
+	Description  string               `json:"description"`
+	MainImageURL string               `json:"mainImageUrl"`
+	PublishedAt  time.Time            `json:"publishedAt"`
+	Categories   []*MediaPostCategory `json:"categories"`
+}
+
+type MediaPostCategory struct {
+	ID    string   `json:"id"`
+	Names []string `json:"names"`
 }
 
 type PageInfo struct {
@@ -221,12 +283,14 @@ func (e ErrorCode) MarshalGQL(w io.Writer) {
 type EventID string
 
 const (
+	EventIDHome             EventID = "HOME"
 	EventIDSearch           EventID = "SEARCH"
 	EventIDQuerySuggestions EventID = "QUERY_SUGGESTIONS"
 	EventIDSimilarItems     EventID = "SIMILAR_ITEMS"
 )
 
 var AllEventID = []EventID{
+	EventIDHome,
 	EventIDSearch,
 	EventIDQuerySuggestions,
 	EventIDSimilarItems,
@@ -234,7 +298,7 @@ var AllEventID = []EventID{
 
 func (e EventID) IsValid() bool {
 	switch e {
-	case EventIDSearch, EventIDQuerySuggestions, EventIDSimilarItems:
+	case EventIDHome, EventIDSearch, EventIDQuerySuggestions, EventIDSimilarItems:
 		return true
 	}
 	return false

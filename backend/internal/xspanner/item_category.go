@@ -23,6 +23,7 @@ type ItemCategory struct {
 	Name      string             `spanner:"name"`
 	Level     int64              `spanner:"level"`
 	ParentID  spanner.NullString `spanner:"parent_id"`
+	ImageURL  spanner.NullString `spanner:"image_url"`
 	UpdatedAt time.Time          `spanner:"updated_at"`
 }
 
@@ -91,6 +92,34 @@ func GetAllItemCategories(ctx context.Context, spannerClient *spanner.Client) ([
 	defer span.End()
 
 	stmt := spanner.NewStatement(fmt.Sprintf(`SELECT %s FROM item_categories`, itemCategoriesTableAllColumnsString))
+	iter := spannerClient.Single().Query(ctx, stmt)
+	defer iter.Stop()
+
+	var itemCategories []*ItemCategory
+	for {
+		row, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		var itemCategory ItemCategory
+		if err := row.ToStruct(&itemCategory); err != nil {
+			return nil, err
+		}
+		itemCategories = append(itemCategories, &itemCategory)
+	}
+	return itemCategories, nil
+}
+
+func GetTopLevelItemCategories(ctx context.Context, spannerClient *spanner.Client) ([]*ItemCategory, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetTopLevelItemCategories")
+	defer span.End()
+
+	stmt := spanner.NewStatement(
+		fmt.Sprintf(`SELECT %s FROM item_categories WHERE level = 0`, itemCategoriesTableAllColumnsString),
+	)
 	iter := spannerClient.Single().Query(ctx, stmt)
 	defer iter.Stop()
 

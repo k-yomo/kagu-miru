@@ -36,9 +36,8 @@ export default function SearchPage() {
   return (
     <>
       <SEOMeta
-        title="カグミル - 家具検索サービス"
-        excludeSiteTitle
-        description="カグミルはオンラインで買える家具を横断で一括検索・比較出来るサービスです。"
+        title="家具・インテリア検索"
+        description="楽天やPayPayモール、Yahooショッピング等、ECサイト横断で家具・インテリアの商品を検索できます。"
         img={{ srcPath: SearchPageScreenImg.src }}
         path={router.asPath}
       />
