@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Image from 'next/image';
+import gql from 'graphql-tag';
+import { ApolloError } from '@apollo/client';
 import SEOMeta from '@src/components/SEOMeta';
 import SearchPageScreenImg from '@public/images/search_screen.jpeg';
 import HomeTopImg from '@public/images/home_top.jpg';
-import { GetServerSideProps } from 'next';
 import apolloClient, { isErrorIncludes } from '@src/lib/apolloClient';
 import {
   ErrorCode,
@@ -19,11 +21,9 @@ import {
   HomeClickItemActionParams,
   useTrackEventMutation,
 } from '@src/generated/graphql';
-import { ApolloError } from '@apollo/client';
-import gql from 'graphql-tag';
 import ItemList from '@src/components/ItemList';
-import { routes } from '@src/routes/routes';
 import PostCard from '@src/components/PostCard';
+import { routes } from '@src/routes/routes';
 
 gql`
   query home {
@@ -159,19 +159,34 @@ function HomeComponent({
       return (
         <HomeComponentItemGroups
           id={component.id}
-          payload={component.payload}
+          payload={
+            component.payload as unknown as HomeComponentPayloadItemGroups
+          }
         />
       );
     }
     case 'HomeComponentPayloadItems':
       return <></>;
     case 'HomeComponentPayloadCategories': {
-      return <HomeComponentCategories payload={component.payload} />;
+      return (
+        <HomeComponentCategories
+          payload={
+            component.payload as unknown as HomeComponentPayloadCategories
+          }
+        />
+      );
     }
     case 'HomeComponentPayloadMediaPosts':
-      return <HomeComponentPosts payload={component.payload} />;
+      return (
+        <HomeComponentPosts
+          payload={
+            component.payload as unknown as HomeComponentPayloadMediaPosts
+          }
+        />
+      );
     default:
       const _: never = component.payload;
+      return <></>;
   }
 }
 
