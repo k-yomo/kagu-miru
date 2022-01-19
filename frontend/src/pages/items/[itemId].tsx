@@ -187,6 +187,7 @@ export default function ItemDetailPage({ item }: Props) {
           description={`${item.name}の詳細ページです。最安値のECサイトや関連商品の表示あり！`}
           img={{ src: mainImgUrl }}
           path={router.asPath}
+          noIndex
         />
       </Head>
       <div className="max-w-[1200px] mx-auto mb-6">

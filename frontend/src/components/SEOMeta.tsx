@@ -14,6 +14,7 @@ interface Props {
   ogpDescription?: string;
   img?: { srcPath: string; src?: string } | { srcPath?: string; src: string };
   path: string;
+  noIndex?: boolean;
 }
 
 export default function SEOMeta({
@@ -23,6 +24,7 @@ export default function SEOMeta({
   ogpDescription,
   img,
   path,
+  noIndex,
 }: Props) {
   return (
     <Head>
@@ -44,6 +46,7 @@ export default function SEOMeta({
           content={img.srcPath ? `${SITE_ROOT_URL}${img.srcPath}` : img.src}
         />
       )}
+      {noIndex && <meta name="robots" content="noindex" />}
     </Head>
   );
 }
