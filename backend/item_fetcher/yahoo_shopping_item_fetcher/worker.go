@@ -224,7 +224,7 @@ func (w *categoryItemsFetcher) start(ctx context.Context) {
 							}
 							res := w.pubsubItemUpdateTopic.Publish(ctx, &pubsub.Message{
 								Data:        itemJSON,
-								OrderingKey: item.CategoryID,
+								OrderingKey: item_fetcher.ItemOrderingKey(item),
 							})
 							if _, err := res.Get(ctx); err != nil {
 								w.logger.Error("publish item update failed",

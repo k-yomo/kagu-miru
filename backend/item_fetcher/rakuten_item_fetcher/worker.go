@@ -244,13 +244,9 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 						go func() {
 							defer wg.Done()
 
-							orderingKey := item.JANCode
-							if orderingKey == "" {
-								orderingKey = item.Name
-							}
 							res := w.pubsubItemUpdateTopic.Publish(ctx, &pubsub.Message{
 								Data:        itemJSON,
-								OrderingKey: orderingKey,
+								OrderingKey: item_fetcher.ItemOrderingKey(item),
 							})
 							if _, err := res.Get(ctx); err != nil {
 								w.logger.Error("publish item update failed",
