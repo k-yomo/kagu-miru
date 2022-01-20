@@ -125,7 +125,6 @@ type ItemConnection struct {
 }
 
 type MediaPost struct {
-	ID           string               `json:"id"`
 	Slug         string               `json:"slug"`
 	Title        string               `json:"title"`
 	Description  string               `json:"description"`

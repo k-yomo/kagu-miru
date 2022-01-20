@@ -61,7 +61,6 @@ gql`
           ... on HomeComponentPayloadMediaPosts {
             title
             posts {
-              id
               slug
               title
               description

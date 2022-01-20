@@ -98,8 +98,7 @@ type MediaPostCategory {
 }
 
 type MediaPost {
-    id: ID!
-    slug: String!
+    slug: ID!
     title: String!
     description: String!
     mainImageUrl: String!

@@ -3,7 +3,6 @@ package cms
 import "time"
 
 type Post struct {
-	ID          string      `json:"id"`
 	Slug        string      `json:"slug"`
 	Title       string      `json:"title"`
 	Description string      `json:"description"`

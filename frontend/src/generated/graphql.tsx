@@ -191,10 +191,9 @@ export enum ItemStatus {
 export type MediaPost = {
   categories: Array<MediaPostCategory>;
   description: Scalars['String'];
-  id: Scalars['ID'];
   mainImageUrl: Scalars['String'];
   publishedAt: Scalars['Time'];
-  slug: Scalars['String'];
+  slug: Scalars['ID'];
   title: Scalars['String'];
 };
 
@@ -434,7 +433,6 @@ export type HomeQuery = {
             __typename: 'HomeComponentPayloadMediaPosts';
             title: string;
             posts: Array<{
-              id: string;
               slug: string;
               title: string;
               description: string;
@@ -736,7 +734,6 @@ export const HomeDocument = gql`
           ... on HomeComponentPayloadMediaPosts {
             title
             posts {
-              id
               slug
               title
               description

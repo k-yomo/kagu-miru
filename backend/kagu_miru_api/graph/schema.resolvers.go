@@ -8,13 +8,12 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
-
 	"github.com/k-yomo/kagu-miru/backend/internal/xerror"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/cms"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlgen"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/graph/gqlmodel"
 	"github.com/k-yomo/kagu-miru/backend/kagu_miru_api/tracking"
+	"github.com/k-yomo/kagu-miru/backend/pkg/logging"
 	"golang.org/x/sync/errgroup"
 )
 

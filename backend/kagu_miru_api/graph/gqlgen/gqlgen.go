@@ -128,7 +128,6 @@ type ComplexityRoot struct {
 	MediaPost struct {
 		Categories   func(childComplexity int) int
 		Description  func(childComplexity int) int
-		ID           func(childComplexity int) int
 		MainImageURL func(childComplexity int) int
 		PublishedAt  func(childComplexity int) int
 		Slug         func(childComplexity int) int
@@ -520,13 +519,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MediaPost.Description(childComplexity), true
 
-	case "MediaPost.id":
-		if e.complexity.MediaPost.ID == nil {
-			break
-		}
-
-		return e.complexity.MediaPost.ID(childComplexity), true
-
 	case "MediaPost.mainImageUrl":
 		if e.complexity.MediaPost.MainImageURL == nil {
 			break
@@ -863,8 +855,7 @@ type MediaPostCategory {
 }
 
 type MediaPost {
-    id: ID!
-    slug: String!
+    slug: ID!
     title: String!
     description: String!
     mainImageUrl: String!
@@ -2707,41 +2698,6 @@ func (ec *executionContext) _ItemConnection_nodes(ctx context.Context, field gra
 	return ec.marshalNItem2ᚕᚖgithubᚗcomᚋkᚑyomoᚋkaguᚑmiruᚋbackendᚋkagu_miru_apiᚋgraphᚋgqlmodelᚐItemᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _MediaPost_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "MediaPost",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _MediaPost_slug(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2774,7 +2730,7 @@ func (ec *executionContext) _MediaPost_slug(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaPost_title(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.MediaPost) (ret graphql.Marshaler) {
@@ -5943,16 +5899,6 @@ func (ec *executionContext) _MediaPost(ctx context.Context, sel ast.SelectionSet
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MediaPost")
-		case "id":
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._MediaPost_id(ctx, field, obj)
-			}
-
-			out.Values[i] = innerFunc(ctx)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "slug":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._MediaPost_slug(ctx, field, obj)

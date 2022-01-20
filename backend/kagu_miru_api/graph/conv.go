@@ -282,7 +282,6 @@ func mapPostsToGraphqlPosts(posts []*cms.Post) []*gqlmodel.MediaPost {
 	gqlPosts := make([]*gqlmodel.MediaPost, 0, len(posts))
 	for _, post := range posts {
 		gqlPosts = append(gqlPosts, &gqlmodel.MediaPost{
-			ID:           post.ID,
 			Slug:         post.Slug,
 			Title:        post.Title,
 			Description:  post.Description,

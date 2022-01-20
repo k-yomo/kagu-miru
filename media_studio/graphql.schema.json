@@ -1554,22 +1554,6 @@
             "deprecationReason": null
           },
           {
-            "name": "id",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "mainImageUrl",
             "description": null,
             "args": [],
@@ -1610,7 +1594,7 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "ID",
                 "ofType": null
               }
             },

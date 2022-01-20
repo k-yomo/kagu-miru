@@ -380,10 +380,6 @@
     <td></td>
   </tr>
   <tr>
-    <td><strong>id</strong> (<a href="scalars.md#id">ID!</a>)</td> 
-    <td></td>
-  </tr>
-  <tr>
     <td><strong>mainImageUrl</strong> (<a href="scalars.md#string">String!</a>)</td> 
     <td></td>
   </tr>
@@ -392,7 +388,7 @@
     <td></td>
   </tr>
   <tr>
-    <td><strong>slug</strong> (<a href="scalars.md#string">String!</a>)</td> 
+    <td><strong>slug</strong> (<a href="scalars.md#id">ID!</a>)</td> 
     <td></td>
   </tr>
   <tr>
