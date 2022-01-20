@@ -207,8 +207,11 @@ func (w *categoryItemsFetcher) start(ctx context.Context) {
 					wg := sync.WaitGroup{}
 					var publishedCount int64
 					for _, item := range items {
-						item := item
+						if !item.IsIndexable() {
+							continue
+						}
 
+						item := item
 						wg.Add(1)
 						go func() {
 							defer wg.Done()

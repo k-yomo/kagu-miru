@@ -229,21 +229,23 @@ func (w *genreItemsFetcher) start(ctx context.Context) {
 					wg := sync.WaitGroup{}
 					var publishedCount int64
 					for _, item := range items {
-						item := item
-						itemJSON, err := json.Marshal(item)
-						if err != nil {
-							w.logger.Error(
-								"json.Marshal item failed",
-								zap.Error(err),
-								zap.Any("item", item),
-							)
+						if !item.IsIndexable() {
 							continue
 						}
 
+						item := item
 						wg.Add(1)
 						go func() {
 							defer wg.Done()
 
+							itemJSON, err := json.Marshal(item)
+							if err != nil {
+								w.logger.Error(
+									"json.Marshal item failed",
+									zap.Error(err),
+									zap.Any("item", item),
+								)
+							}
 							res := w.pubsubItemUpdateTopic.Publish(ctx, &pubsub.Message{
 								Data:        itemJSON,
 								OrderingKey: item_fetcher.ItemOrderingKey(item),

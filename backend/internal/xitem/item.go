@@ -43,6 +43,31 @@ type Item struct {
 	Platform      Platform  `json:"platform"`
 }
 
+func (i *Item) IsIndexable() bool {
+	var excludeCategoryIDs = map[string]struct{}{
+		"406451": {}, // ベッド用部品・メンテナンス用品
+		"566177": {}, // 収納家具用部品
+		"215720": {}, // 蛍光灯
+		"566178": {}, // 電球
+		"568590": {}, // 誘導灯
+		"215716": {}, // 照明器具部品
+		"101860": {}, // その他
+		"566188": {}, // デスク用部品
+		"566193": {}, // カーテン・ブラインド用アクセサリー
+		"207738": {}, // 温度計・湿度計
+		"500349": {}, // 火鉢
+		"101859": {}, // その他
+	}
+
+	for _, categoryID := range i.CategoryIDs {
+		if _, ok := excludeCategoryIDs[categoryID]; ok {
+			return false
+		}
+	}
+
+	return true
+}
+
 func ItemUniqueID(platform Platform, itemID string) string {
 	return fmt.Sprintf("%s:%s", platform, itemID)
 }
