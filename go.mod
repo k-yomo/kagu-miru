@@ -15,7 +15,7 @@ require (
 	github.com/blendle/zapdriver v1.3.1
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/go-chi/chi/v5 v5.0.7
-	github.com/google/go-cmp v0.5.6
+	github.com/google/go-cmp v0.5.7
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/k-yomo/jp-dimension-parser v0.2.1
 	github.com/k-yomo/pm v0.3.0
