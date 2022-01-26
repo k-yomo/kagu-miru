@@ -411,8 +411,8 @@ github.com/vektah/dataloaden v0.2.1-0.20190515034641-a19b9a6e7c9e/go.mod h1:/HUd
 github.com/vektah/gqlparser/v2 v2.1.0/go.mod h1:SyUiHgLATUR8BiYURfTirrTcGpcE+4XkV2se04Px1Ms=
 github.com/vektah/gqlparser/v2 v2.2.0 h1:bAc3slekAAJW6sZTi07aGq0OrfaCjj4jxARAaC7g2EM=
 github.com/vektah/gqlparser/v2 v2.2.0/go.mod h1:i3mQIGIrbK2PD1RrCeMTlVbkF2FJ6WkU1KJlJlC+3F4=
-github.com/vitali-fedulov/images/v2 v2.1.0 h1:DocBP611WdArdyMFswr6J8BaPU2N05mdC6mKrZJfZEQ=
-github.com/vitali-fedulov/images/v2 v2.1.0/go.mod h1:Uf6xw8bNfbWjRE/qS0kDNvSTchTwohLBZR0AKhmfNWM=
+github.com/vitali-fedulov/images/v2 v2.1.2 h1:m0QcNqcN7S8yiOELjoBZySZuH08/bb+/idjgjupBnBY=
+github.com/vitali-fedulov/images/v2 v2.1.2/go.mod h1:Uf6xw8bNfbWjRE/qS0kDNvSTchTwohLBZR0AKhmfNWM=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
