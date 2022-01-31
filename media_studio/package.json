@@ -18,7 +18,7 @@
     "sanity"
   ],
   "dependencies": {
-    "@apollo/client": "^3.5.7",
+    "@apollo/client": "^3.5.8",
     "@heroicons/react": "^1.0.5",
     "@sanity/base": "^2.25.4",
     "@sanity/core": "^2.25.0",
