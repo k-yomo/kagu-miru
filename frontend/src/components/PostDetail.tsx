@@ -15,6 +15,7 @@ import PostCategoryBadge from '@src/components/PostCategoryBadge';
 import PostTagBadge from '@src/components/PostTagBadge';
 import AuthorIcon from '@src/components/AuthorIcon';
 import { formatDistance, parseISO } from 'date-fns';
+import jaLocale from 'date-fns/locale/ja';
 import BlockContent from '@sanity/block-content-to-react';
 import TableOfContents from '@src/components/TableOfContents';
 
@@ -211,6 +212,7 @@ export default function PostDetail({
             {publishedAt &&
               formatDistance(parseISO(publishedAt), new Date(), {
                 addSuffix: true,
+                locale: jaLocale,
               })}
           </span>
         </div>
