@@ -24,7 +24,7 @@ require (
 	github.com/olivere/elastic/v7 v7.0.31
 	github.com/rs/cors v1.8.2
 	github.com/sanity-io/client-go v1.0.0-alpha.5
-	github.com/vektah/gqlparser/v2 v2.2.0
+	github.com/vektah/gqlparser/v2 v2.3.1
 	github.com/vitali-fedulov/images/v2 v2.1.2
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.28.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.28.0
