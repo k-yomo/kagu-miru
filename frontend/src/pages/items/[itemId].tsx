@@ -136,7 +136,11 @@ export default function ItemDetailPage({ item }: Props) {
   const [trackEvent] = useTrackEventMutation();
   const similarItems = data?.getSimilarItems?.itemConnection.nodes;
 
-  const mainImgUrl = changeItemImageSize(item.imageUrls[0], item.platform, 512);
+  // TODO: use default url if no images
+  const mainImgUrl =
+    item.imageUrls.length > 0
+      ? changeItemImageSize(item.imageUrls[0], item.platform, 512)
+      : '';
   // Because of implementation error, yahoo shopping item has two dup images (medium and small)
   // So restricting images to remove the dup.
   // TODO: remove this condition after reindex
