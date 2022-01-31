@@ -116,7 +116,7 @@ export default function HomePage({ components }: Props) {
       <SEOMeta
         title="カグミル - 家具検索サービス"
         excludeSiteTitle
-        description="カグミルはオンラインで買える家具・インテリアを横断で一括検索・比較出来るサービスです。"
+        description="【掲載商品数1400万件】カグミルはオンラインで買える家具・インテリアを横断で一括検索・比較出来るサービスです。"
         img={{ srcPath: SearchPageScreenImg.src }}
         path={router.asPath}
       />
