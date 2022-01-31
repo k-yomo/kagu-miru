@@ -2,8 +2,7 @@ const colors = require('tailwindcss/colors');
 
 module.exports = {
   mode: 'jit',
-  purge: ['./src/**/*.{ts,tsx}'],
-  darkMode: 'class', // or 'media' or 'class'
+  content: ['./src/**/*.{ts,tsx}'],
   theme: {
     colors,
     extend: {
@@ -39,9 +38,6 @@ module.exports = {
         ],
       },
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: [
     require('@tailwindcss/line-clamp'),

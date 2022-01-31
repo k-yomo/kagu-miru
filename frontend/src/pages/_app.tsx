@@ -17,7 +17,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ApolloProvider client={apolloClient}>
         <div className="flex flex-col min-h-screen">
           <Header />
-          <main className="z-0 flex-grow relative bg-white dark:bg-black">
+          <main className="z-0 grow relative bg-white dark:bg-black">
             <NextNProgress
               color="#06b6d4"
               height={3}
