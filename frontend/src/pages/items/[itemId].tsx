@@ -185,15 +185,13 @@ export default function ItemDetailPage({ item }: Props) {
 
   return (
     <>
-      <Head>
-        <SEOMeta
-          title={item.name}
-          description={`${item.name}の詳細ページです。最安値のECサイトや関連商品の表示あり！`}
-          img={{ src: mainImgUrl }}
-          path={router.asPath}
-          noIndex
-        />
-      </Head>
+      <SEOMeta
+        title={item.name}
+        description={`${item.name}の詳細ページです。最安値のECサイトや関連商品の表示あり！`}
+        img={{ src: mainImgUrl }}
+        path={router.asPath}
+        noIndex
+      />
       <div className="max-w-[1200px] mx-auto mb-6">
         <div className="relative w-full h-[350px] sm:h-[600px]">
           <Swiper thumbs={{ swiper: thumbsSwiper }} zoom pagination>
