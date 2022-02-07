@@ -7,6 +7,8 @@ body {
     @apply text-text-primary;
     @apply dark:text-text-primary-dark;
 
+    @apply break-all;
+
     font-size: 18px;
 }
 
