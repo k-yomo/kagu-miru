@@ -51,6 +51,11 @@ export interface PostFragment {
   body: any[];
 }
 
+interface Box {
+  title?: string;
+  content: string;
+}
+
 interface InternalLink {
   slug: string;
   title: string;
@@ -74,6 +79,18 @@ const serializers = {
     },
   },
   types: {
+    box: ({ node }: { node: Box }) => {
+      return (
+        <div className="my-2 p-3 border-2 border-gray-800 dark:border-gray-200 rounded-sm">
+          {node.title && (
+            <div className="pb-2 mb-2 border-b-[1px] border-gray-200 dark:border-gray-800 font-bold">
+              {node.title}
+            </div>
+          )}
+          <pre>{node.content}</pre>
+        </div>
+      );
+    },
     internalLink: ({ node }: { node: InternalLink }) => {
       return (
         <div className="my-2">

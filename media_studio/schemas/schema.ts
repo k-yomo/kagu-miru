@@ -13,6 +13,7 @@ import author from './author';
 import item from './item';
 import customHtml from './customHtml';
 import searchPageLink from './searchPageLink';
+import box from './box';
 
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
@@ -33,5 +34,6 @@ export default createSchema({
     item,
     customHtml,
     searchPageLink,
+    box,
   ]),
 });

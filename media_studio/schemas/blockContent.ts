@@ -55,6 +55,11 @@ export default {
       },
     },
     {
+      title: 'ボックス',
+      name: 'box',
+      type: 'box',
+    },
+    {
       title: '記事リンク',
       name: 'internalLink',
       type: 'reference',
