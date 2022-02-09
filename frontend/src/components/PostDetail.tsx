@@ -81,19 +81,19 @@ const serializers = {
   types: {
     box: ({ node }: { node: Box }) => {
       return (
-        <div className="my-2 p-3 border-2 border-gray-800 dark:border-gray-200 rounded-sm">
+        <div className="my-4 px-2 py-4 bg-slate-100 rounded-md">
           {node.title && (
             <div className="pb-2 mb-2 border-b-[1px] border-gray-200 dark:border-gray-800 font-bold">
               {node.title}
             </div>
           )}
-          <pre>{node.content}</pre>
+          <pre className="whitespace-pre-wrap">{node.content}</pre>
         </div>
       );
     },
     internalLink: ({ node }: { node: InternalLink }) => {
       return (
-        <div className="my-2">
+        <div className="my-4">
           <LinkWithThumbnail
             url={routes.mediaPost(node.slug)}
             title={node.title}
@@ -109,7 +109,7 @@ const serializers = {
       const urlAs = new URL(node.url);
       urlAs.searchParams.delete('searchFrom');
       return (
-        <div className="my-2">
+        <div className="my-4">
           <LinkWithThumbnail
             url={url.toString()}
             urlAs={urlAs.toString()}
@@ -142,7 +142,7 @@ const serializers = {
     },
     item: ({ node }: { node: { id: string } }) => {
       return (
-        <div className="my-2">
+        <div className="my-4">
           <ItemDetailCard itemId={node.id} />
         </div>
       );
@@ -191,7 +191,10 @@ export default function PostDetail({
   }, [router.asPath]);
 
   return (
-    <article id="post" className="max-w-[1000px] mx-auto mb-4 sm:my-8">
+    <article
+      id="post"
+      className="max-w-[1000px] mx-auto mb-4 sm:my-8 leading-8"
+    >
       <div className="relative w-full h-[300px] sm:h-[600px]">
         <Image
           src={mainImgUrl}

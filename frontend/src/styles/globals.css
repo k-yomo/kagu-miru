@@ -21,17 +21,11 @@ input::-webkit-inner-spin-button {
     @apply border-t-black;
 }
 
-li {
-    @apply list-disc;
-    @apply ml-6;
-    @apply my-2;
-}
-
 /*
  For post's rich text
 */
 #post h2 {
-    @apply my-3;
+    @apply mt-12;
     @apply pb-2;
     @apply border-b-4;
     border-image: linear-gradient(90deg, #EC4899, #F43F5E) 1;
@@ -40,7 +34,7 @@ li {
 }
 
 #post h3 {
-    @apply my-2;
+    @apply mt-8;
     @apply pl-2;
     @apply border-l-4;
     border-image: linear-gradient(90deg, #EC4899, #F43F5E) 1;
@@ -49,7 +43,7 @@ li {
 }
 
 #post h4 {
-    @apply my-1;
+    @apply mt-6;
     @apply text-lg;
     @apply font-bold;
 }
@@ -58,8 +52,18 @@ li {
     @apply my-5;
 }
 
-#post blockquote {
+#post ul {
+    @apply my-5;
+}
+
+#post li {
+    @apply list-disc;
+    @apply ml-6;
     @apply my-2;
+}
+
+#post blockquote {
+    @apply my-5;
     padding-left: calc(1rem - 1px);
     @apply border-l-4;
     @apply border-[rgba(123,140,168,.25)];

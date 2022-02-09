@@ -8,13 +8,14 @@ const projectId = 'iwkc43by';
 export const sanityClient = client({
   projectId: projectId,
   dataset: SANITY_DATASET_ENV,
-  apiVersion: '2021-08-31',
+  apiVersion: '2022-01-01',
   useCdn: true,
 });
 
 export const sanityPreviewClient = client({
   projectId: projectId,
   dataset: SANITY_DATASET_ENV,
+  apiVersion: '2022-01-01',
   useCdn: false,
   withCredentials: true,
 });
