@@ -166,6 +166,22 @@ export default function PostDetail({
   body,
 }: Props) {
   const router = useRouter();
+  // remove line breaks
+  body = body.map((block) => {
+    if (!['h2', 'h3', 'h4', 'normal'].includes(block.style) || !block.children)
+      return block;
+    block.children = block.children.map((child) => {
+      child.text = child.text.replace(/\n/g, '').replace(/<br>/g, '');
+      return child;
+    });
+    return block;
+  });
+  // remove empty lines
+  body = body.filter(
+    (block) =>
+      !['h2', 'h3', 'h4', 'normal'].includes(block.style) ||
+      (block.children && !!block.children[0].text)
+  );
   const headings: string[] = body
     .filter((block) => block.style === 'h2')
     .map((block) => block.children[0].text);
