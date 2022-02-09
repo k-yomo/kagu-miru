@@ -50,3 +50,4 @@ const PostPreview = () => {
 };
 
 PostPreview.theme = 'light';
+export default PostPreview;
