@@ -13,7 +13,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   usePageView();
 
   return (
-    <ThemeProvider attribute="class">
+    // @ts-ignore
+    <ThemeProvider attribute="class" forcedTheme={Component.theme}>
       <ApolloProvider client={apolloClient}>
         <div className="flex flex-col min-h-screen">
           <Header />

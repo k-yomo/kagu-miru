@@ -43,4 +43,5 @@ const Post = (props: PostFragment) => {
   );
 };
 
+Post.theme = 'light';
 export default Post;

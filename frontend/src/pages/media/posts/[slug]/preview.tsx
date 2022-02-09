@@ -13,7 +13,7 @@ const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0]{
   ${postFragmentForPostDetail}
 }`;
 
-export default function PostPreview() {
+const PostPreview = () => {
   const [data, setData] = useState<PostFragment | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -47,4 +47,6 @@ export default function PostPreview() {
       <PostDetail {...data} />
     </>
   );
-}
+};
+
+PostPreview.theme = 'light';
