@@ -170,7 +170,7 @@ export default function PostDetail({
   body = body.map((block) => {
     if (!['h2', 'h3', 'h4', 'normal'].includes(block.style) || !block.children)
       return block;
-    block.children = block.children.map((child) => {
+    block.children = block.children.map((child: any) => {
       child.text = child.text.replace(/\n/g, '').replace(/<br>/g, '');
       return child;
     });
