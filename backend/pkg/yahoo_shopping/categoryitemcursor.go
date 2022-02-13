@@ -67,18 +67,15 @@ func (g *CategoryItemCursor) Next(ctx context.Context) (*SearchItemResponse, err
 		}
 	}
 
-	lastResultPosition := (searchItemRes.FirstResultPosition - 1) + searchItemRes.TotalResultsReturned
-	if g.curPage*maxResultCount >= maxResultTotalCount || lastResultPosition == searchItemRes.TotalResultsAvailable {
-		if searchItemRes.TotalResultsAvailable < maxResultTotalCount {
-			g.isDone = true
-		} else {
-			nextPrice := searchItemRes.Hits[len(searchItemRes.Hits)-1].Price
-			if g.curMinPrice == nextPrice {
-				nextPrice++
-			}
-			g.curPage = 1
-			g.curMinPrice = nextPrice
+	if noMoreItems := searchItemRes.TotalResultsReturned == searchItemRes.TotalResultsAvailable; noMoreItems {
+		g.isDone = true
+	} else if g.curPage*maxResultCount >= maxResultTotalCount {
+		nextPrice := searchItemRes.Hits[len(searchItemRes.Hits)-1].Price
+		if g.curMinPrice == nextPrice {
+			nextPrice++
 		}
+		g.curPage = 1
+		g.curMinPrice = nextPrice
 	} else {
 		g.curPage++
 	}

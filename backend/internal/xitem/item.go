@@ -7,6 +7,7 @@ import (
 type Platform string
 
 const (
+	PlatformAmazon        Platform = "amazon"
 	PlatformRakuten       Platform = "rakuten"
 	PlatformYahooShopping Platform = "yahoo_shopping"
 	PlatformPayPayMall    Platform = "paypay_mall"

@@ -8,6 +8,17 @@ CREATE TABLE item_categories (
     FOREIGN KEY (parent_id) REFERENCES item_categories (id)
 ) PRIMARY KEY(id);
 
+CREATE TABLE amazon_browse_nodes (
+    id STRING(256) NOT NULL,
+    name STRING(256) NOT NULL,
+    level INT64 NOT NULL,
+    parent_id STRING(256),
+    item_category_id STRING(256) NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (parent_id) REFERENCES amazon_browse_nodes (id),
+    FOREIGN KEY (item_category_id) REFERENCES item_categories (id)
+) PRIMARY KEY(id);
+
 CREATE TABLE rakuten_item_genres (
     id INT64 NOT NULL,
     name STRING(256) NOT NULL,

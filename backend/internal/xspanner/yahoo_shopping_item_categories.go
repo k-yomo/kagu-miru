@@ -46,11 +46,11 @@ func GetAllYahooShoppingItemCategories(ctx context.Context, spannerClient *spann
 		if err != nil {
 			return nil, logging.Error(ctx, fmt.Errorf("iter.Next :%w", err))
 		}
-		var genre YahooShoppingItemCategory
-		if err := row.ToStruct(&genre); err != nil {
+		var category YahooShoppingItemCategory
+		if err := row.ToStruct(&category); err != nil {
 			return nil, logging.Error(ctx, fmt.Errorf("row.ToStruct :%w", err))
 		}
-		itemCategories = append(itemCategories, &genre)
+		itemCategories = append(itemCategories, &category)
 	}
 	return itemCategories, nil
 }
