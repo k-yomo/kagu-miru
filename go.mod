@@ -5,7 +5,7 @@ go 1.17
 require (
 	cloud.google.com/go/aiplatform v1.3.0
 	cloud.google.com/go/profiler v0.1.2
-	cloud.google.com/go/pubsub v1.17.1
+	cloud.google.com/go/pubsub v1.18.0
 	cloud.google.com/go/spanner v1.29.0
 	github.com/99designs/gqlgen v0.16.0
 	github.com/Code-Hex/gqldoc v0.0.4
@@ -34,7 +34,7 @@ require (
 	go.uber.org/multierr v1.7.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
+	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11
 	google.golang.org/api v0.68.0
 	google.golang.org/genproto v0.0.0-20220207185906-7721543eae58
 	google.golang.org/grpc v1.44.0
