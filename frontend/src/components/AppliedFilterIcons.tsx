@@ -1,10 +1,6 @@
 import React, { memo, ReactNode } from 'react';
 import { XIcon } from '@heroicons/react/solid';
-import {
-  defaultSearchFilter,
-  SearchActionType,
-  useSearch,
-} from '@src/contexts/search';
+import { SearchActionType, useSearch } from '@src/contexts/search';
 import { findCategoryNameById } from '@src/lib/itemCategories';
 import { platFormText } from '@src/conv/platform';
 import { colorText } from '@src/conv/color';
@@ -15,21 +11,35 @@ export default function AppliedFilterIcons() {
   const onClickClear = () => {
     dispatch({
       type: SearchActionType.SET_FILTER,
-      payload: defaultSearchFilter,
+      payload: {},
     });
   };
 
-  const filter = searchState.searchInput.filter;
+  if (!searchState.searchInput.filter) {
+    return null;
+  }
+
+  const {
+    platforms,
+    categoryIds,
+    brandNames,
+    colors,
+    minPrice,
+    maxPrice,
+    minRating,
+    metadata,
+  } = searchState.searchInput.filter;
+
   let filterIcons: ReactNode[] = [];
-  if (filter.platforms.length > 0) {
-    const platformFilterIcons = filter.platforms.map((platform) => (
+  if (platforms && platforms.length > 0) {
+    const platformFilterIcons = platforms.map((platform) => (
       <FilterIcon
         key={`platformFilter:${platform}`}
         name={platFormText(platform)}
         onClear={() =>
           dispatch({
             type: SearchActionType.SET_PLATFORM_FILTER,
-            payload: filter.platforms.filter((p) => p !== platform),
+            payload: platforms!.filter((p) => p !== platform),
           })
         }
       />
@@ -37,15 +47,15 @@ export default function AppliedFilterIcons() {
     filterIcons = [...filterIcons, ...platformFilterIcons];
   }
 
-  if (filter.categoryIds.length > 0) {
-    const categoryFilterIcons = filter.categoryIds.map((categoryId) => (
+  if (categoryIds && categoryIds.length > 0) {
+    const categoryFilterIcons = categoryIds.map((categoryId) => (
       <FilterIcon
         key={`categoryFilter:${categoryId}`}
         name={findCategoryNameById(categoryId)}
         onClear={() =>
           dispatch({
             type: SearchActionType.SET_CATEGORY_FILTER,
-            payload: filter.categoryIds.filter((id) => id !== categoryId),
+            payload: categoryIds.filter((id) => id !== categoryId),
           })
         }
       />
@@ -53,15 +63,15 @@ export default function AppliedFilterIcons() {
     filterIcons = [...filterIcons, ...categoryFilterIcons];
   }
 
-  if (filter.brandNames.length > 0) {
-    const brandFilterIcons = filter.brandNames.map((brandName) => (
+  if (brandNames && brandNames.length > 0) {
+    const brandFilterIcons = brandNames.map((brandName) => (
       <FilterIcon
         key={`brandFilter:${brandName}`}
         name={brandName}
         onClear={() =>
           dispatch({
             type: SearchActionType.SET_BRAND_FILTER,
-            payload: filter.brandNames.filter((name) => name !== brandName),
+            payload: brandNames.filter((name) => name !== brandName),
           })
         }
       />
@@ -69,15 +79,15 @@ export default function AppliedFilterIcons() {
     filterIcons = [...filterIcons, ...brandFilterIcons];
   }
 
-  if (filter.colors.length > 0) {
-    const colorFilterIcons = filter.colors.map((color) => (
+  if (colors && colors.length > 0) {
+    const colorFilterIcons = colors.map((color) => (
       <FilterIcon
         key={`colorFilter:${color}`}
         name={colorText(color)}
         onClear={() =>
           dispatch({
             type: SearchActionType.SET_COLOR_FILTER,
-            payload: filter.colors.filter((c) => c !== color),
+            payload: colors.filter((c) => c !== color),
           })
         }
       />
@@ -85,14 +95,14 @@ export default function AppliedFilterIcons() {
     filterIcons = [...filterIcons, ...colorFilterIcons];
   }
 
-  if (filter.minPrice || filter.maxPrice) {
+  if (minPrice || maxPrice) {
     let name: string;
-    if (filter.minPrice && filter.maxPrice) {
-      name = `${filter.minPrice.toLocaleString()}円 ~ ${filter.maxPrice.toLocaleString()}円`;
-    } else if (filter.minPrice) {
-      name = `${filter.minPrice.toLocaleString()}円 ~`;
+    if (minPrice && maxPrice) {
+      name = `${minPrice.toLocaleString()}円 ~ ${maxPrice.toLocaleString()}円`;
+    } else if (minPrice) {
+      name = `${minPrice.toLocaleString()}円 ~`;
     } else {
-      name = `~ ${filter.maxPrice?.toLocaleString()}円`;
+      name = `~ ${maxPrice?.toLocaleString()}円`;
     }
     filterIcons.push(
       <FilterIcon
@@ -105,11 +115,11 @@ export default function AppliedFilterIcons() {
     );
   }
 
-  if (filter.minRating) {
+  if (minRating) {
     filterIcons.push(
       <FilterIcon
         key="ratingFilter"
-        name={`評価${filter.minRating}以上`}
+        name={`評価${minRating}以上`}
         onClear={() => {
           dispatch({
             type: SearchActionType.SET_RATING_FILTER,
@@ -120,8 +130,8 @@ export default function AppliedFilterIcons() {
     );
   }
 
-  if (filter.metadata) {
-    const metadataFilterIcons = filter.metadata.map((appliedMetadata) =>
+  if (metadata) {
+    const metadataFilterIcons = metadata.map((appliedMetadata) =>
       appliedMetadata.values.map((appliedValue) => (
         <FilterIcon
           key={`metadataFilter:${appliedMetadata.name}:${appliedValue}`}
@@ -129,7 +139,7 @@ export default function AppliedFilterIcons() {
           onClear={() =>
             dispatch({
               type: SearchActionType.SET_METADATA_FILTER,
-              payload: filter.metadata
+              payload: metadata
                 .map((m) => ({
                   name: m.name,
                   values: m.values.filter(

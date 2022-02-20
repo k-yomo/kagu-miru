@@ -264,14 +264,14 @@ export type SearchDisplayItemsActionParams = {
 };
 
 export type SearchFilter = {
-  brandNames: Array<Scalars['String']>;
-  categoryIds: Array<Scalars['ID']>;
-  colors: Array<ItemColor>;
+  brandNames?: InputMaybe<Array<Scalars['String']>>;
+  categoryIds?: InputMaybe<Array<Scalars['ID']>>;
+  colors?: InputMaybe<Array<ItemColor>>;
   maxPrice?: InputMaybe<Scalars['Int']>;
-  metadata: Array<AppliedMetadata>;
+  metadata?: InputMaybe<Array<AppliedMetadata>>;
   minPrice?: InputMaybe<Scalars['Int']>;
   minRating?: InputMaybe<Scalars['Int']>;
-  platforms: Array<ItemSellingPlatform>;
+  platforms?: InputMaybe<Array<ItemSellingPlatform>>;
 };
 
 export enum SearchFrom {
@@ -285,11 +285,11 @@ export enum SearchFrom {
 }
 
 export type SearchInput = {
-  filter: SearchFilter;
+  filter?: InputMaybe<SearchFilter>;
   page?: InputMaybe<Scalars['Int']>;
   pageSize?: InputMaybe<Scalars['Int']>;
   query: Scalars['String'];
-  sortType: SearchSortType;
+  sortType?: InputMaybe<SearchSortType>;
 };
 
 export type SearchResponse = {
@@ -316,7 +316,7 @@ export type SubItemCategoryFragment = {
   id: string;
   level: number;
   name: string;
-  parentId?: string | null | undefined;
+  parentId?: string | null;
 };
 
 export type CategoryInputGetAllCategoriesQueryVariables = Exact<{
@@ -328,22 +328,22 @@ export type CategoryInputGetAllCategoriesQuery = {
     id: string;
     level: number;
     name: string;
-    parentId?: string | null | undefined;
+    parentId?: string | null;
     children: Array<{
       id: string;
       level: number;
       name: string;
-      parentId?: string | null | undefined;
+      parentId?: string | null;
       children: Array<{
         id: string;
         level: number;
         name: string;
-        parentId?: string | null | undefined;
+        parentId?: string | null;
         children: Array<{
           id: string;
           level: number;
           name: string;
-          parentId?: string | null | undefined;
+          parentId?: string | null;
         }>;
       }>;
     }>;

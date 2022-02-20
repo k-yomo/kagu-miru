@@ -25,6 +25,7 @@ func (r *mutationResolver) TrackEvent(ctx context.Context, event gqlmodel.Event)
 func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error) {
 	eg := errgroup.Group{}
 
+	sortType := gqlmodel.SearchSortTypeReviewCount
 	var rakutenItemsRes *gqlmodel.SearchResponse
 	eg.Go(func() error {
 		var err error
@@ -32,7 +33,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 			Filter: &gqlmodel.SearchFilter{
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformRakuten},
 			},
-			SortType: gqlmodel.SearchSortTypeReviewCount,
+			SortType: &sortType,
 			PageSize: func() *int { i := 10; return &i }(),
 		})
 		return err
@@ -45,7 +46,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 			Filter: &gqlmodel.SearchFilter{
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformYahooShopping},
 			},
-			SortType: gqlmodel.SearchSortTypeReviewCount,
+			SortType: &sortType,
 			PageSize: func() *int { i := 10; return &i }(),
 		})
 		return err
@@ -58,7 +59,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 			Filter: &gqlmodel.SearchFilter{
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformPaypayMall},
 			},
-			SortType: gqlmodel.SearchSortTypeReviewCount,
+			SortType: &sortType,
 			PageSize: func() *int { i := 10; return &i }(),
 		})
 		return err
@@ -137,6 +138,9 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 }
 
 func (r *queryResolver) Search(ctx context.Context, input gqlmodel.SearchInput) (*gqlmodel.SearchResponse, error) {
+	if input.Filter == nil {
+		input.Filter = &gqlmodel.SearchFilter{}
+	}
 	// Categorizing Query is slow (~ 1sec), so disabling for the time being
 	// if input.Query != "" && len(input.Filter.CategoryIds) == 0 {
 	// 	categoryIDs, err := r.QueryClassifierClient.CategorizeQuery(ctx, input.Query)

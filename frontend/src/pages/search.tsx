@@ -30,6 +30,7 @@ import PlatformFilter from '@src/components/PlatformFilter';
 import SearchPageScreenImg from '@public/images/search_screen.jpeg';
 import ItemList from '@src/components/ItemList';
 import Facets from '@src/components/Facets';
+import { isNotEmptyArray } from '@src/lib/array';
 
 export default function SearchPage() {
   const router = useRouter();
@@ -61,6 +62,7 @@ export const SearchPageInner = memo(function SearchPageInner({
   const toast = useToast();
   const clipboard = useClipboard();
   const [trackEvent] = useTrackEventMutation();
+  const searchFilter = searchState.searchInput.filter;
 
   const onSubmitQuery = useCallback(
     (query: string, searchFrom: SearchFrom) => {
@@ -105,7 +107,7 @@ export const SearchPageInner = memo(function SearchPageInner({
       <div className="my-8 mx-2 lg:mx-4 lg:min-w-[300px] hidden md:block">
         <div
           className={`mt-1 p-3 ${
-            searchState.searchInput.filter.categoryIds.length > 0
+            isNotEmptyArray(searchFilter?.categoryIds)
               ? 'bg-gray-100 dark:bg-gray-800'
               : ''
           }`}
@@ -115,7 +117,7 @@ export const SearchPageInner = memo(function SearchPageInner({
         </div>
         <div
           className={`mt-6 p-3 ${
-            searchState.searchInput.filter.platforms.length > 0
+            isNotEmptyArray(searchFilter?.platforms)
               ? 'bg-gray-100 dark:bg-gray-800'
               : ''
           }`}
@@ -125,7 +127,7 @@ export const SearchPageInner = memo(function SearchPageInner({
         </div>
         <div
           className={`mt-6 p-3 ${
-            searchState.searchInput.filter.colors.length > 0
+            isNotEmptyArray(searchFilter?.colors)
               ? 'bg-gray-100 dark:bg-gray-800'
               : ''
           }`}
@@ -135,8 +137,7 @@ export const SearchPageInner = memo(function SearchPageInner({
         </div>
         <div
           className={`mt-6 p-3 ${
-            searchState.searchInput.filter.minPrice ||
-            searchState.searchInput.filter.maxPrice
+            searchFilter?.minPrice || searchFilter?.maxPrice
               ? 'bg-gray-100 dark:bg-gray-800'
               : ''
           }`}
@@ -146,9 +147,7 @@ export const SearchPageInner = memo(function SearchPageInner({
         </div>
         <div
           className={`mt-6 p-3 ${
-            searchState.searchInput.filter.minRating
-              ? 'bg-gray-100 dark:bg-gray-800'
-              : ''
+            searchFilter?.minRating ? 'bg-gray-100 dark:bg-gray-800' : ''
           }`}
         >
           <h3 className="mb-2 text-md font-bold">レビュー評価</h3>

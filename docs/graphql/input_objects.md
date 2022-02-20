@@ -205,15 +205,15 @@
     <th>Description</th>
   </tr>
   <tr>
-    <td><strong>brandNames</strong> (<a href="scalars.md#string">[String!]!</a>)</td>
+    <td><strong>brandNames</strong> (<a href="scalars.md#string">[String!]</a>)</td>
     <td></td>
   </tr>
   <tr>
-    <td><strong>categoryIds</strong> (<a href="scalars.md#id">[ID!]!</a>)</td>
+    <td><strong>categoryIds</strong> (<a href="scalars.md#id">[ID!]</a>)</td>
     <td></td>
   </tr>
   <tr>
-    <td><strong>colors</strong> (<a href="enums.md#itemcolor">[ItemColor!]!</a>)</td>
+    <td><strong>colors</strong> (<a href="enums.md#itemcolor">[ItemColor!]</a>)</td>
     <td></td>
   </tr>
   <tr>
@@ -221,7 +221,7 @@
     <td></td>
   </tr>
   <tr>
-    <td><strong>metadata</strong> (<a href="input_objects.md#appliedmetadata">[AppliedMetadata!]!</a>)</td>
+    <td><strong>metadata</strong> (<a href="input_objects.md#appliedmetadata">[AppliedMetadata!]</a>)</td>
     <td></td>
   </tr>
   <tr>
@@ -233,7 +233,7 @@
     <td></td>
   </tr>
   <tr>
-    <td><strong>platforms</strong> (<a href="enums.md#itemsellingplatform">[ItemSellingPlatform!]!</a>)</td>
+    <td><strong>platforms</strong> (<a href="enums.md#itemsellingplatform">[ItemSellingPlatform!]</a>)</td>
     <td></td>
   </tr>
 </table>
@@ -253,7 +253,7 @@
     <th>Description</th>
   </tr>
   <tr>
-    <td><strong>filter</strong> (<a href="input_objects.md#searchfilter">SearchFilter!</a>)</td>
+    <td><strong>filter</strong> (<a href="input_objects.md#searchfilter">SearchFilter</a>)</td>
     <td></td>
   </tr>
   <tr>
@@ -269,7 +269,7 @@
     <td></td>
   </tr>
   <tr>
-    <td><strong>sortType</strong> (<a href="enums.md#searchsorttype">SearchSortType!</a>)</td>
+    <td><strong>sortType</strong> (<a href="enums.md#searchsorttype">SearchSortType</a>)</td>
     <td></td>
   </tr>
 </table>

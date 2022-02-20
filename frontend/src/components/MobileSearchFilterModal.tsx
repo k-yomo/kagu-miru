@@ -8,18 +8,14 @@ import {
   SearchFilter,
 } from '@src/generated/graphql';
 import RatingSelect from '@src/components/RatingSelect';
-import {
-  defaultSearchFilter,
-  SearchActionType,
-  useSearch,
-} from '@src/contexts/search';
+import { SearchActionType, useSearch } from '@src/contexts/search';
 import PlatformSelect from '@src/components/PlatformSelect';
 import ColorSelect from '@src/components/ColorSelect';
 
 export default function MobileSearchFilterModal() {
   const { searchState, dispatch } = useSearch();
   const [searchFilter, setSearchFilter] = useState<SearchFilter>(
-    searchState.searchInput.filter
+    searchState.searchInput.filter || {}
   );
   const [open, setOpen] = useState(false);
   const cancelButtonRef = useRef(null);
@@ -58,11 +54,13 @@ export default function MobileSearchFilterModal() {
   };
 
   const onClickClear = () => {
-    setSearchFilter(defaultSearchFilter);
+    setSearchFilter({});
   };
 
   useEffect(() => {
-    setSearchFilter(searchState.searchInput.filter);
+    if (searchState.searchInput.filter) {
+      setSearchFilter(searchState.searchInput.filter);
+    }
   }, [searchState.searchInput.filter]);
 
   return (
@@ -129,7 +127,7 @@ export default function MobileSearchFilterModal() {
                 <div className="flex-1 px-6 mt-2 overflow-y-scroll text-left">
                   <h3 className="my-2 text-md font-bold">カテゴリー</h3>
                   <CategoryList
-                    categoryIds={searchFilter.categoryIds}
+                    categoryIds={searchFilter.categoryIds || []}
                     showCategoryCount={5}
                     onClickCategory={(categoryId: string) =>
                       setCategoryIds([categoryId])
@@ -139,14 +137,14 @@ export default function MobileSearchFilterModal() {
                   <hr className="my-3 border-gray-100 dark:border-gray-800" />
                   <h3 className="my-2 text-md font-bold">ECサイト</h3>
                   <PlatformSelect
-                    platforms={searchFilter.platforms}
+                    platforms={searchFilter.platforms || []}
                     onChangePlatforms={setPlatforms}
                     htmlIdPrefix="mobile"
                   />
                   <hr className="my-3 border-gray-100 dark:border-gray-800" />
                   <h3 className="my-2 text-md font-bold">カラー</h3>
                   <ColorSelect
-                    colors={searchFilter.colors}
+                    colors={searchFilter.colors || []}
                     onChangeColors={setColors}
                   />
                   <hr className="my-3 border-gray-100 dark:border-gray-800" />

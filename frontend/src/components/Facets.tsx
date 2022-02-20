@@ -12,15 +12,16 @@ export default memo(function Facets() {
     (facetType: FacetType, title: string) => {
       switch (facetType) {
         case FacetType.CategoryIds:
-          return searchState.searchInput.filter.categoryIds;
+          return searchState.searchInput.filter?.categoryIds;
         case FacetType.BrandNames:
-          return searchState.searchInput.filter.brandNames;
+          return searchState.searchInput.filter?.brandNames;
         case FacetType.Colors:
-          return searchState.searchInput.filter.colors;
+          return searchState.searchInput.filter?.colors;
         case FacetType.Metadata:
           return (
-            searchState.searchInput.filter.metadata.find((m) => m.name == title)
-              ?.values || []
+            searchState.searchInput.filter?.metadata?.find(
+              (m) => m.name == title
+            )?.values || []
           );
         default:
           return [];
@@ -33,11 +34,13 @@ export default memo(function Facets() {
     (facetType: FacetType, selectedId: string, name: string) => {
       switch (facetType) {
         case FacetType.CategoryIds:
-          let categoryIds = searchState.searchInput.filter.categoryIds;
-          if (categoryIds.includes(selectedId)) {
+          let categoryIds = searchState.searchInput.filter?.categoryIds;
+          if (categoryIds?.includes(selectedId)) {
             categoryIds = categoryIds.filter((id) => id !== selectedId);
           } else {
-            categoryIds = Array.from(new Set([...categoryIds, selectedId]));
+            categoryIds = Array.from(
+              new Set([...(categoryIds || []), selectedId])
+            );
           }
           dispatch({
             type: SearchActionType.SET_CATEGORY_FILTER,
@@ -45,11 +48,13 @@ export default memo(function Facets() {
           });
           return;
         case FacetType.BrandNames:
-          let brandNames = searchState.searchInput.filter.brandNames;
-          if (brandNames.includes(selectedId)) {
+          let brandNames = searchState.searchInput.filter?.brandNames;
+          if (brandNames?.includes(selectedId)) {
             brandNames = brandNames.filter((name) => name !== selectedId);
           } else {
-            brandNames = Array.from(new Set([...brandNames, selectedId]));
+            brandNames = Array.from(
+              new Set([...(brandNames || []), selectedId])
+            );
           }
           dispatch({
             type: SearchActionType.SET_BRAND_FILTER,
@@ -57,13 +62,15 @@ export default memo(function Facets() {
           });
           return;
         case FacetType.Colors:
-          let colors = searchState.searchInput.filter.colors;
-          if (colors.includes(selectedId as ItemColor)) {
+          let colors = searchState.searchInput.filter?.colors;
+          if (colors?.includes(selectedId as ItemColor)) {
             colors = colors.filter(
               (color) => color !== (selectedId as ItemColor)
             );
           } else {
-            colors = Array.from(new Set([...colors, selectedId as ItemColor]));
+            colors = Array.from(
+              new Set([...(colors || []), selectedId as ItemColor])
+            );
           }
           dispatch({
             type: SearchActionType.SET_COLOR_FILTER,
@@ -71,8 +78,8 @@ export default memo(function Facets() {
           });
           return;
         case FacetType.Metadata:
-          let metadata = searchState.searchInput.filter.metadata;
-          const selectedMetadata = metadata.find((m) => m.name === name);
+          let metadata = searchState.searchInput.filter?.metadata;
+          const selectedMetadata = metadata?.find((m) => m.name === name);
           // already selected
           if (selectedMetadata) {
             if (selectedMetadata.values.includes(selectedId)) {
@@ -85,11 +92,14 @@ export default memo(function Facets() {
               );
             }
           } else {
-            metadata = [...metadata, { name: name, values: [selectedId] }];
+            metadata = [
+              ...(metadata || []),
+              { name: name, values: [selectedId] },
+            ];
           }
           dispatch({
             type: SearchActionType.SET_METADATA_FILTER,
-            payload: metadata,
+            payload: metadata || [],
           });
           return;
       }
@@ -105,7 +115,7 @@ export default memo(function Facets() {
           <div key={facet.title}>
             <FacetDropdown
               facet={facet}
-              selectedIds={selectedIds}
+              selectedIds={selectedIds || []}
               onClickFacet={onClickFacet}
             />
           </div>

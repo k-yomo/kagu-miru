@@ -210,14 +210,6 @@ const searchReducer = (
   }
 };
 
-export const defaultSearchFilter: SearchFilter = {
-  categoryIds: [],
-  brandNames: [],
-  platforms: [],
-  colors: [],
-  metadata: [],
-};
-
 const SearchContext = createContext<{
   searchState: SearchState;
   searchId: string;
@@ -231,7 +223,7 @@ const SearchContext = createContext<{
   searchState: {
     searchInput: {
       query: '',
-      filter: defaultSearchFilter,
+      filter: {},
       sortType: SearchSortType.BestMatch,
     },
     searchFrom: SearchFrom.Url,
@@ -302,8 +294,8 @@ export function queryParamsToSearchParams(
 
 export function buildSearchUrlQuery(
   query: string,
-  filter: SearchFilter,
   searchFrom: SearchFrom,
+  filter?: SearchFilter,
   sortType?: SearchSortType,
   page?: number
 ) {
@@ -311,17 +303,19 @@ export function buildSearchUrlQuery(
     q: query,
     searchFrom: searchFrom.toString(),
   };
-  if (filter.categoryIds.length > 0)
+
+  if (filter?.categoryIds && filter.categoryIds.length > 0)
     urlQuery.categoryIds = filter.categoryIds.join(',');
-  if (filter.brandNames.length > 0)
+  if (filter?.brandNames && filter.brandNames.length > 0)
     urlQuery.brandNames = filter.brandNames.join(',');
-  if (filter.platforms.length > 0)
+  if (filter?.platforms && filter.platforms.length > 0)
     urlQuery.platforms = filter.platforms.join(',');
-  if (filter.colors.length > 0) urlQuery.colors = filter.colors.join(',');
-  if (filter.minPrice) urlQuery.minPrice = filter.minPrice.toString();
-  if (filter.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
-  if (filter.minRating) urlQuery.minRating = filter.minRating.toString();
-  if (filter.metadata.length > 0) {
+  if (filter?.colors && filter.colors.length > 0)
+    urlQuery.colors = filter.colors.join(',');
+  if (filter?.minPrice) urlQuery.minPrice = filter.minPrice.toString();
+  if (filter?.maxPrice) urlQuery.maxPrice = filter.maxPrice.toString();
+  if (filter?.minRating) urlQuery.minRating = filter.minRating.toString();
+  if (filter?.metadata && filter.metadata.length > 0) {
     filter.metadata.forEach((m) => {
       urlQuery[`m:${m.name}`] = m.values.join(',');
     });
@@ -398,9 +392,9 @@ export const SearchProvider: FC<Props> = memo(function SearchProvider({
 
     const urlQuery = buildSearchUrlQuery(
       query,
-      filter,
       searchFrom,
-      sortType,
+      filter || undefined,
+      sortType || undefined,
       page || undefined
     );
     // Exclude searchFrom to track actual searched from, since url can be shared.

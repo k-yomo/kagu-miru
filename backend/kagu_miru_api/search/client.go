@@ -64,7 +64,7 @@ type Response struct {
 }
 
 func (s *searchClient) SearchItems(ctx context.Context, input *gqlmodel.SearchInput) (*Response, error) {
-	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_SearchItems")
+	ctx, span := otel.Tracer("").Start(ctx, "search.searchClient_SearchItems")
 	defer span.End()
 
 	searchQuery, err := buildSearchQuery(input)
@@ -170,9 +170,13 @@ func extractFiltersExceptForField(field string, filterMap map[string]elastic.Que
 	return filters
 }
 
-func getSorters(sortType gqlmodel.SearchSortType) []elastic.Sorter {
+func getSorters(sortType *gqlmodel.SearchSortType) []elastic.Sorter {
+	// defaulting to best match
+	if sortType == nil {
+		return []elastic.Sorter{elastic.NewScoreSort().Desc()}
+	}
 	var sorters []elastic.Sorter
-	switch sortType {
+	switch *sortType {
 	case gqlmodel.SearchSortTypePriceAsc:
 		sorters = []elastic.Sorter{elastic.NewFieldSort(es.ItemFieldPrice).Asc()}
 	case gqlmodel.SearchSortTypePriceDesc:
@@ -195,7 +199,7 @@ func getSorters(sortType gqlmodel.SearchSortType) []elastic.Sorter {
 }
 
 func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetSimilarItemsInput, item *xspanner.Item) (*Response, error) {
-	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetSimilarIts")
+	ctx, span := otel.Tracer("").Start(ctx, "search.searchClient_GetSimilarIts")
 	defer span.End()
 
 	boolQuery := elastic.NewBoolQuery().
@@ -264,7 +268,7 @@ func (s *searchClient) GetSimilarItems(ctx context.Context, input *gqlmodel.GetS
 }
 
 func (s *searchClient) GetQuerySuggestions(ctx context.Context, query string) ([]string, error) {
-	ctx, span := otel.Tracer("").Start(ctx, "search.elasticsearchClient_GetQuerySuggestions")
+	ctx, span := otel.Tracer("").Start(ctx, "search.searchClient_GetQuerySuggestions")
 	defer span.End()
 
 	const aggregationTerm = "queries"

@@ -167,8 +167,8 @@ enum SearchSortType {
 
 input SearchInput {
     query: String!
-    filter: SearchFilter!
-    sortType: SearchSortType!
+    sortType: SearchSortType
+    filter: SearchFilter
     page: Int
     pageSize: Int
 }
@@ -206,14 +206,14 @@ input AppliedMetadata {
 }
 
 input SearchFilter {
-    categoryIds: [ID!]!
-    platforms: [ItemSellingPlatform!]!
-    brandNames: [String!]!
-    colors: [ItemColor!]!
+    categoryIds: [ID!]
+    platforms: [ItemSellingPlatform!]
+    brandNames: [String!]
+    colors: [ItemColor!]
     minPrice: Int
     maxPrice: Int
     minRating: Int
-    metadata: [AppliedMetadata!]!
+    metadata: [AppliedMetadata!]
 }
 
 enum EventID {

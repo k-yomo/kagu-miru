@@ -2198,19 +2198,15 @@
             "name": "brandNames",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
+              "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 }
               }
             },
@@ -2222,19 +2218,15 @@
             "name": "categoryIds",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
+              "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "ID",
-                    "ofType": null
-                  }
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
                 }
               }
             },
@@ -2246,19 +2238,15 @@
             "name": "colors",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
+              "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "ENUM",
-                    "name": "ItemColor",
-                    "ofType": null
-                  }
+                  "kind": "ENUM",
+                  "name": "ItemColor",
+                  "ofType": null
                 }
               }
             },
@@ -2282,19 +2270,15 @@
             "name": "metadata",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
+              "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "AppliedMetadata",
-                    "ofType": null
-                  }
+                  "kind": "INPUT_OBJECT",
+                  "name": "AppliedMetadata",
+                  "ofType": null
                 }
               }
             },
@@ -2330,19 +2314,15 @@
             "name": "platforms",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
+              "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "ENUM",
-                    "name": "ItemSellingPlatform",
-                    "ofType": null
-                  }
+                  "kind": "ENUM",
+                  "name": "ItemSellingPlatform",
+                  "ofType": null
                 }
               }
             },
@@ -2418,13 +2398,9 @@
             "name": "filter",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INPUT_OBJECT",
-                "name": "SearchFilter",
-                "ofType": null
-              }
+              "kind": "INPUT_OBJECT",
+              "name": "SearchFilter",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -2474,13 +2450,9 @@
             "name": "sortType",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "SearchSortType",
-                "ofType": null
-              }
+              "kind": "ENUM",
+              "name": "SearchSortType",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,

@@ -21,7 +21,7 @@ export default memo(function CategoryFilter() {
 
   return (
     <CategoryList
-      categoryIds={searchState.searchInput.filter.categoryIds}
+      categoryIds={searchState.searchInput.filter?.categoryIds || []}
       onClickCategory={onClickCategory}
       onClearCategory={onClearCategory}
     />

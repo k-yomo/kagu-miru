@@ -35,6 +35,11 @@ type Facet struct {
 	TotalCount int
 }
 
+func (f *Facet) IsValid() bool {
+	// facet must have multiple variations if not selected
+	return len(f.Values) > 0
+}
+
 type FacetValue struct {
 	ID    string
 	Name  string
@@ -235,7 +240,7 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 			idNameMap[itemCategory.ID] = strings.Join(itemCategory.CategoryNames(), " > ")
 		}
 		facet := newFacetFromBucketKeyItems(result, FacetTypeCategoryIDs, idNameMap)
-		if facet.TotalCount > 0 {
+		if facet.IsValid() {
 			facets = append(facets, facet)
 		}
 	}
@@ -254,8 +259,7 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 			idNameMap[keyStr] = keyStr
 		}
 		facet := newFacetFromBucketKeyItems(result, FacetTypeBrandNames, idNameMap)
-		// facet must have multiple variations if not selected
-		if isFilterAggregation || len(facet.Values) > 1 {
+		if facet.IsValid() {
 			facets = append(facets, facet)
 		}
 	}
@@ -274,8 +278,7 @@ func (s *searchClient) mapAggregationToFacets(ctx context.Context, agg elastic.A
 			idNameMap[keyStr] = keyStr
 		}
 		facet := newFacetFromBucketKeyItems(result, FacetTypeColors, idNameMap)
-		// facet must have multiple variations if not selected
-		if isFilterAggregation || len(facet.Values) > 1 {
+		if facet.IsValid() {
 			facets = append(facets, facet)
 		}
 	}

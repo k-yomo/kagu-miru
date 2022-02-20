@@ -178,11 +178,11 @@ type SearchFilter struct {
 }
 
 type SearchInput struct {
-	Query    string         `json:"query"`
-	Filter   *SearchFilter  `json:"filter"`
-	SortType SearchSortType `json:"sortType"`
-	Page     *int           `json:"page"`
-	PageSize *int           `json:"pageSize"`
+	Query    string          `json:"query"`
+	SortType *SearchSortType `json:"sortType"`
+	Filter   *SearchFilter   `json:"filter"`
+	Page     *int            `json:"page"`
+	PageSize *int            `json:"pageSize"`
 }
 
 type SearchResponse struct {

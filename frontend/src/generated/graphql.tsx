@@ -11,7 +11,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
   [SubKey in K]: Maybe<T[SubKey]>;
 };
-const defaultOptions = {};
+const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -264,14 +264,14 @@ export type SearchDisplayItemsActionParams = {
 };
 
 export type SearchFilter = {
-  brandNames: Array<Scalars['String']>;
-  categoryIds: Array<Scalars['ID']>;
-  colors: Array<ItemColor>;
+  brandNames?: InputMaybe<Array<Scalars['String']>>;
+  categoryIds?: InputMaybe<Array<Scalars['ID']>>;
+  colors?: InputMaybe<Array<ItemColor>>;
   maxPrice?: InputMaybe<Scalars['Int']>;
-  metadata: Array<AppliedMetadata>;
+  metadata?: InputMaybe<Array<AppliedMetadata>>;
   minPrice?: InputMaybe<Scalars['Int']>;
   minRating?: InputMaybe<Scalars['Int']>;
-  platforms: Array<ItemSellingPlatform>;
+  platforms?: InputMaybe<Array<ItemSellingPlatform>>;
 };
 
 export enum SearchFrom {
@@ -285,11 +285,11 @@ export enum SearchFrom {
 }
 
 export type SearchInput = {
-  filter: SearchFilter;
+  filter?: InputMaybe<SearchFilter>;
   page?: InputMaybe<Scalars['Int']>;
   pageSize?: InputMaybe<Scalars['Int']>;
   query: Scalars['String'];
-  sortType: SearchSortType;
+  sortType?: InputMaybe<SearchSortType>;
 };
 
 export type SearchResponse = {
