@@ -15,7 +15,7 @@ export default memo(function ColorFilter() {
 
   return (
     <ColorSelect
-      colors={searchState.searchInput.filter.colors}
+      colors={searchState.searchInput.filter?.colors || []}
       onChangeColors={onChangeColors}
     />
   );

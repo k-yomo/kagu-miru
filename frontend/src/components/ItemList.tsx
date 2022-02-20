@@ -11,6 +11,7 @@ gql`
   fragment itemListItemFragment on Item {
     id
     name
+    categoryId
     url
     affiliateUrl
     price

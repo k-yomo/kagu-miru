@@ -4,10 +4,10 @@ import { SearchActionType, useSearch } from '@src/contexts/search';
 export default memo(function PriceFilter() {
   const { searchState, dispatch } = useSearch();
   const [minPrice, setMinPrice] = useState(
-    searchState.searchInput.filter.minPrice
+    searchState.searchInput.filter?.minPrice
   );
   const [maxPrice, setMaxPrice] = useState(
-    searchState.searchInput.filter.maxPrice
+    searchState.searchInput.filter?.maxPrice
   );
 
   const onClickClear = () => {

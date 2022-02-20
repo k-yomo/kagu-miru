@@ -24,7 +24,7 @@ export default memo(function SortTypeSelectBox() {
         id="location"
         name="location"
         className="appearance-none mt-1 block w-full pl-3 pr-10 py-2 rounded-md text-base dark:bg-gray-800 border border-gray-700 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-gray-400"
-        value={searchState.searchInput.sortType}
+        value={searchState.searchInput.sortType || SearchSortType.BestMatch}
         onChange={onChangeSortBy}
         disabled={loading}
       >

@@ -4,7 +4,7 @@ import RatingSelect from '@src/components/RatingSelect';
 
 export default memo(function RatingFilter() {
   const { searchState, dispatch } = useSearch();
-  const minRating = searchState.searchInput.filter.minRating;
+  const minRating = searchState.searchInput.filter?.minRating;
 
   const onChangeRating = (rating?: number) => {
     dispatch({ type: SearchActionType.SET_RATING_FILTER, payload: rating });

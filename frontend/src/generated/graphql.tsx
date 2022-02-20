@@ -315,6 +315,7 @@ export type SimilarItemsDisplayItemsActionParams = {
 export type ItemListItemFragmentFragment = {
   id: string;
   name: string;
+  categoryId: string;
   url: string;
   affiliateUrl: string;
   price: number;
@@ -344,6 +345,7 @@ export type SearchQuery = {
       nodes: Array<{
         id: string;
         name: string;
+        categoryId: string;
         url: string;
         affiliateUrl: string;
         price: number;
@@ -392,6 +394,7 @@ export type HomeQuery = {
               items: Array<{
                 id: string;
                 name: string;
+                categoryId: string;
                 url: string;
                 affiliateUrl: string;
                 price: number;
@@ -408,6 +411,7 @@ export type HomeQuery = {
             items: Array<{
               id: string;
               name: string;
+              categoryId: string;
               url: string;
               affiliateUrl: string;
               price: number;
@@ -454,6 +458,7 @@ export type ItemDetailPageGetItemQuery = {
     sameGroupItems: Array<{
       id: string;
       name: string;
+      categoryId: string;
       url: string;
       affiliateUrl: string;
       price: number;
@@ -477,6 +482,7 @@ export type ItemDetailPageGetSimilarItemsQuery = {
       nodes: Array<{
         id: string;
         name: string;
+        categoryId: string;
         url: string;
         affiliateUrl: string;
         price: number;
@@ -493,6 +499,7 @@ export const ItemListItemFragmentFragmentDoc = gql`
   fragment itemListItemFragment on Item {
     id
     name
+    categoryId
     url
     affiliateUrl
     price

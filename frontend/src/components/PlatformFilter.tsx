@@ -15,7 +15,7 @@ export default memo(function RatingFilter() {
 
   return (
     <PlatformSelect
-      platforms={searchState.searchInput.filter.platforms}
+      platforms={searchState.searchInput.filter?.platforms || []}
       onChangePlatforms={onChangePlatforms}
       htmlIdPrefix="desktop"
     />
