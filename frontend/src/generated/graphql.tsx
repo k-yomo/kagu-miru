@@ -315,15 +315,12 @@ export type SimilarItemsDisplayItemsActionParams = {
 export type ItemListItemFragmentFragment = {
   id: string;
   name: string;
-  description: string;
-  status: ItemStatus;
   url: string;
   affiliateUrl: string;
   price: number;
   imageUrls: Array<string>;
   averageRating: number;
   reviewCount: number;
-  categoryId: string;
   platform: ItemSellingPlatform;
 };
 
@@ -347,15 +344,12 @@ export type SearchQuery = {
       nodes: Array<{
         id: string;
         name: string;
-        description: string;
-        status: ItemStatus;
         url: string;
         affiliateUrl: string;
         price: number;
         imageUrls: Array<string>;
         averageRating: number;
         reviewCount: number;
-        categoryId: string;
         platform: ItemSellingPlatform;
       }>;
     };
@@ -398,15 +392,12 @@ export type HomeQuery = {
               items: Array<{
                 id: string;
                 name: string;
-                description: string;
-                status: ItemStatus;
                 url: string;
                 affiliateUrl: string;
                 price: number;
                 imageUrls: Array<string>;
                 averageRating: number;
                 reviewCount: number;
-                categoryId: string;
                 platform: ItemSellingPlatform;
               }>;
             }>;
@@ -417,15 +408,12 @@ export type HomeQuery = {
             items: Array<{
               id: string;
               name: string;
-              description: string;
-              status: ItemStatus;
               url: string;
               affiliateUrl: string;
               price: number;
               imageUrls: Array<string>;
               averageRating: number;
               reviewCount: number;
-              categoryId: string;
               platform: ItemSellingPlatform;
             }>;
           }
@@ -466,15 +454,12 @@ export type ItemDetailPageGetItemQuery = {
     sameGroupItems: Array<{
       id: string;
       name: string;
-      description: string;
-      status: ItemStatus;
       url: string;
       affiliateUrl: string;
       price: number;
       imageUrls: Array<string>;
       averageRating: number;
       reviewCount: number;
-      categoryId: string;
       platform: ItemSellingPlatform;
     }>;
   };
@@ -492,15 +477,12 @@ export type ItemDetailPageGetSimilarItemsQuery = {
       nodes: Array<{
         id: string;
         name: string;
-        description: string;
-        status: ItemStatus;
         url: string;
         affiliateUrl: string;
         price: number;
         imageUrls: Array<string>;
         averageRating: number;
         reviewCount: number;
-        categoryId: string;
         platform: ItemSellingPlatform;
       }>;
     };
@@ -511,15 +493,12 @@ export const ItemListItemFragmentFragmentDoc = gql`
   fragment itemListItemFragment on Item {
     id
     name
-    description
-    status
     url
     affiliateUrl
     price
     imageUrls
     averageRating
     reviewCount
-    categoryId
     platform
   }
 `;

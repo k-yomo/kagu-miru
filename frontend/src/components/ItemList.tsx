@@ -11,15 +11,12 @@ gql`
   fragment itemListItemFragment on Item {
     id
     name
-    description
-    status
     url
     affiliateUrl
     price
     imageUrls
     averageRating
     reviewCount
-    categoryId
     platform
   }
 `;
@@ -49,7 +46,7 @@ export default memo(function ItemList({ items, onClickItem, isAdmin }: Props) {
     <>
       {items.map((item) => (
         <ItemWrapper key={item.id} id={item.id}>
-          <div className="rounded-md sm:shadow">
+          <div className="min-w-[140px] rounded-md sm:shadow">
             <Image
               src={item.imageUrls[0] || 'https://via.placeholder.com/300'}
               alt={item.name}
