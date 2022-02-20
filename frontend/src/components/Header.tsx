@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import Link from 'next/link';
 import { routes } from '@src/routes/routes';
-import { SearchIcon } from '@heroicons/react/outline';
+import SearchBarModal from '@src/components/SearchBarModal';
 
 export default memo(function Header() {
   return (
@@ -18,11 +18,7 @@ export default memo(function Header() {
 
           <div className="flex items-center justify-end flex-1 divide-x-2 divide-black dark:divide-white">
             <div className="pr-3">
-              <Link href={routes.search()}>
-                <a aria-label="検索">
-                  <SearchIcon className="w-5 h-5" />
-                </a>
-              </Link>
+              <SearchBarModal />
             </div>
             <div className="pl-2">
               <Link href={routes.media()}>
