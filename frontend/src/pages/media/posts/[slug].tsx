@@ -1,5 +1,5 @@
 import React from 'react';
-import { GetServerSideProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import groq from 'groq';
 import { buildSanityImageSrc, sanityClient } from '@src/lib/sanityClient';
@@ -8,21 +8,27 @@ import PostDetail, {
   postFragmentForPostDetail,
   PostFragment,
 } from '@src/components/PostDetail';
+import { routes } from '@src/routes/routes';
 
 const fetchPostQuery = groq`*[_type == "post" && slug.current == $slug][0]{
   ${postFragmentForPostDetail}
 }`;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { slug } = ctx.query;
-  const props = await sanityClient.fetch(fetchPostQuery, { slug });
-  if (Object.keys(props).length === 0) {
-    return { notFound: true };
-  }
-  ctx.res.setHeader(
-    'Cache-Control',
-    'public, max-age=600, s-maxage=3600, stale-while-revalidate=864000'
+export const getStaticPaths: GetStaticPaths = async () => {
+  const query = groq`{
+      "posts": *[_type == 'post']{slug},
+    }`;
+  const { posts } = await sanityClient.fetch(query);
+  const paths = posts.map(({ slug }: { slug: { current: string } }) =>
+    routes.mediaPost(slug.current)
   );
+  return { paths, fallback: 'blocking' };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const props = await sanityClient.fetch(fetchPostQuery, {
+    slug: params!.slug,
+  });
   return { props };
 };
 const Post = (props: PostFragment) => {
