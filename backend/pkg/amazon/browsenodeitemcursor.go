@@ -3,6 +3,7 @@ package amazon
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/utekaravinash/gopaapi5/api"
 
@@ -83,10 +84,15 @@ func (g *BrowseNodeItemCursor) Next(ctx context.Context) ([]api.Item, error) {
 		},
 	}
 	var searchItemRes *api.SearchResult
-	b := backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 5)
+	expBackoff := backoff.NewExponentialBackOff()
+	expBackoff.InitialInterval = 1 * time.Second
+	b := backoff.WithMaxRetries(expBackoff, 5)
 	err := backoff.Retry(func() error {
 		var err error
 		searchItemRes, err = g.amazonClient.SearchItems(ctx, searchItemParams)
+		if err == TransactionPerDayExhausted {
+			return backoff.Permanent(err)
+		}
 		return err
 	}, b)
 	if err != nil {
