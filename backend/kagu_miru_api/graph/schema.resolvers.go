@@ -34,7 +34,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformRakuten},
 			},
 			SortType: &sortType,
-			PageSize: func() *int { i := 10; return &i }(),
+			PageSize: func() *int { i := 20; return &i }(),
 		})
 		return err
 	})
@@ -47,7 +47,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformYahooShopping},
 			},
 			SortType: &sortType,
-			PageSize: func() *int { i := 10; return &i }(),
+			PageSize: func() *int { i := 20; return &i }(),
 		})
 		return err
 	})
@@ -60,7 +60,7 @@ func (r *queryResolver) Home(ctx context.Context) (*gqlmodel.HomeResponse, error
 				Platforms: []gqlmodel.ItemSellingPlatform{gqlmodel.ItemSellingPlatformPaypayMall},
 			},
 			SortType: &sortType,
-			PageSize: func() *int { i := 10; return &i }(),
+			PageSize: func() *int { i := 20; return &i }(),
 		})
 		return err
 	})
