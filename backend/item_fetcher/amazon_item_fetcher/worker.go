@@ -141,7 +141,9 @@ func (r *worker) getBrowseNodeIDItemCategoryMap(ctx context.Context) (map[string
 
 	browseNodeIDItemCategoryMap := make(map[string]*xspanner.ItemCategoryWithParent)
 	for browseNodeID, itemCategoryID := range browseNodeIDItemCategoryIDMap {
-		browseNodeIDItemCategoryMap[browseNodeID] = itemCategoryMap[itemCategoryID]
+		if itemCategoryMap[itemCategoryID] != nil {
+			browseNodeIDItemCategoryMap[browseNodeID] = itemCategoryMap[itemCategoryID]
+		}
 	}
 
 	return browseNodeIDItemCategoryMap, nil
@@ -267,7 +269,6 @@ func mapAmazonItemsToIndexItems(
 		browseNodeID := amazonItem.BrowseNodeInfo.BrowseNodes[0].Id
 		itemCategory, ok := browseNodeIDItemCategoryMap[browseNodeID]
 		if !ok {
-			errors = append(errors, fmt.Errorf("failed to get itemCategory, item ASIN: %s", amazonItem.ASIN))
 			continue
 		}
 		item, err := mapAmazonItemToIndexItem(amazonItem, itemCategory)

@@ -161,7 +161,9 @@ func (r *worker) getGenreIDItemCategoryMap(ctx context.Context) (map[int]*xspann
 
 	genreIDItemCategoryMap := make(map[int]*xspanner.ItemCategoryWithParent)
 	for genreID, itemCategoryID := range genreIDItemCategoryIDMap {
-		genreIDItemCategoryMap[genreID] = itemCategoryMap[itemCategoryID]
+		if itemCategoryMap[itemCategoryID] != nil {
+			genreIDItemCategoryMap[genreID] = itemCategoryMap[itemCategoryID]
+		}
 	}
 
 	return genreIDItemCategoryMap, nil
@@ -294,7 +296,6 @@ func mapRakutenItemsToIndexItems(
 		}
 		itemCategory, ok := genreIDItemCategoryMap[genreID]
 		if !ok {
-			errors = append(errors, fmt.Errorf("failed to get itemCategory, item id: %s", rakutenItem.ItemCode))
 			continue
 		}
 		item, err := mapRakutenItemToIndexItem(rakutenItem, itemCategory, tagMap)

@@ -143,7 +143,9 @@ func (r *worker) getYSCategoryIDItemCategoryMap(ctx context.Context) (map[int]*x
 
 	ysCategoryIDItemCategoryMap := make(map[int]*xspanner.ItemCategoryWithParent)
 	for ysCategoryID, itemCategoryID := range ysCategoryIDItemCategoryIDMap {
-		ysCategoryIDItemCategoryMap[ysCategoryID] = itemCategoryMap[itemCategoryID]
+		if itemCategoryMap[itemCategoryID] != nil {
+			ysCategoryIDItemCategoryMap[ysCategoryID] = itemCategoryMap[itemCategoryID]
+		}
 	}
 
 	return ysCategoryIDItemCategoryMap, nil
@@ -263,7 +265,6 @@ func mapYahooShoppingItemsToIndexItems(yahooShoppingItems []*yahoo_shopping.Item
 	var errors []error
 	for _, yahooShoppingItem := range yahooShoppingItems {
 		itemCategory, ok := ysCategoryIDItemCategoryMap[yahooShoppingItem.GenreCategory.Id]
-		// TODO: logging?
 		if !ok {
 			continue
 		}
