@@ -26,8 +26,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
+  if (!params) {
+    return { notFound: true };
+  }
   const props = await sanityClient.fetch(fetchPostQuery, {
-    slug: params!.slug,
+    slug: params.slug,
   });
   return { props };
 };
