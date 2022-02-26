@@ -32,6 +32,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const props = await sanityClient.fetch(fetchPostQuery, {
     slug: params.slug,
   });
+  if (!props) {
+    return { notFound: true };
+  }
   return { props };
 };
 const Post = (props: PostFragment) => {
