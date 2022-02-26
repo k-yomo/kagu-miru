@@ -137,6 +137,10 @@ type SearchItemResponse struct {
 	Hits                  []*Item `json:"hits"`
 }
 
+func (s *SearchItemResponse) NoMoreHits() bool {
+	return len(s.Hits) == 0 || s.TotalResultsReturned == s.TotalResultsAvailable
+}
+
 // https://developer.yahoo.co.jp/webapi/shopping/shopping/v3/itemsearch.html
 func (c *Client) SearchItem(ctx context.Context, params *SearchItemParams) (*SearchItemResponse, error) {
 	if params.Page == 0 {

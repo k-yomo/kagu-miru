@@ -67,7 +67,7 @@ func (g *CategoryItemCursor) Next(ctx context.Context) (*SearchItemResponse, err
 		}
 	}
 
-	if noMoreItems := searchItemRes.TotalResultsReturned == searchItemRes.TotalResultsAvailable; noMoreItems {
+	if searchItemRes.NoMoreHits() {
 		g.isDone = true
 	} else if g.curPage*maxResultCount >= maxResultTotalCount {
 		nextPrice := searchItemRes.Hits[len(searchItemRes.Hits)-1].Price
