@@ -46,7 +46,7 @@ export default function SEOMeta({
           content={img.srcPath ? `${SITE_ROOT_URL}${img.srcPath}` : img.src}
         />
       )}
-      {noIndex && <meta name="robots" content="noindex" />}
+      {noIndex && <meta name="robots" content="noindex,nofollow,noarchive" />}
     </Head>
   );
 }
