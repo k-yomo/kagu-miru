@@ -38,11 +38,6 @@ export default function ItemDetailCard({ itemId }: Props) {
           <div className="my-1 line-clamp-3 font-bold text-sm sm:text-lg">
             {item.name}
           </div>
-          <div className="hidden sm:block">
-            <span className="line-clamp-3 text-sm text-text-secondary dark:text-text-secondary-dark">
-              {item.description}
-            </span>
-          </div>
           <div className="my-1 flex items-center">
             <Rating rating={item.averageRating} maxRating={5} />
             <div className="ml-1 text-sm text-text-secondary dark:text-text-secondary-dark">
