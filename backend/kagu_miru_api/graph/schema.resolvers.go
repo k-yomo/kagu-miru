@@ -234,9 +234,9 @@ func (r *queryResolver) GetItem(ctx context.Context, id string) (*gqlmodel.Item,
 }
 
 func (r *queryResolver) GetAllItemCategories(ctx context.Context) ([]*gqlmodel.ItemCategory, error) {
-	allItemCategories, err := r.DBClient.GetAllItemCategories(ctx)
+	allItemCategories, err := r.DBClient.GetAllActiveItemCategories(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("DBClient.GetAllItemCategories: %w", err)
+		return nil, fmt.Errorf("DBClient.GetAllActiveItemCategories: %w", err)
 	}
 
 	gqlItemCategories := mapSpannerItemCategoriesToGraphqlItemCategories(allItemCategories)

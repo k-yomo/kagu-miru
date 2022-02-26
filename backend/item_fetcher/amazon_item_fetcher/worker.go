@@ -130,9 +130,9 @@ func (r *worker) getBrowseNodeIDItemCategoryMap(ctx context.Context) (map[string
 		browseNodeIDItemCategoryIDMap[browseNode.ID] = browseNode.ItemCategoryID
 	}
 
-	itemCategoriesWithParent, err := xspanner.GetAllItemCategoriesWithParent(ctx, r.spannerClient)
+	itemCategoriesWithParent, err := xspanner.GetAllActiveItemCategoriesWithParent(ctx, r.spannerClient)
 	if err != nil {
-		return nil, fmt.Errorf("xspanner.GetAllItemCategoriesWithParent: %w", err)
+		return nil, fmt.Errorf("xspanner.GetAllActiveItemCategoriesWithParent: %w", err)
 	}
 	itemCategoryMap := make(map[string]*xspanner.ItemCategoryWithParent)
 	for _, itemCategory := range itemCategoriesWithParent {

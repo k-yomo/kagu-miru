@@ -132,9 +132,9 @@ func (r *worker) getYSCategoryIDItemCategoryMap(ctx context.Context) (map[int]*x
 		ysCategoryIDItemCategoryIDMap[int(genre.ID)] = genre.ItemCategoryID
 	}
 
-	itemCategoriesWithParent, err := xspanner.GetAllItemCategoriesWithParent(ctx, r.spannerClient)
+	itemCategoriesWithParent, err := xspanner.GetAllActiveItemCategoriesWithParent(ctx, r.spannerClient)
 	if err != nil {
-		return nil, fmt.Errorf("xspanner.GetAllItemCategoriesWithParent: %w", err)
+		return nil, fmt.Errorf("xspanner.GetAllActiveItemCategoriesWithParent: %w", err)
 	}
 	itemCategoryMap := make(map[string]*xspanner.ItemCategoryWithParent)
 	for _, itemCategory := range itemCategoriesWithParent {

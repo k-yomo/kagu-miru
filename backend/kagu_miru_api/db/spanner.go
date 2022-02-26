@@ -23,12 +23,12 @@ func (s *SpannerDBClient) GetSameGroupItemsByItemID(ctx context.Context, itemID 
 	return xspanner.GetSameGroupItemsByItemID(ctx, s.spannerClient, itemID)
 }
 
-func (s *SpannerDBClient) GetAllItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error) {
-	return xspanner.GetAllItemCategories(ctx, s.spannerClient)
+func (s *SpannerDBClient) GetAllActiveItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error) {
+	return xspanner.GetAllActiveItemCategories(ctx, s.spannerClient)
 }
 
 func (s *SpannerDBClient) GetAllItemCategoriesWithParent(ctx context.Context) ([]*xspanner.ItemCategoryWithParent, error) {
-	return xspanner.GetAllItemCategoriesWithParent(ctx, s.spannerClient)
+	return xspanner.GetAllActiveItemCategoriesWithParent(ctx, s.spannerClient)
 }
 
 func (s *SpannerDBClient) GetTopLevelItemCategories(ctx context.Context) ([]*xspanner.ItemCategory, error) {

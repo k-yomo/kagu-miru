@@ -26,6 +26,7 @@ type ItemCategory struct {
 	Level     int64              `spanner:"level"`
 	ParentID  spanner.NullString `spanner:"parent_id"`
 	ImageURL  spanner.NullString `spanner:"image_url"`
+	IsActive  bool               `spanner:"is_active"`
 	UpdatedAt time.Time          `spanner:"updated_at"`
 }
 
@@ -56,11 +57,11 @@ func (i *ItemCategoryWithParent) CategoryNames() []string {
 	return categoryNames
 }
 
-func GetAllItemCategoriesWithParent(ctx context.Context, spannerClient *spanner.Client) ([]*ItemCategoryWithParent, error) {
-	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllItemCategoriesWithParent")
+func GetAllActiveItemCategoriesWithParent(ctx context.Context, spannerClient *spanner.Client) ([]*ItemCategoryWithParent, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllActiveItemCategoriesWithParent")
 	defer span.End()
 
-	allItemCategories, err := GetAllItemCategories(ctx, spannerClient)
+	allItemCategories, err := GetAllActiveItemCategories(ctx, spannerClient)
 	if err != nil {
 		return nil, err
 	}
@@ -89,11 +90,11 @@ func GetAllItemCategoriesWithParent(ctx context.Context, spannerClient *spanner.
 	return itemCategoriesWithParent, nil
 }
 
-func GetAllItemCategories(ctx context.Context, spannerClient *spanner.Client) ([]*ItemCategory, error) {
-	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllItemCategories")
+func GetAllActiveItemCategories(ctx context.Context, spannerClient *spanner.Client) ([]*ItemCategory, error) {
+	ctx, span := otel.Tracer("").Start(ctx, "xspanner.GetAllActiveItemCategories")
 	defer span.End()
 
-	stmt := spanner.NewStatement(fmt.Sprintf(`SELECT %s FROM item_categories`, itemCategoriesTableAllColumnsString))
+	stmt := spanner.NewStatement(fmt.Sprintf(`SELECT %s FROM item_categories WHERE is_active = true`, itemCategoriesTableAllColumnsString))
 	iter := spannerClient.Single().Query(ctx, stmt)
 	defer iter.Stop()
 

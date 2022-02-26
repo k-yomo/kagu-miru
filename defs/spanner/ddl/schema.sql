@@ -4,6 +4,7 @@ CREATE TABLE item_categories (
     level INT64 NOT NULL,
     parent_id STRING(256),
     image_url STRING(1024),
+    is_active BOOL NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     FOREIGN KEY (parent_id) REFERENCES item_categories (id)
 ) PRIMARY KEY(id);
