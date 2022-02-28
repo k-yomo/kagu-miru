@@ -3,7 +3,7 @@ module github.com/k-yomo/kagu-miru
 go 1.17
 
 require (
-	cloud.google.com/go/aiplatform v1.4.0
+	cloud.google.com/go/aiplatform v1.5.0
 	cloud.google.com/go/profiler v0.2.0
 	cloud.google.com/go/pubsub v1.18.0
 	cloud.google.com/go/spanner v1.29.0
@@ -35,8 +35,8 @@ require (
 	go.uber.org/zap v1.21.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11
-	google.golang.org/api v0.69.0
-	google.golang.org/genproto v0.0.0-20220211171837-173942840c17
+	google.golang.org/api v0.70.0
+	google.golang.org/genproto v0.0.0-20220222213610-43724f9ea8cf
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 	gotest.tools/gotestsum v1.7.0
@@ -44,7 +44,7 @@ require (
 
 require (
 	cloud.google.com/go v0.100.2 // indirect
-	cloud.google.com/go/compute v1.2.0 // indirect
+	cloud.google.com/go/compute v1.3.0 // indirect
 	cloud.google.com/go/iam v0.1.1 // indirect
 	cloud.google.com/go/trace v1.0.0 // indirect
 	github.com/agnivade/levenshtein v1.1.0 // indirect
