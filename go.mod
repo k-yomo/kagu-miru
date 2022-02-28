@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/profiler v0.2.0
 	cloud.google.com/go/pubsub v1.18.0
 	cloud.google.com/go/spanner v1.29.0
-	github.com/99designs/gqlgen v0.15.1
+	github.com/99designs/gqlgen v0.16.0
 	github.com/Code-Hex/gqldoc v0.0.4
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.3.0
 	github.com/alexedwards/scs/v2 v2.5.0
