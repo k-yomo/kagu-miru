@@ -25,7 +25,7 @@ require (
 	github.com/rs/cors v1.8.2
 	github.com/sanity-io/client-go v1.0.0-alpha.5
 	github.com/utekaravinash/gopaapi5 v1.3.3
-	github.com/vektah/gqlparser/v2 v2.4.0
+	github.com/vektah/gqlparser/v2 v2.4.1
 	github.com/vitali-fedulov/images/v2 v2.1.2
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.29.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.29.0
