@@ -7,8 +7,8 @@ require (
 	cloud.google.com/go/profiler v0.2.0
 	cloud.google.com/go/pubsub v1.18.0
 	cloud.google.com/go/spanner v1.29.0
-	github.com/99designs/gqlgen v0.16.0
-	github.com/Code-Hex/gqldoc v0.0.4
+	github.com/99designs/gqlgen v0.17.1
+	github.com/Code-Hex/gqldoc v0.0.6
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.3.0
 	github.com/alexedwards/scs/v2 v2.5.0
 	github.com/avct/uasurfer v0.0.0-20191028135549-26b5daa857f1
@@ -25,7 +25,7 @@ require (
 	github.com/rs/cors v1.8.2
 	github.com/sanity-io/client-go v1.0.0-alpha.5
 	github.com/utekaravinash/gopaapi5 v1.3.3
-	github.com/vektah/gqlparser/v2 v2.3.1
+	github.com/vektah/gqlparser/v2 v2.4.0
 	github.com/vitali-fedulov/images/v2 v2.1.2
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.29.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.29.0
@@ -67,7 +67,6 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/gqlgo/gqlparser/v2 v2.1.1-0.20210410045713-c9e512f85393 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
@@ -87,13 +86,13 @@ require (
 	go.opentelemetry.io/otel/metric v0.27.0 // indirect
 	go.opentelemetry.io/otel/trace v1.4.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	golang.org/x/mod v0.5.0 // indirect
+	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.5 // indirect
+	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
