@@ -5,7 +5,7 @@ go 1.17
 require (
 	cloud.google.com/go/aiplatform v1.5.0
 	cloud.google.com/go/profiler v0.2.0
-	cloud.google.com/go/pubsub v1.18.0
+	cloud.google.com/go/pubsub v1.19.0
 	cloud.google.com/go/spanner v1.30.0
 	github.com/99designs/gqlgen v0.17.1
 	github.com/Code-Hex/gqldoc v0.0.6
