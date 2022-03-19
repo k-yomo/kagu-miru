@@ -6,7 +6,7 @@ export const findCategoryNameById = (id: string): string => {
 
 // findCategoryIdsById finds hierarchical id list from L0 to the given category
 export const findCategoryIdsById = (id: string): string[] => {
-  return itemCategoryIdsMap[id];
+  return itemCategoryIdsMap[id] || [];
 };
 
 const itemCategoryIdNameMap = setItemCategoryIdNameMap(itemCategories, {});
