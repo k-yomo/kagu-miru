@@ -27,7 +27,7 @@ require (
 	github.com/utekaravinash/gopaapi5 v1.3.3
 	github.com/vektah/gqlparser/v2 v2.4.1
 	github.com/vitali-fedulov/images/v2 v2.1.2
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.29.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.30.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.30.0
 	go.opentelemetry.io/otel v1.5.0
 	go.opentelemetry.io/otel/sdk v1.5.0
