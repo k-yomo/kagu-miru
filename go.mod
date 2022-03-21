@@ -3,7 +3,7 @@ module github.com/k-yomo/kagu-miru
 go 1.17
 
 require (
-	cloud.google.com/go/aiplatform v1.5.0
+	cloud.google.com/go/aiplatform v1.6.0
 	cloud.google.com/go/profiler v0.2.0
 	cloud.google.com/go/pubsub v1.19.0
 	cloud.google.com/go/spanner v1.30.0
