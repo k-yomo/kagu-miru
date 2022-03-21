@@ -21,7 +21,7 @@ require (
 	github.com/k-yomo/pm v0.3.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/oklog/ulid/v2 v2.0.2
-	github.com/olivere/elastic/v7 v7.0.31
+	github.com/olivere/elastic/v7 v7.0.32
 	github.com/rs/cors v1.8.2
 	github.com/sanity-io/client-go v1.0.0-alpha.5
 	github.com/utekaravinash/gopaapi5 v1.3.3
