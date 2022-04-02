@@ -33,7 +33,7 @@ export default memo(function ItemList({ items, onClickItem, isAdmin }: Props) {
     id,
     url,
     children,
-  }: PropsWithChildren<{ id: string, url: string }>) {
+  }: PropsWithChildren<{ id: string; url: string }>) {
     if (isAdmin) {
       return <button onClick={() => onClickItem(id)}>{children}</button>;
     } else {

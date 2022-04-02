@@ -55,6 +55,6 @@ module.exports = {
         destination: '/media',
         permanent: true,
       },
-    ]
+    ];
   },
 };
