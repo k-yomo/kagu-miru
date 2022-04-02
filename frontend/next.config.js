@@ -48,4 +48,13 @@ module.exports = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/media',
+        permanent: true,
+      },
+    ]
+  },
 };

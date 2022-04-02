@@ -1,8 +1,6 @@
 export const routes = {
-  home: () => '/',
-  search: () => '/search',
-
-  itemDetail: (itemId: string) => `/items/${itemId}`,
+  home: () => '/media',
+  search: () => '/search', // deprecated
 
   media: () => '/media',
   mediaPost: (slug: string) => `/media/posts/${slug}`,

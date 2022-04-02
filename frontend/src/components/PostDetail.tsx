@@ -103,22 +103,9 @@ const serializers = {
         </div>
       );
     },
+    // deprecated
     searchPageLink: ({ node }: { node: SearchPageLink }) => {
-      const url = new URL(node.url);
-      url.searchParams.set('searchFrom', SearchFrom.Media);
-      const urlAs = new URL(node.url);
-      urlAs.searchParams.delete('searchFrom');
-      return (
-        <div className="my-4">
-          <LinkWithThumbnail
-            url={url.toString()}
-            urlAs={urlAs.toString()}
-            title={node.title}
-            subTitle=""
-            imgSrc={SearchPageScreenImg.src}
-          />
-        </div>
-      );
+      return <></>;
     },
     image: ({ node }: { node: SanityImageObject }) => {
       const imgUrl = buildSanityImageSrc(node).quality(70).width(600).url();

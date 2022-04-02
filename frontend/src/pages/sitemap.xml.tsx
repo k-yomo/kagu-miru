@@ -11,8 +11,6 @@ export default function SiteMap() {
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const sitemapUrls = [
-    routes.home(),
-    routes.search(),
     routes.media(),
     routes.contact(),
     routes.privacyPolicy(),
