@@ -27,7 +27,7 @@ const fetchRecentlyPublishedPostsQuery = groq`*[_type == "post"]{
   mainImage,
   publishedAt,
   categories,
-} | order(publishedAt desc) [0..9]`;
+} | order(publishedAt desc)`;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const featuredPostsGroup = await sanityClient.fetch(
