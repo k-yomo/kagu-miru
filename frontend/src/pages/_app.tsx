@@ -9,6 +9,26 @@ import Header from '@src/components/Header';
 import Footer from '@src/components/Footer';
 import { ToastProvider } from '@src/contexts/toast';
 
+interface WebVitalsMetric {
+  id: string;
+  name: string;
+  startTime: number;
+  value: number;
+  label: 'web-vital' | 'custom';
+}
+
+export function reportWebVitals({ id, name, label, value }: WebVitalsMetric) {
+  // 以下のURLの例のように初期化した場合は、`window.gtag` を使用します:
+  // https://github.com/vercel/next.js/blob/canary/examples/with-google-analytics/pages/_app.js
+  window.gtag('event', name, {
+    event_category:
+      label === 'web-vital' ? 'Web Vitals' : 'Next.js custom metric',
+    value: Math.round(name === 'CLS' ? value * 1000 : value), // 値は整数にする必要があります
+    event_label: id, // 現在のページのロードした一意なID
+    non_interaction: true, // バウンス率への影響を回避
+  })
+}
+
 function MyApp({ Component, pageProps }: AppProps) {
   usePageView();
 
