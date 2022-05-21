@@ -1,4 +1,5 @@
 # kagu-miru
+![demo](./docs/kagu_miru_search.jpg)
 
 ## Architecture
 ![architecture](./docs/kagu_miru_architecture.png)
