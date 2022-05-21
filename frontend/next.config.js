@@ -55,6 +55,11 @@ module.exports = {
         destination: '/media',
         permanent: true,
       },
+      {
+        source: '/media/posts/brand-mattress-compare',
+        destination: 'https://shing.jp/posts/brand-mattress-compare',
+        permanent: true,
+      },
     ];
   },
 };
