@@ -1,5 +1,5 @@
 # kagu-miru
-![demo](./docs/kagu_miru_search.jpg)
+<img src="./docs/kagu_miru_search.jpg" width="300">
 
 ## Architecture
 ![architecture](./docs/kagu_miru_architecture.png)
